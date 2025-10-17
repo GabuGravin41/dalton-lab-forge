@@ -1,9 +1,12 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { Link, useLocation } from "react-router-dom";
 
 const Navigation = () => {
   const [scrolled, setScrolled] = useState(false);
+  const location = useLocation();
+  const isPlayground = location.pathname === '/playground';
 
   useEffect(() => {
     const handleScroll = () => {
@@ -36,37 +39,48 @@ const Navigation = () => {
           </button>
 
           <div className="hidden md:flex items-center gap-6">
-            <button
-              onClick={() => scrollToSection("about")}
-              className="text-sm text-foreground/80 hover:text-foreground transition-colors"
-            >
-              About
-            </button>
-            <button
-              onClick={() => scrollToSection("projects")}
-              className="text-sm text-foreground/80 hover:text-foreground transition-colors"
-            >
-              Projects
-            </button>
-            <button
-              onClick={() => scrollToSection("research")}
-              className="text-sm text-foreground/80 hover:text-foreground transition-colors"
-            >
-              Research
-            </button>
-            <button
-              onClick={() => scrollToSection("contact")}
-              className="text-sm text-foreground/80 hover:text-foreground transition-colors"
-            >
-              Contact
-            </button>
+            {!isPlayground && (
+              <>
+                <button
+                  onClick={() => scrollToSection("about")}
+                  className="text-sm text-foreground/80 hover:text-foreground transition-colors"
+                >
+                  About
+                </button>
+                <button
+                  onClick={() => scrollToSection("projects")}
+                  className="text-sm text-foreground/80 hover:text-foreground transition-colors"
+                >
+                  Projects
+                </button>
+                <button
+                  onClick={() => scrollToSection("research")}
+                  className="text-sm text-foreground/80 hover:text-foreground transition-colors"
+                >
+                  Research
+                </button>
+                <button
+                  onClick={() => scrollToSection("contact")}
+                  className="text-sm text-foreground/80 hover:text-foreground transition-colors"
+                >
+                  Contact
+                </button>
+              </>
+            )}
+            <Link to="/playground">
+              <button className="text-sm text-foreground/80 hover:text-foreground transition-colors">
+                Playground
+              </button>
+            </Link>
             <ThemeToggle />
-            <Button
-              onClick={() => scrollToSection("contact")}
-              className="bg-gradient-accent text-accent-foreground hover:opacity-90 transition-opacity"
-            >
-              Hire Me
-            </Button>
+            {!isPlayground && (
+              <Button
+                onClick={() => scrollToSection("contact")}
+                className="bg-gradient-accent text-accent-foreground hover:opacity-90 transition-opacity"
+              >
+                Let's Connect
+              </Button>
+            )}
           </div>
         </div>
       </div>
