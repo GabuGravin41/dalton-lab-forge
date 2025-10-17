@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Brain, ImageIcon, MessageSquare, Wand2, Loader2, ArrowLeft } from "lucide-react";
+import { Brain, ImageIcon, MessageSquare, Wand2, Loader2, ArrowLeft, Video } from "lucide-react";
 import { Link } from "react-router-dom";
 import Navigation from "@/components/Navigation";
 
@@ -12,6 +12,7 @@ const Playground = () => {
   const [textInput, setTextInput] = useState("");
   const [imagePrompt, setImagePrompt] = useState("");
   const [chatPrompt, setChatPrompt] = useState("");
+  const [videoPrompt, setVideoPrompt] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [results, setResults] = useState<{[key: string]: string}>({});
 
@@ -48,6 +49,17 @@ const Playground = () => {
     }, 1500);
   };
 
+  const handleVideoGeneration = async () => {
+    setIsLoading(true);
+    setTimeout(() => {
+      setResults(prev => ({
+        ...prev,
+        video: "Video generation using Veo would happen here. Your prompt: '" + videoPrompt + "' has been processed."
+      }));
+      setIsLoading(false);
+    }, 4000);
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
@@ -75,18 +87,22 @@ const Playground = () => {
 
           {/* AI Tools Tabs */}
           <Tabs defaultValue="text" className="space-y-8">
-            <TabsList className="grid w-full grid-cols-3 bg-card/50 backdrop-blur-sm border border-border">
+            <TabsList className="grid w-full grid-cols-4 bg-card/50 backdrop-blur-sm border border-border">
               <TabsTrigger value="text" className="flex items-center gap-2">
                 <MessageSquare className="w-4 h-4" />
-                Text Analysis
+                Sentiment Analysis
               </TabsTrigger>
               <TabsTrigger value="image" className="flex items-center gap-2">
                 <ImageIcon className="w-4 h-4" />
                 Image Gen
               </TabsTrigger>
+              <TabsTrigger value="video" className="flex items-center gap-2">
+                <Video className="w-4 h-4" />
+                Video Gen
+              </TabsTrigger>
               <TabsTrigger value="chat" className="flex items-center gap-2">
                 <Brain className="w-4 h-4" />
-                Language Model
+                Chatbot
               </TabsTrigger>
             </TabsList>
 
@@ -193,14 +209,67 @@ const Playground = () => {
               </div>
             </TabsContent>
 
-            {/* Language Model Tab */}
+            {/* Video Generation Tab */}
+            <TabsContent value="video">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <Card className="bg-card/50 backdrop-blur-sm border-border">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Video className="w-5 h-5 text-accent" />
+                      AI Video Generation (Veo)
+                    </CardTitle>
+                    <CardDescription>
+                      Generate videos from text descriptions using Google's Veo model.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <Textarea
+                      placeholder="Describe the video you want to generate..."
+                      value={videoPrompt}
+                      onChange={(e) => setVideoPrompt(e.target.value)}
+                      className="min-h-32 bg-background/50"
+                    />
+                    <Button
+                      onClick={handleVideoGeneration}
+                      disabled={!videoPrompt.trim() || isLoading}
+                      className="w-full bg-gradient-accent hover:opacity-90 text-accent-foreground"
+                    >
+                      {isLoading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Video className="w-4 h-4 mr-2" />}
+                      Generate Video
+                    </Button>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-card/50 backdrop-blur-sm border-border">
+                  <CardHeader>
+                    <CardTitle>Generated Video</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {results.video ? (
+                      <div className="p-4 rounded-lg bg-accent/10 border border-accent/20">
+                        <p className="text-sm">{results.video}</p>
+                        <div className="mt-4 aspect-video bg-gradient-accent/10 rounded-lg flex items-center justify-center">
+                          <span className="text-muted-foreground">Generated video would appear here</span>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="text-center text-muted-foreground py-8">
+                        Generate a video to see results here
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </div>
+            </TabsContent>
+
+            {/* Chatbot Tab */}
             <TabsContent value="chat">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <Card className="bg-card/50 backdrop-blur-sm border-border">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
-                      <Brain className="w-5 h-5 text-accent" />
-                      Language Model
+                      <Brain className="w-5 h-5 text-primary" />
+                      AI Chatbot
                     </CardTitle>
                     <CardDescription>
                       Interact with advanced language models for text completion, Q&A, and creative writing.
@@ -216,7 +285,7 @@ const Playground = () => {
                     <Button
                       onClick={handleChatCompletion}
                       disabled={!chatPrompt.trim() || isLoading}
-                      className="w-full bg-gradient-accent hover:opacity-90 text-accent-foreground"
+                      className="w-full bg-gradient-primary hover:opacity-90 text-white"
                     >
                       {isLoading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Brain className="w-4 h-4 mr-2" />}
                       Generate Response
@@ -230,7 +299,7 @@ const Playground = () => {
                   </CardHeader>
                   <CardContent>
                     {results.chat ? (
-                      <div className="p-4 rounded-lg bg-accent/10 border border-accent/20">
+                      <div className="p-4 rounded-lg bg-primary/10 border border-primary/20">
                         <p className="text-sm">{results.chat}</p>
                       </div>
                     ) : (
@@ -250,7 +319,7 @@ const Playground = () => {
               <h3 className="text-2xl font-bold mb-4">Ready for Integration</h3>
               <p className="text-muted-foreground">
                 This playground demonstrates the UI for AI capabilities. 
-                Ready to integrate with OpenAI GPT, Stable Diffusion, or custom trained models.
+                Ready to integrate with Google Gemini API for sentiment analysis, chatbot, image generation (Imagen), and video generation (Veo).
               </p>
             </div>
           </div>
