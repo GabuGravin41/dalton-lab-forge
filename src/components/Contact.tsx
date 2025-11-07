@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Github, Linkedin, Mail, ExternalLink } from "lucide-react";
+import { Github, Linkedin, Mail, ExternalLink, Send, Sparkles, MapPin, Clock } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -51,31 +51,63 @@ const Contact = () => {
   ];
 
   return (
-    <section id="contact" className="py-24 px-6 bg-gradient-subtle">
-      <div className="container mx-auto">
-        <div className="max-w-5xl mx-auto space-y-16">
-          <div className="text-center space-y-4">
-            <h2 className="text-4xl md:text-5xl font-bold">
-              Let's <span className="bg-gradient-accent bg-clip-text text-transparent">Work Together</span>
+    <section id="contact" className="py-32 px-6 bg-gradient-subtle relative overflow-hidden">
+      {/* Background elements */}
+      <div className="absolute inset-0 opacity-30">
+        <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-accent/20 rounded-full blur-[120px] animate-glow-pulse" />
+        <div className="absolute bottom-1/4 left-1/4 w-80 h-80 bg-primary/20 rounded-full blur-[100px] animate-glow-pulse" style={{ animationDelay: "2s" }} />
+      </div>
+      
+      <div className="container mx-auto relative z-10">
+        <div className="max-w-6xl mx-auto space-y-16">
+          {/* Header */}
+          <div className="text-center space-y-6">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-accent/10 border border-accent/20 rounded-full backdrop-blur-sm mb-4">
+              <Sparkles className="w-4 h-4 text-accent" />
+              <span className="text-sm font-medium text-foreground">Get In Touch</span>
+            </div>
+            <h2 className="text-5xl md:text-6xl font-bold">
+              Let's <span className="bg-gradient-to-r from-[hsl(30,90%,58%)] to-[hsl(20,85%,55%)] bg-clip-text text-transparent">Work Together</span>
             </h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Open to freelance projects, research collaborations, and full-time opportunities
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+              Open to freelance projects, research collaborations, and full-time opportunities.
+              Let's build something amazing together.
             </p>
+            
+            {/* Quick info */}
+            <div className="flex flex-wrap justify-center gap-6 pt-4 text-sm text-muted-foreground">
+              <div className="flex items-center gap-2">
+                <MapPin className="w-4 h-4 text-primary" />
+                <span>Remote / Hybrid</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Clock className="w-4 h-4 text-accent" />
+                <span>Usually responds within 24h</span>
+              </div>
+            </div>
           </div>
 
           <div className="grid md:grid-cols-2 gap-8">
-            <Card className="p-8 bg-card border-border space-y-6">
-              <div>
-                <h3 className="text-2xl font-semibold mb-2">Send a Message</h3>
-                <p className="text-muted-foreground">
+            {/* Contact Form */}
+            <Card className="group relative p-8 bg-card/50 backdrop-blur-sm border-border hover:border-primary/30 transition-all duration-500 space-y-6 overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-primary opacity-0 group-hover:opacity-5 transition-opacity" />
+              <div className="absolute -top-20 -right-20 w-40 h-40 bg-primary/20 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-all duration-700" />
+              <div className="relative">
+                <h3 className="text-2xl font-bold mb-3 flex items-center gap-2">
+                  <Send className="w-6 h-6 text-accent" />
+                  Send a Message
+                </h3>
+                <p className="text-muted-foreground leading-relaxed">
                   Have a project in mind? Let's discuss how I can help bring it to life.
+                  Fill out the form and I'll get back to you shortly.
                 </p>
               </div>
 
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                  <label htmlFor="name" className="text-sm font-medium mb-2 block">
+              <form onSubmit={handleSubmit} className="space-y-5 relative">
+                <div className="space-y-2">
+                  <label htmlFor="name" className="text-sm font-semibold mb-2 block flex items-center gap-2">
                     Your Name
+                    <span className="text-destructive">*</span>
                   </label>
                   <Input
                     id="name"
@@ -83,13 +115,14 @@ const Contact = () => {
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     placeholder="John Doe"
                     required
-                    className="bg-background border-border"
+                    className="bg-background/50 border-border focus:border-primary/50 transition-colors h-11"
                   />
                 </div>
 
-                <div>
-                  <label htmlFor="email" className="text-sm font-medium mb-2 block">
+                <div className="space-y-2">
+                  <label htmlFor="email" className="text-sm font-semibold mb-2 block flex items-center gap-2">
                     Email Address
+                    <span className="text-destructive">*</span>
                   </label>
                   <Input
                     id="email"
@@ -98,74 +131,108 @@ const Contact = () => {
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     placeholder="john@example.com"
                     required
-                    className="bg-background border-border"
+                    className="bg-background/50 border-border focus:border-primary/50 transition-colors h-11"
                   />
                 </div>
 
-                <div>
-                  <label htmlFor="message" className="text-sm font-medium mb-2 block">
+                <div className="space-y-2">
+                  <label htmlFor="message" className="text-sm font-semibold mb-2 block flex items-center gap-2">
                     Your Message
+                    <span className="text-destructive">*</span>
                   </label>
                   <Textarea
                     id="message"
                     value={formData.message}
                     onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                    placeholder="Tell me about your project..."
+                    placeholder="Tell me about your project, timeline, budget, and any specific requirements..."
                     required
-                    rows={5}
-                    className="bg-background border-border resize-none"
+                    rows={6}
+                    className="bg-background/50 border-border focus:border-primary/50 transition-colors resize-none"
                   />
                 </div>
 
-                <Button type="submit" className="w-full bg-gradient-accent text-accent-foreground hover:opacity-90">
+                <Button 
+                  type="submit" 
+                  className="w-full bg-gradient-accent text-accent-foreground hover:opacity-90 shadow-lg shadow-accent/20 hover:shadow-accent/30 transition-all h-11 font-semibold group"
+                >
+                  <Send className="w-4 h-4 mr-2 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
                   Send Message
                 </Button>
               </form>
             </Card>
 
+            {/* Connect & Social Links */}
             <div className="space-y-6">
-              <Card className="p-8 bg-card border-border">
-                <h3 className="text-2xl font-semibold mb-6">Connect With Me</h3>
-                <div className="space-y-4">
-                  {socialLinks.map((link) => (
-                    <a
-                      key={link.name}
-                      href={link.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-4 p-4 rounded-lg bg-background/50 border border-border hover:border-primary/50 transition-all group"
-                    >
-                      <div className="p-2 rounded-lg bg-primary/10 text-primary group-hover:bg-primary/20 transition-colors">
-                        {link.icon}
-                      </div>
-                      <div className="flex-1">
-                        <div className="font-medium group-hover:text-primary transition-colors">
-                          {link.name}
+              <Card className="relative p-8 bg-card/50 backdrop-blur-sm border-border overflow-hidden">
+                <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-primary/10 rounded-full blur-2xl" />
+                <div className="relative">
+                  <h3 className="text-2xl font-bold mb-3 flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-accent animate-pulse"></span>
+                    Connect With Me
+                  </h3>
+                  <p className="text-muted-foreground text-sm mb-6">Find me across these platforms</p>
+                  <div className="space-y-3">
+                    {socialLinks.map((link, idx) => (
+                      <a
+                        key={link.name}
+                        href={link.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-4 p-4 rounded-xl bg-background/50 border border-border hover:border-primary/50 transition-all duration-300 group hover:-translate-x-1 hover:shadow-lg hover:shadow-primary/5"
+                        style={{ animationDelay: `${idx * 100}ms` }}
+                      >
+                        <div className="p-3 rounded-lg bg-primary/10 text-primary group-hover:bg-primary/20 group-hover:scale-110 transition-all">
+                          {link.icon}
                         </div>
-                        <div className="text-sm text-muted-foreground">{link.label}</div>
-                      </div>
-                      <ExternalLink className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
-                    </a>
-                  ))}
+                        <div className="flex-1">
+                          <div className="font-semibold group-hover:text-primary transition-colors">
+                            {link.name}
+                          </div>
+                          <div className="text-sm text-muted-foreground">{link.label}</div>
+                        </div>
+                        <ExternalLink className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 group-hover:translate-x-1 group-hover:-translate-y-1 transition-all" />
+                      </a>
+                    ))}
+                  </div>
                 </div>
               </Card>
 
-              <Card className="p-8 bg-secondary/30 border-border">
-                <h3 className="text-xl font-semibold mb-3">Looking for specific services?</h3>
-                <p className="text-muted-foreground mb-4">
-                  I offer freelance services through Fiverr for custom PCB design, IoT solutions, 
-                  and machine learning implementations.
-                </p>
-                <Button
-                  variant="outline"
-                  className="w-full border-border hover:bg-background"
-                  onClick={() => window.open("https://fiverr.com", "_blank")}
-                >
-                  View Fiverr Profile
-                  <ExternalLink className="ml-2 h-4 w-4" />
-                </Button>
+              <Card className="relative p-8 bg-gradient-to-br from-accent/10 via-card/50 to-primary/10 backdrop-blur-sm border-border overflow-hidden">
+                <div className="absolute top-0 right-0 w-24 h-24 bg-accent/20 rounded-full blur-2xl" />
+                <div className="relative space-y-4">
+                  <h3 className="text-xl font-bold mb-2 flex items-center gap-2">
+                    💼 Freelance Services
+                  </h3>
+                  <p className="text-muted-foreground text-sm leading-relaxed">
+                    I offer professional freelance services through Fiverr for custom PCB design, 
+                    IoT solutions, and machine learning implementations. Let's collaborate!
+                  </p>
+                  <div className="flex flex-wrap gap-2 text-xs pt-2">
+                    <span className="px-3 py-1 bg-primary/20 text-primary rounded-full">PCB Design</span>
+                    <span className="px-3 py-1 bg-accent/20 text-accent rounded-full">IoT Dev</span>
+                    <span className="px-3 py-1 bg-primary/20 text-primary rounded-full">ML Solutions</span>
+                  </div>
+                  <Button
+                    variant="outline"
+                    className="w-full border-accent/30 hover:bg-accent/10 hover:border-accent/50 group mt-4"
+                    onClick={() => window.open("https://fiverr.com", "_blank")}
+                  >
+                    View Fiverr Profile
+                    <ExternalLink className="ml-2 h-4 w-4 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+                  </Button>
+                </div>
               </Card>
             </div>
+          </div>
+
+          {/* Bottom note */}
+          <div className="text-center pt-8">
+            <Card className="inline-block px-8 py-4 bg-card/30 backdrop-blur-sm border-border">
+              <p className="text-sm text-muted-foreground">
+                ✨ Response time: <span className="font-semibold text-foreground">Usually within 24 hours</span> • 
+                All inquiries are welcome!
+              </p>
+            </Card>
           </div>
         </div>
       </div>

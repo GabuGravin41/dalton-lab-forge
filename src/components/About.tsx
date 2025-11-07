@@ -40,7 +40,7 @@ const About = () => {
                 <div className="text-sm font-mono text-primary mb-2">{'<about>'}</div>
                 <h2 className="text-5xl md:text-6xl font-bold">
                   The
-                  <span className="block bg-gradient-accent bg-clip-text text-transparent">Intersection</span>
+                  <span className="block bg-gradient-to-r from-[hsl(30,90%,58%)] to-[hsl(20,85%,55%)] bg-clip-text text-transparent">Intersection</span>
                 </h2>
                 <div className="text-sm font-mono text-primary mt-2">{'</about>'}</div>
               </div>

@@ -1,0 +1,141 @@
+import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold, GenerationConfig, ChatSession } from "@google/generative-ai";
+
+// 1. Get API Key from environment variables
+const apiKey = import.meta.env.VITE_GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY;
+
+if (!apiKey) {
+  const errorMsg = "VITE_GEMINI_API_KEY is not defined in environment variables. " +
+                  "Please check your .env file and make sure it's properly configured.";
+  console.error(errorMsg);
+  // Instead of throwing, we'll log the error and the app will show appropriate UI
+  // This prevents the whole app from crashing in production
+  if (import.meta.env.DEV) {
+    throw new Error(errorMsg);
+  }
+}
+
+// 2. Initialize the GoogleGenerativeAI instance
+const genAI = new GoogleGenerativeAI(apiKey);
+
+// 3. Define safety settings for content generation
+const safetySettings = [
+  {
+    category: HarmCategory.HARM_CATEGORY_HARASSMENT,
+    threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+  },
+  {
+    category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+    threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+  },
+  {
+    category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+    threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+  },
+  {
+    category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+    threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+  },
+];
+
+// 4. Define the system prompt for your chatbot
+const systemInstruction = {
+  role: "system",
+  parts: [{
+    text: "You are Dalton Omondi, an ML and hardware engineer. Answer questions about my portfolio, projects, skills, and provide helpful advice on AI, machine learning, PCB design, and IoT. Be friendly, professional, and insightful."
+  }],
+};
+
+// 5. Configuration for the generative model
+const generationConfig: GenerationConfig = {
+  temperature: 0.7,
+  topK: 1,
+  topP: 1,
+  maxOutputTokens: 2048,
+};
+
+// --- Exportable Models & Functions ---
+
+/**
+ * The primary generative model instance (e.g., gemini-2.0-flash).
+ */
+export const geminiModel = genAI.getGenerativeModel({
+  model: "gemini-2.0-flash",
+  safetySettings,
+  generationConfig,
+});
+
+/**
+ * Creates a new chat session with conversation history.
+ */
+export const getChatSession = (): ChatSession => {
+  const model = genAI.getGenerativeModel({
+    model: "gemini-2.0-flash",
+    safetySettings,
+    generationConfig,
+  });
+
+  return model.startChat({
+    history: [
+      {
+        role: "user",
+        parts: [{ text: "You are Dalton Omondi, an ML and hardware engineer. Answer questions about my portfolio, projects, skills, and provide helpful advice on AI, machine learning, PCB design, and IoT. Be friendly, professional, and insightful." }],
+      },
+      {
+        role: "model",
+        parts: [{ text: "I understand. I'm Dalton Omondi, an ML and hardware engineer. I'll answer questions about your portfolio, projects, skills, and provide helpful advice on AI, machine learning, PCB design, and IoT. I'll be friendly, professional, and insightful in my responses." }],
+      },
+    ],
+  });
+};
+
+/**
+ * A helper function for one-off sentiment analysis.
+ */
+export const analyzeSentiment = async (textToAnalyze: string) => {
+  const prompt = `
+    Analyze the sentiment of the following text. Provide your analysis in a JSON object format.
+    The JSON object should have three keys:
+    1. "emotion": A single dominant emotion (e.g., "Positive", "Negative", "Neutral", "Joy", "Anger", "Surprise").
+    2. "confidence": A number between 0 and 1 representing your confidence in the emotion analysis.
+    3. "feedback": A brief, constructive feedback or summary of the text's tone (20 words or less).
+
+    Text to analyze: "${textToAnalyze}"
+
+    Example JSON response:
+    {
+      "emotion": "Positive",
+      "confidence": 0.9,
+      "feedback": "The user seems very pleased and excited."
+    }
+  `;
+
+  const generationConfigWithJson = {
+    ...generationConfig,
+    responseMimeType: "application/json",
+  };
+
+  const modelWithJson = genAI.getGenerativeModel({
+    model: "gemini-2.0-flash",
+    safetySettings,
+    generationConfig: generationConfigWithJson,
+  });
+
+  const result = await modelWithJson.generateContent(prompt);
+  const response = result.response;
+  const jsonText = response.text();
+
+  return JSON.parse(jsonText);
+};
+
+// --- Type Definitions ---
+
+export interface SentimentAnalysisResult {
+  emotion: string;
+  confidence: number;
+  feedback: string;
+}
+
+export interface ChatMessage {
+  role: "user" | "model";
+  parts: [{ text: string }];
+}

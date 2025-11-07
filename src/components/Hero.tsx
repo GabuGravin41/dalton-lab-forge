@@ -38,7 +38,7 @@ const Hero = () => {
             <div className="space-y-4">
               <h1 className="text-6xl md:text-7xl lg:text-8xl font-bold leading-[0.9] tracking-tight">
                 <span className="block text-foreground">Dalton</span>
-                <span className="block bg-gradient-primary bg-clip-text text-transparent">Omondi</span>
+                <span className="block bg-gradient-to-r from-[hsl(245,58%,51%)] to-[hsl(260,60%,45%)] bg-clip-text text-transparent">Omondi</span>
               </h1>
               
               <div className="flex flex-wrap gap-2 pt-2">
@@ -83,10 +83,17 @@ const Hero = () => {
           {/* Right side - Skill cards */}
           <div className="grid grid-cols-2 gap-4 animate-fade-in-slow">
             {[
+              /*
               { icon: "🧠", title: "Machine Learning", desc: "Neural networks, computer vision, AI deployment" },
               { icon: "⚡", title: "PCB Design", desc: "Hardware fabrication, embedded systems" },
               { icon: "🔬", title: "Chip Design", desc: "VLSI architecture, digital circuits" },
               { icon: "📡", title: "IoT Systems", desc: "Connected devices, sensor networks" },
+              */
+
+              { title: "Machine Learning", desc: "Neural networks, computer vision, AI deployment" },
+              { title: "PCB Design", desc: "Hardware fabrication, embedded systems" },
+              { title: "Chip Design", desc: "VLSI architecture, digital circuits" },
+              { title: "IoT Systems", desc: "Connected devices, sensor networks" },
             ].map((skill, index) => (
               <div
                 key={skill.title}
@@ -104,12 +111,14 @@ const Hero = () => {
           </div>
         </div>
 
+        
         {/* Bottom scroll indicator */}
+        {/*
         <div className="absolute bottom-12 left-1/2 -translate-x-1/2 animate-bounce">
           <div className="w-6 h-10 border-2 border-primary/30 rounded-full flex items-start justify-center p-2">
             <div className="w-1 h-2 bg-primary rounded-full animate-pulse" />
           </div>
-        </div>
+        </div> */}
       </div>
     </section>
   );
