@@ -68,7 +68,7 @@ const Projects = () => {
     : projects.filter(p => p.category === activeFilter);
 
   return (
-    <section id="projects" className="py-32 px-6 bg-gradient-subtle relative overflow-hidden">
+    <section id="projects" className="py-32 px-6 bg-gradient-subtle relative overflow-hidden z-10">
       {/* Background decoration */}
       <div className="absolute top-1/4 right-0 w-96 h-96 bg-primary/10 rounded-full blur-[120px] animate-glow-pulse" />
       <div className="absolute bottom-1/4 left-0 w-80 h-80 bg-accent/10 rounded-full blur-[100px] animate-glow-pulse" style={{ animationDelay: "3s" }} />

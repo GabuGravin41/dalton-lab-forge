@@ -4,17 +4,17 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Brain, ImageIcon, MessageSquare, Wand2, Loader2, ArrowLeft, Video, Network } from "lucide-react";
+import { Brain, ImageIcon, MessageSquare, Wand2, Loader2, ArrowLeft, Camera, Network } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useGeminiChat, useSentimentAnalysis } from '@/hooks/useGemini';
 import Navigation from "@/components/Navigation";
 import NeuralNetworkVisualizer from "@/components/NeuralNetworkVisualizer";
+import ObjectDetection from "@/components/ObjectDetection";
 
 const Playground = () => {
   const [textInput, setTextInput] = useState("");
   const [imagePrompt, setImagePrompt] = useState("");
   const [chatPrompt, setChatPrompt] = useState("");
-  const [videoPrompt, setVideoPrompt] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [chatHistory, setChatHistory] = useState<Array<{role: 'user' | 'model', text: string}>>([]);
   const [results, setResults] = useState<{[key: string]: string}>({});
@@ -82,20 +82,6 @@ const Playground = () => {
     }
   };
 
-  const handleVideoGeneration = async () => {
-    setIsLoading(true);
-    setTimeout(() => {
-      const duration = videoPrompt.toLowerCase().includes('long') ? '30-60' :
-                      videoPrompt.toLowerCase().includes('short') ? '5-10' : '15-30';
-      const hasMotion = videoPrompt.toLowerCase().includes('moving') || videoPrompt.toLowerCase().includes('walking') || videoPrompt.toLowerCase().includes('running');
-      
-      setResults(prev => ({
-        ...prev,
-        video: `🎬 Video generation request processed!\n\n📝 Your prompt: "${videoPrompt}"\n⏱️ Estimated duration: ${duration} seconds\n🎭 Scene complexity: ${hasMotion ? 'High (includes motion)' : 'Medium (static scene)'}\n🎨 Rendering quality: 1080p HD\n\n✨ Ready to integrate with Google Veo for cutting-edge AI video generation. Veo can create realistic, high-quality videos from text descriptions with smooth motion and coherent scenes.`
-      }));
-      setIsLoading(false);
-    }, 2500);
-  };
 
   const handleTestAPI = async () => {
     try {
@@ -143,17 +129,10 @@ const Playground = () => {
             <h1 className="text-5xl md:text-6xl font-bold mb-6">
               AI <span className="bg-gradient-to-r from-[hsl(245,58%,51%)] to-[hsl(260,60%,45%)] bg-clip-text text-transparent">Playground</span>
             </h1>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-6">
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
               Experience interactive AI capabilities firsthand. Test sentiment analysis, 
               image generation, and language models in real-time.
             </p>
-            <Button
-              onClick={handleTestAPI}
-              variant="outline"
-              className="bg-card/50 hover:bg-card/80 border-primary/20 hover:border-primary/40"
-            >
-              🔧 Test Gemini API Connection
-            </Button>
           </div>
 
           {/* AI Tools Tabs */}
@@ -167,9 +146,9 @@ const Playground = () => {
                 <ImageIcon className="w-4 h-4" />
                 Image Gen
               </TabsTrigger>
-              <TabsTrigger value="video" className="flex items-center gap-2">
-                <Video className="w-4 h-4" />
-                Video Gen
+              <TabsTrigger value="detection" className="flex items-center gap-2">
+                <Camera className="w-4 h-4" />
+                Object Detection
               </TabsTrigger>
               <TabsTrigger value="chat" className="flex items-center gap-2">
                 <Brain className="w-4 h-4" />
@@ -243,6 +222,14 @@ const Playground = () => {
                     <CardDescription>
                       Generate unique images from text descriptions using state-of-the-art diffusion models.
                     </CardDescription>
+                    <div className="mt-3 p-3 rounded-lg bg-orange-500/10 border border-orange-500/20">
+                      <p className="text-sm text-orange-600 font-medium flex items-center gap-2">
+                        ⚠️ Dalton has not paid for image gen credits yet
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        This feature is currently disabled as image generation credits have been used up. The demo shows the processing pipeline though. Have fun!! :)
+                      </p>
+                    </div>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <Input
@@ -257,7 +244,7 @@ const Playground = () => {
                       className="w-full bg-gradient-primary hover:opacity-90 text-white"
                     >
                       {isLoading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <ImageIcon className="w-4 h-4 mr-2" />}
-                      Generate Image
+                      Demo Processing Pipeline
                     </Button>
                   </CardContent>
                 </Card>
@@ -284,57 +271,9 @@ const Playground = () => {
               </div>
             </TabsContent>
 
-            {/* Video Generation Tab */}
-            <TabsContent value="video">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <Card className="bg-card/50 backdrop-blur-sm border-border">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Video className="w-5 h-5 text-accent" />
-                      AI Video Generation (Veo)
-                    </CardTitle>
-                    <CardDescription>
-                      Generate videos from text descriptions using Google's Veo model.
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <Textarea
-                      placeholder="Describe the video you want to generate..."
-                      value={videoPrompt}
-                      onChange={(e) => setVideoPrompt(e.target.value)}
-                      className="min-h-32 bg-background/50"
-                    />
-                    <Button
-                      onClick={handleVideoGeneration}
-                      disabled={!videoPrompt.trim() || isLoading}
-                      className="w-full bg-gradient-accent hover:opacity-90 text-accent-foreground"
-                    >
-                      {isLoading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Video className="w-4 h-4 mr-2" />}
-                      Generate Video
-                    </Button>
-                  </CardContent>
-                </Card>
-
-                <Card className="bg-card/50 backdrop-blur-sm border-border">
-                  <CardHeader>
-                    <CardTitle>Generated Video</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    {results.video ? (
-                      <div className="p-4 rounded-lg bg-accent/10 border border-accent/20">
-                        <p className="text-sm">{results.video}</p>
-                        <div className="mt-4 aspect-video bg-gradient-accent/10 rounded-lg flex items-center justify-center">
-                          <span className="text-muted-foreground">Generated video would appear here</span>
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="text-center text-muted-foreground py-8">
-                        Generate a video to see results here
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              </div>
+            {/* Object Detection Tab */}
+            <TabsContent value="detection">
+              <ObjectDetection />
             </TabsContent>
 
             {/* Chatbot Tab */}

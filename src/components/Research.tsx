@@ -1,33 +1,70 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { FileText, ExternalLink, BookOpen, Award, TrendingUp } from "lucide-react";
+import { FileText, ExternalLink, BookOpen, Award, TrendingUp, Eye } from "lucide-react";
+import { useState } from "react";
+import PaperModal from "./PaperModal";
+
+interface Paper {
+  title: string;
+  authors: string;
+  venue?: string;
+  year: string;
+  abstract: string;
+  tags: string[];
+  pdfPath: string;
+  status: 'published' | 'submitted' | 'draft' | 'preprint';
+}
 
 const Research = () => {
-  const publications = [
+  const [selectedPaper, setSelectedPaper] = useState<Paper | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const publications: Paper[] = [
     {
-      title: "Efficient Edge Deployment of Convolutional Neural Networks for Real-Time Applications",
-      venue: "International Conference on Machine Learning (ICML) Workshop",
-      year: "2024",
-      description: "Investigated model compression techniques and hardware acceleration strategies for deploying CNNs on resource-constrained edge devices.",
-      tags: ["Edge AI", "Model Compression", "Hardware Acceleration"],
-      link: "#",
+      title: "Zeta-Prime Sparse Networks: Infusing Number-Theoretic Priors for Structured Sparsity",
+      authors: "Dalton Omondi, Grok 42",
+      year: "2025",
+      abstract: "The overparameterization of deep neural networks often leads to inefficiency and poor generalization. While traditional regularizers like L1 and L2 promote sparsity or weight shrinkage, they lack a principled, domain-inspired structure. We introduce Zeta-Prime Sparse Networks (ZPSN), a novel regularization framework grounded in analytic number theory. ZPSN uses the Riemann zeta function, ζ(s), to impose a sparsity pattern inspired by the distribution of prime numbers. The regularizer encourages a weight distribution where most parameters are near zero, with sparse, significant outliers—mimicking the primality property. Experiments on CIFAR-10 show that ZPSN achieves comparable sparsity to baseline models (20.7% vs. 22.8%) while slightly improving test accuracy (70.7% vs. 69.7%) and demonstrating superior robustness to post-training pruning.",
+      tags: ["Number Theory", "Neural Networks", "Sparsity", "Regularization", "CIFAR-10"],
+      pdfPath: "/papers/zpsn_vs_tradcnn.pdf",
+      status: "draft"
     },
     {
-      title: "Low-Power Circuit Design Techniques for IoT Sensor Nodes",
-      venue: "IEEE Transactions on Circuits and Systems",
+      title: "From Software Models to Optical Circuits: Operator-Level Translation of Convolutional Neural Networks for Photonic Neural Processors",
+      authors: "Dalton Omondi",
+      year: "2025",
+      abstract: "Photonic neural networks (PNNs) provide a promising approach to alleviate the energy and latency limitations of electronic deep learning accelerators. A key challenge, however, lies in systematically embedding trained models into silicon photonic (SiP) hardware. This work introduces an operator-based framework that maps neural network primitives—including convolutions, activations, pooling, and residual connections—onto SiP building blocks such as Mach–Zehnder interferometer meshes, microring resonators, and multimode interference couplers. As a case study, MNIST inference is demonstrated using spectrum-slicing convolutions with photodetection pooling, achieving approximately 98% accuracy at 0.1 fJ/MAC and 7.6×10⁶ inferences/s.",
+      tags: ["Photonic Computing", "Silicon Photonics", "CNN", "Optical Accelerators", "EfficientNet", "Neuromorphic"],
+      pdfPath: "/papers/Photonic_chips_for_machine_learning.pdf",
+      status: "submitted"
+    },
+    {
+      title: "Light Based Applications in Medicine: Integrated Pulse Oximetry-Glucose Monitoring",
+      authors: "Dalton Omondi",
+      year: "2025",
+      abstract: "The convergence of pulse oximetry and glucose monitoring technologies represents a paradigm shift in non-invasive biosensing. This review examines the technical requirements, current research progress and implementation challenges of integrated optical systems capable of simultaneous oxygen saturation (SpO₂) and blood glucose level (BGL) measurements. We analyze recent advances in photoplethysmography (PPG) signal processing, multiwavelength optical configurations and machine learning algorithms applied to glucose estimation. While technical and regulatory hurdles remain, integrated pulse oximetry-glucose monitors show incredible potential for diabetes monitoring and management.",
+      tags: ["Biomedical Engineering", "Photoplethysmography", "Glucose Monitoring", "Pulse Oximetry", "Medical Devices"],
+      pdfPath: "/papers/Light_Based_Applications_in_Medicine__Integrated_Pulse_Oximetry_Glucose_Monitoring.pdf",
+      status: "draft"
+    },
+    {
+      title: "Metasurfaces: High Impedance Surfaces",
+      authors: "Dalton Omondi",
       year: "2023",
-      description: "Proposed novel circuit design methodologies to minimize power consumption in battery-operated IoT devices without sacrificing performance.",
-      tags: ["Low Power Design", "IoT", "Analog Circuits"],
-      link: "#",
+      abstract: "In this paper, we introduce the high impedance surfaces (HIS), which are metasurfaces that have been found to have abnormal electromagnetic (EM) properties, and thus are of interest in EMC (Electromagnetic Compatibility) applications. We look into the design of a one-patch, one-cell HIS, after which we design a mushroom-type HIS and cavity-type HIS. Finally, we highlight two applications of HIS in shielding box design and antenna design. Through these examples, we demonstrate how HIS can be engineered to reflect EM waves without phase reversal, suppress surface wave propagation, and contribute to optimized EM environments for modern electronic systems.",
+      tags: ["Metasurfaces", "Electromagnetic Compatibility", "Antenna Design", "High Impedance Surfaces", "EMC"],
+      pdfPath: "/papers/High_Impedance_Surfaces (2).pdf",
+      status: "submitted"
     },
     {
-      title: "Bridging Machine Learning and VLSI: A Co-Design Approach",
-      venue: "Design Automation Conference (DAC)",
-      year: "2023",
-      description: "Explored hardware-software co-design strategies for optimizing neural network inference on custom ASIC architectures.",
-      tags: ["VLSI", "Neural Network Hardware", "Co-Design"],
-      link: "#",
-    },
+      title: "Stochastic Processes and Machine Learning in Commodity Price Forecasting: Insights from the Mitsui & Co. Commodity Prediction Challenge",
+      authors: "Dalton Omondi",
+      year: "2025",
+      abstract: "Commodity markets exhibit profound volatility, shaped by stochastic dynamics and multifaceted global influences. This paper advances the modeling of commodity returns through a dual lens: theoretical stochastic processes and practical machine learning pipelines. Inspired by the 2025 Mitsui & Co. Commodity Prediction Challenge on Kaggle, we formalize processes like Geometric Brownian Motion (GBM), Ornstein-Uhlenbeck (OU), and jump-diffusion models via stochastic differential equations (SDEs). We then integrate empirical insights from a comprehensive ML baseline—employing ensemble tree boosters (LightGBM, XGBoost, CatBoost) with cross-validation and feature engineering—trained on the competition's multi-asset dataset. The ML pipeline achieves RMSE 0.029-0.030 across 424 targets, emphasizing stability via the challenge's Sharpe-variant metric.",
+      tags: ["Stochastic Processes", "Machine Learning", "Commodity Forecasting", "Kaggle Competition", "Financial Modeling", "Ensemble Methods"],
+      pdfPath: "/papers/stoch_market_pred.pdf",
+      status: "draft"
+    }
   ];
 
   const interests = [
@@ -35,12 +72,44 @@ const Research = () => {
     "Neuromorphic Computing",
     "Efficient Neural Network Architectures",
     "Low-Power Embedded Systems",
-    "Quantum Computing Applications",
+    "Photonic Chip Design",
     "Autonomous Systems",
   ];
 
+  const handlePaperClick = (paper: Paper) => {
+    setSelectedPaper(paper);
+    setIsModalOpen(true);
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'published': return 'bg-green-500/10 text-green-600 border-green-500/20';
+      case 'submitted': return 'bg-blue-500/10 text-blue-600 border-blue-500/20';
+      case 'preprint': return 'bg-purple-500/10 text-purple-600 border-purple-500/20';
+      case 'draft': return 'bg-orange-500/10 text-orange-600 border-orange-500/20';
+      default: return 'bg-gray-500/10 text-gray-600 border-gray-500/20';
+    }
+  };
+
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case 'published': return 'Published';
+      case 'submitted': return 'Under Review';
+      case 'preprint': return 'Preprint';
+      case 'draft': return 'Draft';
+      default: return status;
+    }
+  };
+
+  // Calculate dynamic stats
+  const totalPapers = publications.length;
+  const publishedCount = publications.filter(p => p.status === 'published').length;
+  const draftCount = publications.filter(p => p.status === 'draft').length;
+  const submittedCount = publications.filter(p => p.status === 'submitted').length;
+  const preprintCount = publications.filter(p => p.status === 'preprint').length;
+
   return (
-    <section id="research" className="py-32 px-6 relative overflow-hidden">
+    <section id="research" className="py-32 px-6 relative overflow-hidden bg-background z-10">
       {/* Background elements */}
       <div className="absolute top-0 left-1/3 w-px h-full bg-gradient-to-b from-transparent via-accent/20 to-transparent" />
       <div className="absolute top-0 right-1/3 w-px h-full bg-gradient-to-b from-transparent via-primary/20 to-transparent" />
@@ -55,25 +124,49 @@ const Research = () => {
               <span className="text-sm font-medium text-foreground">Academic Contributions</span>
             </div>
             <h2 className="text-5xl md:text-6xl font-bold">
-              Research & <span className="bg-gradient-to-r from-[hsl(30,90%,58%)] to-[hsl(20,85%,55%)] bg-clip-text text-transparent">Publications</span>
+              Research & <span className="bg-gradient-to-r from-[hsl(30,90%,58%)] to-[hsl(20,85%,55%)] bg-clip-text text-transparent">Papers</span>
             </h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-              Contributing to the intersection of machine learning and hardware design through
-              peer-reviewed publications and innovative research.
+              Exploring the intersection of machine learning and hardware design through
+              ongoing research projects and academic papers.
             </p>
             
             {/* Stats */}
-            <div className="flex flex-wrap justify-center gap-8 pt-6">
+            <div className="flex flex-wrap justify-center gap-6 pt-6">
               <div className="flex items-center gap-2">
                 <Award className="w-5 h-5 text-accent" />
                 <span className="text-sm text-muted-foreground">
-                  <span className="font-bold text-foreground text-lg">3</span> Publications
+                  <span className="font-bold text-foreground text-lg">{totalPapers}</span> Research Papers
                 </span>
               </div>
+              {publishedCount > 0 && (
+                <div className="flex items-center gap-2">
+                  <FileText className="w-5 h-5 text-green-500" />
+                  <span className="text-sm text-muted-foreground">
+                    <span className="font-bold text-foreground text-lg">{publishedCount}</span> Published
+                  </span>
+                </div>
+              )}
+              {draftCount > 0 && (
+                <div className="flex items-center gap-2">
+                  <FileText className="w-5 h-5 text-orange-500" />
+                  <span className="text-sm text-muted-foreground">
+                    <span className="font-bold text-foreground text-lg">{draftCount}</span> Drafts
+                  </span>
+                </div>
+              )}
+              {submittedCount > 0 && (
+                <div className="flex items-center gap-2">
+                  <FileText className="w-5 h-5 text-blue-500" />
+                  <span className="text-sm text-muted-foreground">
+                    <span className="font-bold text-foreground text-lg">{submittedCount}</span> Under Review
+                  </span>
+                </div>
+              )}
               <div className="flex items-center gap-2">
                 <TrendingUp className="w-5 h-5 text-primary" />
                 <span className="text-sm text-muted-foreground">
-                  <span className="font-bold text-foreground text-lg">6</span> Research Interests
+                  <span className="font-bold text-foreground text-lg">{interests.length}</span> Research Interests
                 </span>
               </div>
             </div>
@@ -81,56 +174,87 @@ const Research = () => {
 
           {/* Publications List */}
           <div className="space-y-8">
-            {publications.map((pub, index) => (
-              <Card
-                key={pub.title}
-                className="group relative p-6 md:p-8 bg-card/50 backdrop-blur-sm border-border hover:border-accent/50 transition-all duration-500 hover:shadow-2xl hover:shadow-accent/10 overflow-hidden"
-                style={{ animationDelay: `${index * 150}ms` }}
-              >
-                {/* Hover gradient */}
-                <div className="absolute inset-0 bg-gradient-accent opacity-0 group-hover:opacity-5 transition-opacity duration-500" />
-                <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-accent/20 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-all duration-700" />
-                <div className="flex flex-col md:flex-row gap-6 relative">
-                  {/* Icon */}
-                  <div className="flex-shrink-0">
-                    <div className="p-4 rounded-xl bg-accent/10 group-hover:bg-accent/20 border border-accent/20 group-hover:border-accent/40 transition-all duration-300 group-hover:scale-110 group-hover:rotate-3">
-                      <FileText className="h-8 w-8 text-accent" />
-                    </div>
-                  </div>
-                  
-                  {/* Content */}
-                  <div className="flex-1 space-y-4">
-                    <div>
-                      <h3 className="text-xl md:text-2xl font-bold mb-3 group-hover:text-accent transition-colors">
-                        {pub.title}
-                      </h3>
-                      <div className="flex flex-wrap items-center gap-3 text-sm mb-3">
-                        <span className="font-semibold text-foreground/90 px-3 py-1 bg-accent/10 rounded-full">{pub.venue}</span>
-                        <span className="text-muted-foreground">•</span>
-                        <span className="text-muted-foreground font-medium">{pub.year}</span>
+            {publications.length > 0 ? (
+              publications.map((pub, index) => (
+                <Card
+                  key={pub.title}
+                  className="group relative p-6 md:p-8 bg-card/50 backdrop-blur-sm border-border hover:border-accent/50 transition-all duration-500 hover:shadow-2xl hover:shadow-accent/10 overflow-hidden"
+                  style={{ animationDelay: `${index * 150}ms` }}
+                >
+                  {/* Hover gradient */}
+                  <div className="absolute inset-0 bg-gradient-accent opacity-0 group-hover:opacity-5 transition-opacity duration-500" />
+                  <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-accent/20 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-all duration-700" />
+                  <div className="flex flex-col md:flex-row gap-6 relative">
+                    {/* Icon */}
+                    <div className="flex-shrink-0">
+                      <div className="p-4 rounded-xl bg-accent/10 group-hover:bg-accent/20 border border-accent/20 group-hover:border-accent/40 transition-all duration-300 group-hover:scale-110 group-hover:rotate-3">
+                        <FileText className="h-8 w-8 text-accent" />
                       </div>
                     </div>
-                    <p className="text-foreground/80 leading-relaxed text-base">
-                      {pub.description}
-                    </p>
-                    <div className="flex flex-wrap items-center gap-3 pt-2">
-                      {pub.tags.map((tag) => (
-                        <Badge key={tag} variant="secondary" className="text-xs px-3 py-1.5 bg-secondary/50 hover:bg-accent/20 hover:text-accent transition-colors">
-                          {tag}
+                    
+                    {/* Content */}
+                    <div className="flex-1 space-y-4">
+                      <div>
+                        <h3 className="text-xl md:text-2xl font-bold mb-3 group-hover:text-accent transition-colors">
+                          {pub.title}
+                        </h3>
+                        <div className="flex flex-wrap items-center gap-3 text-sm mb-3">
+                          <span className="text-muted-foreground font-medium">{pub.authors}</span>
+                          <span className="text-muted-foreground">•</span>
+                          <span className="text-muted-foreground font-medium">{pub.year}</span>
+                          {pub.venue && (
+                            <>
+                              <span className="text-muted-foreground">•</span>
+                              <span className="font-semibold text-foreground/90 px-3 py-1 bg-accent/10 rounded-full">{pub.venue}</span>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                      <p className="text-foreground/80 leading-relaxed text-base">
+                        {pub.abstract.length > 200 ? `${pub.abstract.substring(0, 200)}...` : pub.abstract}
+                      </p>
+                      <div className="flex flex-wrap items-center gap-3 pt-2">
+                        <Badge className={`text-xs px-3 py-1 ${getStatusColor(pub.status)}`}>
+                          {getStatusText(pub.status)}
                         </Badge>
-                      ))}
-                      <a
-                        href={pub.link}
-                        className="ml-auto flex items-center gap-2 text-sm font-medium text-accent hover:text-accent/80 transition-all group/link px-4 py-2 rounded-lg hover:bg-accent/10"
-                      >
-                        Read Paper
-                        <ExternalLink className="h-4 w-4 group-hover/link:translate-x-1 group-hover/link:-translate-y-1 transition-transform" />
-                      </a>
+                        {pub.tags.map((tag) => (
+                          <Badge key={tag} variant="secondary" className="text-xs px-3 py-1.5 bg-secondary/50 hover:bg-accent/20 hover:text-accent transition-colors">
+                            {tag}
+                          </Badge>
+                        ))}
+                        <button
+                          onClick={() => handlePaperClick(pub)}
+                          className="ml-auto flex items-center gap-2 text-sm font-medium text-accent hover:text-accent/80 transition-all group/link px-4 py-2 rounded-lg hover:bg-accent/10"
+                        >
+                          View Paper
+                          <Eye className="h-4 w-4 group-hover/link:scale-110 transition-transform" />
+                        </button>
+                      </div>
                     </div>
+                  </div>
+                </Card>
+              ))
+            ) : (
+              <Card className="relative p-8 md:p-12 bg-card/30 backdrop-blur-sm border-dashed border-2 border-accent/30 text-center">
+                <div className="space-y-6">
+                  <div className="mx-auto w-16 h-16 rounded-full bg-accent/10 flex items-center justify-center">
+                    <FileText className="w-8 h-8 text-accent/60" />
+                  </div>
+                  <div className="space-y-3">
+                    <h3 className="text-2xl font-bold text-foreground/80">Publications Coming Soon</h3>
+                    <p className="text-muted-foreground max-w-md mx-auto">
+                      Currently working on research projects that will be submitted for peer review. 
+                      This section will be updated as papers are published.
+                    </p>
+                  </div>
+                  <div className="flex flex-wrap justify-center gap-2 pt-4">
+                    <Badge variant="outline" className="text-xs px-3 py-1.5">Work in Progress</Badge>
+                    <Badge variant="outline" className="text-xs px-3 py-1.5">Research Active</Badge>
+                    <Badge variant="outline" className="text-xs px-3 py-1.5">Submissions Planned</Badge>
                   </div>
                 </div>
               </Card>
-            ))}
+            )}
           </div>
 
           {/* Research Interests */}
@@ -176,6 +300,13 @@ const Research = () => {
           </div>
         </div>
       </div>
+      
+      {/* Paper Modal */}
+      <PaperModal
+        paper={selectedPaper}
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
     </section>
   );
 };

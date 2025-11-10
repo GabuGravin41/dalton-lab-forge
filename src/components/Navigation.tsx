@@ -53,7 +53,7 @@ const Navigation = () => {
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
         scrolled 
           ? "bg-background/95 backdrop-blur-xl border-b border-border shadow-lg shadow-primary/5" 
-          : "bg-transparent"
+          : "bg-background/20 backdrop-blur-sm"
       }`}
     >
       <div className="container mx-auto px-6 py-4">
@@ -86,7 +86,7 @@ const Navigation = () => {
                     className={`relative text-sm font-medium transition-all duration-300 group ${
                       activeSection === link.id
                         ? "text-primary"
-                        : "text-foreground/70 hover:text-foreground"
+                        : "text-foreground/90 hover:text-foreground"
                     }`}
                   >
                     {link.label}
@@ -101,7 +101,7 @@ const Navigation = () => {
             )}
             
             <Link to="/playground">
-              <button className="group relative text-sm font-medium text-foreground/70 hover:text-foreground transition-colors flex items-center gap-1.5">
+              <button className="group relative text-sm font-medium text-foreground/90 hover:text-foreground transition-colors flex items-center gap-1.5">
                 <Sparkles className="w-3.5 h-3.5 group-hover:text-primary transition-colors" />
                 Playground
               </button>

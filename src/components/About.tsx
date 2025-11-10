@@ -26,7 +26,7 @@ const About = () => {
   ];
 
   return (
-    <section id="about" className="py-32 px-6 relative overflow-hidden">
+    <section id="about" className="py-32 px-6 relative overflow-hidden bg-background z-10">
       {/* Decorative background elements */}
       <div className="absolute top-0 left-1/4 w-px h-full bg-gradient-to-b from-transparent via-primary/20 to-transparent" />
       <div className="absolute top-0 right-1/4 w-px h-full bg-gradient-to-b from-transparent via-accent/20 to-transparent" />
@@ -47,7 +47,7 @@ const About = () => {
             </div>
             
             <div className="lg:col-span-3 space-y-6">
-              <p className="text-xl text-foreground leading-relaxed">
+              <p className="text-xl text-muted-foreground leading-relaxed">
                 Where <span className="font-bold text-primary">software intelligence</span> meets{" "}
                 <span className="font-bold text-accent">physical reality</span> — that's where I build.
               </p>
@@ -69,12 +69,12 @@ const About = () => {
                     <span className="w-2 h-2 rounded-full bg-accent animate-pulse" />
                     My Approach
                   </h3>
-                  <p className="text-foreground/90 leading-relaxed">
+                  <p className="text-muted-foreground leading-relaxed">
                     Whether I'm optimizing a machine learning pipeline, laying out a multi-layer PCB, or prototyping 
                     an IoT sensor node, I'm driven by the same question: <span className="text-accent font-semibold italic">
                     "How can we make technology more intelligent, more capable, and more meaningful?"</span>
                   </p>
-                  <p className="text-foreground/80 leading-relaxed">
+                  <p className="text-muted-foreground/90 leading-relaxed">
                     I believe the most groundbreaking innovations emerge when we refuse to stay in our lane — when we 
                     bring the precision of hardware design to AI systems, or the adaptability of machine learning to 
                     embedded devices.
@@ -88,7 +88,7 @@ const About = () => {
                     <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
                     What I'm Looking For
                   </h3>
-                  <p className="text-foreground/90 leading-relaxed">
+                  <p className="text-muted-foreground leading-relaxed">
                     Currently seeking opportunities in <span className="font-semibold text-primary">hardware engineering</span>, 
                     <span className="font-semibold text-accent"> embedded AI</span>, and{" "}
                     <span className="font-semibold text-primary">research positions</span> where I can contribute to projects 

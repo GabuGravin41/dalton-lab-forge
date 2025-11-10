@@ -51,7 +51,7 @@ const Contact = () => {
   ];
 
   return (
-    <section id="contact" className="py-32 px-6 bg-gradient-subtle relative overflow-hidden">
+    <section id="contact" className="py-32 px-6 bg-gradient-subtle relative overflow-hidden z-10">
       {/* Background elements */}
       <div className="absolute inset-0 opacity-30">
         <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-accent/20 rounded-full blur-[120px] animate-glow-pulse" />

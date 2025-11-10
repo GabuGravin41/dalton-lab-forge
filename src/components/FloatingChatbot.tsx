@@ -16,7 +16,7 @@ const FloatingChatbot = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
-      text: "Hello! I'm Dalton's AI assistant. I can answer questions about his work, projects, and expertise. How can I help you?",
+      text: "Hey! 👋 I'm here to tell you about Dalton. Ask me anything - his projects, skills, experience, or how to reach him!",
       sender: 'bot',
       timestamp: new Date()
     }
@@ -61,20 +61,43 @@ const FloatingChatbot = () => {
   const generateBotResponse = (userInput: string): string => {
     const lowerInput = userInput.toLowerCase();
     
-    if (lowerInput.includes('project') || lowerInput.includes('work')) {
-      return "Dalton has worked on fascinating projects spanning machine learning, PCB design, chip design, and IoT systems. You can explore his complete portfolio in the Projects section above!";
-    }
-    if (lowerInput.includes('skill') || lowerInput.includes('expertise')) {
-      return "Dalton specializes in Machine Learning & AI, Hardware Engineering & PCB Design, VLSI & Chip Design, and IoT & Embedded Systems. He combines software intelligence with hardware innovation.";
-    }
-    if (lowerInput.includes('contact') || lowerInput.includes('hire')) {
-      return "You can reach Dalton through the Contact section above. He's available for freelance work, research collaborations, and internship opportunities!";
-    }
-    if (lowerInput.includes('research')) {
-      return "Dalton is passionate about research at the intersection of AI and hardware. Check out his Research section to see his publications and current research interests.";
+    // Projects
+    if (lowerInput.includes('project') || lowerInput.includes('work') || lowerInput.includes('built')) {
+      return "Dalton builds at the intersection of AI and hardware! He's done ML models, PCB designs, chip architecture, and IoT systems. Check the Projects section for the full showcase! 🚀";
     }
     
-    return "That's a great question! Dalton works at the intersection of AI and hardware engineering. Feel free to explore the different sections of his portfolio, or ask me anything specific about his work!";
+    // Skills
+    if (lowerInput.includes('skill') || lowerInput.includes('expertise') || lowerInput.includes('good at') || lowerInput.includes('know')) {
+      return "He's got the full stack: Machine Learning (neural nets, computer vision), Hardware (PCB design, embedded systems), Chip Design (VLSI, digital circuits), and IoT. Software meets hardware! ⚡";
+    }
+    
+    // Contact/Hire
+    if (lowerInput.includes('contact') || lowerInput.includes('hire') || lowerInput.includes('reach') || lowerInput.includes('email')) {
+      return "Hit up the Contact section! Dalton's open to freelance gigs, research collabs, and opportunities. He's ready to build cool stuff! 📬";
+    }
+    
+    // Research
+    if (lowerInput.includes('research') || lowerInput.includes('paper') || lowerInput.includes('academic')) {
+      return "Dalton's deep into AI-hardware fusion research. Neuromorphic computing, efficient neural architectures, you name it. Peep the Research section! 🔬";
+    }
+    
+    // Background/About
+    if (lowerInput.includes('who') || lowerInput.includes('about') || lowerInput.includes('background') || lowerInput.includes('bio')) {
+      return "Dalton's an ML engineer and hardware designer who refuses to pick a lane! He trains neural networks AND designs the chips that run them. Based in Kenya, building the future. 🌍";
+    }
+    
+    // Education
+    if (lowerInput.includes('school') || lowerInput.includes('education') || lowerInput.includes('study') || lowerInput.includes('university')) {
+      return "Engineering student with a passion for AI and hardware. Self-taught in tons of areas - he learns by building! 📚";
+    }
+    
+    // Tools/Tech
+    if (lowerInput.includes('tool') || lowerInput.includes('tech') || lowerInput.includes('language') || lowerInput.includes('framework')) {
+      return "Python for ML, C/C++ for embedded, Verilog for chips, KiCAD for PCBs. TensorFlow, PyTorch, ONNX - the whole AI toolkit! 🛠️";
+    }
+    
+    // Default - friendly and open
+    return "Good question! Dalton's all about AI + hardware. Want to know about his projects, skills, background, or how to connect? Just ask! 💬";
   };
 
   const toggleRecording = () => {

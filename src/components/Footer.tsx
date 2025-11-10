@@ -24,7 +24,7 @@ const Footer = () => {
   };
 
   return (
-    <footer className="relative py-16 px-6 border-t border-border bg-gradient-subtle overflow-hidden">
+    <footer className="relative py-16 px-6 border-t border-border bg-gradient-subtle overflow-hidden z-10">
       {/* Background decoration */}
       <div className="absolute bottom-0 left-1/4 w-64 h-64 bg-primary/5 rounded-full blur-[100px]" />
       <div className="absolute top-0 right-1/4 w-48 h-48 bg-accent/5 rounded-full blur-[80px]" />
