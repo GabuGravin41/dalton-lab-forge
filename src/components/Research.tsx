@@ -62,7 +62,52 @@ const Research = () => {
       year: "2025",
       abstract: "Commodity markets exhibit profound volatility, shaped by stochastic dynamics and multifaceted global influences. This paper advances the modeling of commodity returns through a dual lens: theoretical stochastic processes and practical machine learning pipelines. Inspired by the 2025 Mitsui & Co. Commodity Prediction Challenge on Kaggle, we formalize processes like Geometric Brownian Motion (GBM), Ornstein-Uhlenbeck (OU), and jump-diffusion models via stochastic differential equations (SDEs). We then integrate empirical insights from a comprehensive ML baseline—employing ensemble tree boosters (LightGBM, XGBoost, CatBoost) with cross-validation and feature engineering—trained on the competition's multi-asset dataset. The ML pipeline achieves RMSE 0.029-0.030 across 424 targets, emphasizing stability via the challenge's Sharpe-variant metric.",
       tags: ["Stochastic Processes", "Machine Learning", "Commodity Forecasting", "Kaggle Competition", "Financial Modeling", "Ensemble Methods"],
-      pdfPath: "/papers/stoch_market_pred.pdf",
+      pdfPath: "/papers/Stoch_market_pred.pdf",
+      status: "draft"
+    },
+    {
+      title: "Feasibility Study: EEG-Based Epilepsy Detection System",
+      authors: "Dalton Omondi",
+      year: "2025",
+      abstract: "This feasibility study explores the development of a portable EEG-based epilepsy detection system using machine learning algorithms for real-time seizure prediction. We analyze signal processing techniques, feature extraction methods, and classification algorithms suitable for wearable implementation. The study evaluates hardware requirements, power consumption constraints, and regulatory considerations for a low-cost, accessible epilepsy monitoring device that can provide early warnings to patients and caregivers.",
+      tags: ["Epilepsy Detection", "EEG", "Biomedical Devices", "Machine Learning", "Healthcare", "Wearables"],
+      pdfPath: "/papers/epilepsy_detection.pdf",
+      status: "draft"
+    },
+    {
+      title: "Feasibility Study: Continuous Glucose Monitoring Using Test Strip Technology",
+      authors: "Dalton Omondi",
+      year: "2025",
+      abstract: "This study investigates the technical and commercial feasibility of developing a semi-continuous glucose monitoring system that leverages existing test strip technology with automated sampling mechanisms. We examine miniaturization challenges, biosensor chemistry, microfluidics integration, and user experience design. The analysis includes market assessment, regulatory pathways, manufacturing considerations, and cost projections for a device that bridges the gap between traditional finger-prick testing and continuous glucose monitors.",
+      tags: ["Glucose Monitoring", "Diabetes Management", "Biosensors", "Medical Devices", "Point-of-Care", "Microfluidics"],
+      pdfPath: "/papers/med_inv__continuous_glucose_monitoring_using_test_strips.pdf",
+      status: "draft"
+    },
+    {
+      title: "Feasibility Study: Smartphone Camera-Based Diabetic Retinopathy Screening",
+      authors: "Dalton Omondi",
+      year: "2025",
+      abstract: "This feasibility analysis explores the development of an AI-powered smartphone application for diabetic retinopathy screening using standard phone cameras. We evaluate image acquisition challenges, deep learning model requirements, clinical validation needs, and deployment strategies. The study assesses the technical viability of creating an accessible, low-cost screening tool that can be used in primary care settings and remote locations where ophthalmological services are limited.",
+      tags: ["Diabetic Retinopathy", "Mobile Health", "Computer Vision", "Deep Learning", "Ophthalmology", "AI Diagnostics"],
+      pdfPath: "/papers/phone_camera_for_screening_diabetic_retinopathy.pdf",
+      status: "draft"
+    },
+    {
+      title: "Feasibility Study: Lens-Integrated Imagers for Sepsis and UTI Detection",
+      authors: "Dalton Omondi",
+      year: "2025",
+      abstract: "This study examines the feasibility of developing compact lens-integrated imaging systems for rapid detection of sepsis biomarkers and urinary tract infections. We analyze optical design considerations, microfluidic sample handling, detection algorithms, and point-of-care integration. The technical assessment covers miniaturization challenges, sensitivity requirements, multiplexing capabilities, and regulatory pathways for a device enabling early infection detection in emergency and ambulatory settings.",
+      tags: ["Sepsis Detection", "UTI Diagnostics", "Lens Imagers", "Microfluidics", "Point-of-Care", "Biomarker Detection"],
+      pdfPath: "/papers/sepsis_UTI_lens_imagers.pdf",
+      status: "draft"
+    },
+    {
+      title: "Feasibility Study: Multi-Parameter Vital Signs Tricorder Device",
+      authors: "Dalton Omondi",
+      year: "2025",
+      abstract: "This comprehensive feasibility study explores the development of a handheld tricorder-style device capable of measuring multiple vital signs including heart rate, blood pressure, temperature, blood oxygen, and respiratory rate. We evaluate sensor integration challenges, signal processing requirements, power management, and user interface design. The analysis includes market positioning, competitive landscape, regulatory considerations, and technical roadmap for creating a consumer-friendly, medical-grade vital signs monitoring device.",
+      tags: ["Vital Signs Monitoring", "Tricorder", "Multi-Parameter Sensing", "Wearable Tech", "Healthcare IoT", "Biosensors"],
+      pdfPath: "/papers/vital_signs_tricorder.pdf",
       status: "draft"
     }
   ];

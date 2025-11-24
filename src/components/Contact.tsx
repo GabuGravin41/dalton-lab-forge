@@ -27,25 +27,25 @@ const Contact = () => {
     {
       name: "GitHub",
       icon: <Github className="h-5 w-5" />,
-      href: "https://github.com",
-      label: "github.com/daltonomondi",
+      href: "https://github.com/GabuGravin41",
+      label: "github.com/GabuGravin41",
     },
     {
       name: "LinkedIn",
       icon: <Linkedin className="h-5 w-5" />,
-      href: "https://linkedin.com",
-      label: "linkedin.com/in/daltonomondi",
+      href: "https://www.linkedin.com/in/dalton-opondo/",
+      label: "linkedin.com/in/dalton-opondo",
     },
     {
       name: "Email",
       icon: <Mail className="h-5 w-5" />,
-      href: "mailto:dalton@example.com",
-      label: "dalton@example.com",
+      href: "mailto:daltonomondi588@gmail.com",
+      label: "daltonomondi588@gmail.com",
     },
     {
       name: "Fiverr",
       icon: <ExternalLink className="h-5 w-5" />,
-      href: "https://fiverr.com",
+      href: "https://www.fiverr.com/sellers/daltongab561",
       label: "Freelance Services",
     },
   ];
