@@ -219,9 +219,9 @@ const NeuralNetworkVisualizer = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5 md:space-y-6">
       {/* Canvas */}
-      <div className="bg-card/50 backdrop-blur-sm border border-border rounded-lg p-4">
+      <div className="bg-card/50 backdrop-blur-sm border border-border rounded-lg p-3 md:p-4">
         <canvas
           ref={canvasRef}
           width={800}
@@ -231,10 +231,10 @@ const NeuralNetworkVisualizer = () => {
       </div>
 
       {/* Controls */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
         {/* Network Configuration */}
-        <div className="space-y-4 bg-card/50 backdrop-blur-sm border border-border rounded-lg p-4">
-          <h3 className="text-lg font-semibold mb-3">Network Architecture</h3>
+        <div className="space-y-3 md:space-y-4 bg-card/50 backdrop-blur-sm border border-border rounded-lg p-4 md:p-5">
+          <h3 className="text-base md:text-lg font-semibold mb-2 md:mb-3">Network Architecture</h3>
           
           <div className="space-y-2">
             <Label htmlFor="input-nodes">Input Nodes: {inputNodes}</Label>
@@ -302,11 +302,11 @@ const NeuralNetworkVisualizer = () => {
         </div>
 
         {/* Animation Controls */}
-        <div className="space-y-4 bg-card/50 backdrop-blur-sm border border-border rounded-lg p-4">
-          <h3 className="text-lg font-semibold mb-3">Learning Simulation</h3>
+        <div className="space-y-3 md:space-y-4 bg-card/50 backdrop-blur-sm border border-border rounded-lg p-4 md:p-5">
+          <h3 className="text-base md:text-lg font-semibold mb-2 md:mb-3">Learning Simulation</h3>
           
-          <div className="space-y-2">
-            <Label htmlFor="animation-speed">Animation Speed: {animationSpeed}%</Label>
+          <div className="space-y-1.5 md:space-y-2">
+            <Label htmlFor="animation-speed" className="text-xs md:text-sm">Animation Speed: {animationSpeed}%</Label>
             <Slider
               id="animation-speed"
               min={10}
@@ -318,19 +318,19 @@ const NeuralNetworkVisualizer = () => {
             />
           </div>
 
-          <div className="flex gap-2 pt-4">
+          <div className="flex gap-2 pt-3 md:pt-4">
             <Button
               onClick={() => setIsAnimating(!isAnimating)}
-              className="flex-1 bg-gradient-primary hover:opacity-90 text-white"
+              className="flex-1 bg-gradient-primary hover:opacity-90 text-white text-xs md:text-sm h-9 md:h-10"
             >
               {isAnimating ? (
                 <>
-                  <Pause className="w-4 h-4 mr-2" />
+                  <Pause className="w-3 md:w-4 h-3 md:h-4 mr-1.5 md:mr-2" />
                   Pause
                 </>
               ) : (
                 <>
-                  <Play className="w-4 h-4 mr-2" />
+                  <Play className="w-3 md:w-4 h-3 md:h-4 mr-1.5 md:mr-2" />
                   Start
                 </>
               )}
@@ -339,16 +339,16 @@ const NeuralNetworkVisualizer = () => {
             <Button
               onClick={handleReset}
               variant="outline"
-              className="flex-1"
+              className="flex-1 text-xs md:text-sm h-9 md:h-10"
             >
-              <RotateCcw className="w-4 h-4 mr-2" />
+              <RotateCcw className="w-3 md:w-4 h-3 md:h-4 mr-1.5 md:mr-2" />
               Reset
             </Button>
           </div>
 
-          <div className="mt-6 p-3 bg-primary/10 border border-primary/20 rounded-lg">
-            <h4 className="text-sm font-semibold mb-2">Legend</h4>
-            <div className="space-y-1 text-xs">
+          <div className="mt-4 md:mt-6 p-2.5 md:p-3 bg-primary/10 border border-primary/20 rounded-lg">
+            <h4 className="text-xs md:text-sm font-semibold mb-1.5 md:mb-2">Legend</h4>
+            <div className="space-y-1 text-[10px] md:text-xs">
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full bg-[#3b82f6]"></div>
                 <span>Input Layer</span>
@@ -375,9 +375,9 @@ const NeuralNetworkVisualizer = () => {
       </div>
 
       {/* Information */}
-      <div className="bg-card/50 backdrop-blur-sm border border-border rounded-lg p-4">
-        <h3 className="text-lg font-semibold mb-2">About Neural Network Visualization</h3>
-        <p className="text-sm text-muted-foreground">
+      <div className="bg-card/50 backdrop-blur-sm border border-border rounded-lg p-3 md:p-4">
+        <h3 className="text-base md:text-lg font-semibold mb-1.5 md:mb-2">About Neural Network Visualization</h3>
+        <p className="text-xs md:text-sm text-muted-foreground leading-relaxed">
           This interactive visualization demonstrates how neural networks are structured. 
           Configure the network architecture by adjusting input/output nodes and adding/removing hidden layers. 
           The learning simulation shows how information flows through the network during training, 

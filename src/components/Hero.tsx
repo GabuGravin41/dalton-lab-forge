@@ -27,17 +27,17 @@ const Hero = () => {
       </div>
 
       <div className="container mx-auto relative z-10">
-        <div className="grid lg:grid-cols-[1fr,auto] gap-0 items-center min-h-[70vh]">
+        <div className="grid lg:grid-cols-[1fr,auto] gap-8 items-center min-h-[70vh]">
           {/* Left side - Main content */}
-          <div className="space-y-8 animate-fade-in lg:pr-16 lg:max-w-2xl">
+          <div className="space-y-6 md:space-y-8 animate-fade-in lg:pr-16 lg:max-w-2xl">
             {/*
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 border border-primary/20 rounded-full backdrop-blur-sm">
               <div className="w-2 h-2 rounded-full bg-accent animate-pulse" />
               <span className="text-sm font-medium text-foreground">Available for Opportunities</span>
             </div>*/}
 
-            <div className="space-y-4">
-              <h1 className="text-6xl md:text-7xl lg:text-8xl font-bold leading-[0.9] tracking-tight">
+            <div className="space-y-3 md:space-y-4">
+              <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold leading-[0.9] tracking-tight">
                 <span className="block text-foreground">Dalton</span>
                 <span className="block bg-gradient-to-r from-[hsl(245,58%,51%)] to-[hsl(260,60%,45%)] bg-clip-text text-transparent">Omondi</span>
               </h1>
@@ -55,17 +55,17 @@ const Hero = () => {
               </div>
             </div>
 
-            <p className="text-lg text-muted-foreground leading-relaxed max-w-lg">
+            <p className="text-base md:text-lg text-muted-foreground leading-relaxed max-w-lg">
               Engineering at the intersection of <span className="text-primary font-medium">artificial intelligence</span> and{" "}
               <span className="text-accent font-medium">physical systems</span>. From neural networks to circuit boards, 
               I create technology that thinks and works.
             </p>
 
-            <div className="flex flex-wrap gap-4 pt-4">
+            <div className="flex flex-wrap gap-3 md:gap-4 pt-2 md:pt-4">
               <Button
                 onClick={() => scrollToSection("projects")}
                 size="lg"
-                className="bg-primary text-primary-foreground hover:bg-primary/90 group shadow-lg shadow-primary/20"
+                className="bg-primary text-primary-foreground hover:bg-primary/90 group shadow-lg shadow-primary/20 text-sm md:text-base"
               >
                 View Projects
                 <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
@@ -74,7 +74,7 @@ const Hero = () => {
                 onClick={() => scrollToSection("contact")}
                 size="lg"
                 variant="outline"
-                className="border-border hover:bg-secondary/50 backdrop-blur-sm"
+                className="border-border hover:bg-secondary/50 backdrop-blur-sm text-sm md:text-base"
               >
                 Get in Touch
               </Button>
@@ -82,8 +82,8 @@ const Hero = () => {
           </div>
 
           {/* Right side - Torn Glass Effect with Photo */}
-          <div className="relative lg:fixed lg:right-0 lg:top-0 lg:h-screen lg:w-[45vw] animate-fade-in-slow z-0">
-            <div className="relative h-full min-h-[600px] lg:h-full">
+          <div className="relative lg:fixed lg:right-0 lg:top-0 lg:h-screen lg:w-[45vw] animate-fade-in-slow z-0 hidden lg:block">
+            <div className="relative h-full min-h-[600px]">
               {/* Magenta glow splash on the jagged edge */}
               <div className="absolute left-0 top-0 h-full w-40 opacity-50 z-10">
                 <div className="absolute -left-2 top-[5%] w-16 h-32 bg-[#FF1493] rounded-full blur-[60px] animate-pulse" />
@@ -301,6 +301,47 @@ const Hero = () => {
                   ))}
                 </div>
               </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Mobile Photo Section - Simple and clean */}
+          <div className="lg:hidden relative mt-8 mx-auto max-w-sm">
+            <div className="relative aspect-[3/4] rounded-2xl overflow-hidden border-2 border-primary/30 shadow-2xl">
+              {/* Profile Photo */}
+              <img
+                src="/dalton.jpg"
+                alt="Dalton Omondi - ML Engineer & Hardware Designer"
+                className="w-full h-full object-cover object-center"
+                onError={(e) => {
+                  console.error('Failed to load image');
+                  e.currentTarget.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='600'%3E%3Crect width='400' height='600' fill='%23374151'/%3E%3Ctext x='50%25' y='50%25' font-size='80' text-anchor='middle' dy='.3em' fill='%239CA3AF' font-weight='bold'%3EDO%3C/text%3E%3C/svg%3E";
+                }}
+              />
+              
+              {/* Gradient overlay */}
+              <div className="absolute inset-0 bg-gradient-to-t from-background/60 via-transparent to-transparent" />
+              
+              {/* Floating Skill Cards - Mobile optimized */}
+              <div className="absolute bottom-4 left-4 right-4 z-10">
+                <div className="grid grid-cols-2 gap-2">
+                  {[
+                    { icon: "🧠", title: "Machine Learning", gradient: "from-primary/20 to-primary/5" },
+                    { icon: "⚡", title: "PCB Design", gradient: "from-[#FF1493]/20 to-[#FF1493]/5" },
+                    { icon: "🔬", title: "Chip Design", gradient: "from-primary/20 to-primary/5" },
+                    { icon: "📡", title: "IoT Systems", gradient: "from-[#FF1493]/20 to-[#FF1493]/5" },
+                  ].map((skill) => (
+                    <div
+                      key={skill.title}
+                      className={`p-2 bg-gradient-to-br ${skill.gradient} backdrop-blur-lg border border-border/50 rounded-lg`}
+                    >
+                      <div className="flex items-center gap-1.5">
+                        <div className="text-base">{skill.icon}</div>
+                        <h3 className="font-bold text-[10px] text-foreground leading-tight">{skill.title}</h3>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </div>

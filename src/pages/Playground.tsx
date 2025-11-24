@@ -114,94 +114,98 @@ const Playground = () => {
     <div className="min-h-screen bg-background">
       <Navigation />
       
-      <section className="pt-32 pb-20 px-6">
+      <section className="pt-24 md:pt-28 lg:pt-32 pb-16 md:pb-20 px-4 sm:px-6">
         <div className="max-w-6xl mx-auto">
           {/* Back Button */}
           <Link to="/">
-            <Button variant="ghost" className="mb-8 group">
-              <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
+            <Button variant="ghost" className="mb-6 md:mb-8 group text-sm md:text-base">
+              <ArrowLeft className="w-3 md:w-4 h-3 md:h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
               Back to Portfolio
             </Button>
           </Link>
 
           {/* Section Header */}
-          <div className="text-center mb-16">
-            <h1 className="text-5xl md:text-6xl font-bold mb-6">
+          <div className="text-center mb-10 md:mb-12 lg:mb-16">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-4 md:mb-6">
               AI <span className="bg-gradient-to-r from-[hsl(245,58%,51%)] to-[hsl(260,60%,45%)] bg-clip-text text-transparent">Playground</span>
             </h1>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+            <p className="text-base md:text-lg lg:text-xl text-muted-foreground max-w-3xl mx-auto">
               Experience interactive AI capabilities firsthand. Test sentiment analysis, 
               image generation, and language models in real-time.
             </p>
           </div>
 
           {/* AI Tools Tabs */}
-          <Tabs defaultValue="text" className="space-y-8">
-            <TabsList className="grid w-full grid-cols-5 bg-card/50 backdrop-blur-sm border border-border">
-              <TabsTrigger value="text" className="flex items-center gap-2">
-                <MessageSquare className="w-4 h-4" />
-                Sentiment Analysis
+          <Tabs defaultValue="text" className="space-y-6 md:space-y-8">
+            <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 bg-card/50 backdrop-blur-sm border border-border p-2 h-auto">
+              <TabsTrigger value="text" className="flex items-center gap-1.5 md:gap-2 text-xs md:text-sm py-2 md:py-2.5">
+                <MessageSquare className="w-3 md:w-4 h-3 md:h-4" />
+                <span className="hidden sm:inline">Sentiment</span>
+                <span className="sm:hidden">Sentiment</span>
               </TabsTrigger>
-              <TabsTrigger value="image" className="flex items-center gap-2">
-                <ImageIcon className="w-4 h-4" />
-                Image Gen
+              <TabsTrigger value="image" className="flex items-center gap-1.5 md:gap-2 text-xs md:text-sm py-2 md:py-2.5">
+                <ImageIcon className="w-3 md:w-4 h-3 md:h-4" />
+                <span className="hidden sm:inline">Image Gen</span>
+                <span className="sm:hidden">Image</span>
               </TabsTrigger>
-              <TabsTrigger value="detection" className="flex items-center gap-2">
-                <Camera className="w-4 h-4" />
-                Object Detection
+              <TabsTrigger value="detection" className="flex items-center gap-1.5 md:gap-2 text-xs md:text-sm py-2 md:py-2.5">
+                <Camera className="w-3 md:w-4 h-3 md:h-4" />
+                <span className="hidden sm:inline">Detection</span>
+                <span className="sm:hidden">Detect</span>
               </TabsTrigger>
-              <TabsTrigger value="chat" className="flex items-center gap-2">
-                <Brain className="w-4 h-4" />
-                Chatbot
+              <TabsTrigger value="chat" className="flex items-center gap-1.5 md:gap-2 text-xs md:text-sm py-2 md:py-2.5">
+                <Brain className="w-3 md:w-4 h-3 md:h-4" />
+                <span>Chatbot</span>
               </TabsTrigger>
-              <TabsTrigger value="neural" className="flex items-center gap-2">
-                <Network className="w-4 h-4" />
-                NN Visualizer
+              <TabsTrigger value="neural" className="flex items-center gap-1.5 md:gap-2 text-xs md:text-sm py-2 md:py-2.5 col-span-2 sm:col-span-1">
+                <Network className="w-3 md:w-4 h-3 md:h-4" />
+                <span className="hidden sm:inline">NN Visualizer</span>
+                <span className="sm:hidden">Neural Net</span>
               </TabsTrigger>
             </TabsList>
 
             {/* Text Analysis Tab */}
             <TabsContent value="text">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 md:gap-6 lg:gap-8">
                 <Card className="bg-card/50 backdrop-blur-sm border-border">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <MessageSquare className="w-5 h-5 text-primary" />
+                  <CardHeader className="p-4 md:p-6">
+                    <CardTitle className="flex items-center gap-2 text-lg md:text-xl">
+                      <MessageSquare className="w-4 md:w-5 h-4 md:h-5 text-primary" />
                       Sentiment Analysis
                     </CardTitle>
-                    <CardDescription>
+                    <CardDescription className="text-xs md:text-sm">
                       Analyze the emotional tone and sentiment of any text using advanced NLP models.
                     </CardDescription>
                   </CardHeader>
-                  <CardContent className="space-y-4">
+                  <CardContent className="space-y-3 md:space-y-4 p-4 md:p-6 pt-0">
                     <Textarea
                       placeholder="Enter text to analyze sentiment..."
                       value={textInput}
                       onChange={(e) => setTextInput(e.target.value)}
-                      className="min-h-32 bg-background/50"
+                      className="min-h-28 md:min-h-32 bg-background/50 text-sm md:text-base"
                     />
                     <Button
                       onClick={handleTextAnalysis}
                       disabled={!textInput.trim() || sentimentMutation.isPending}
-                      className="w-full bg-gradient-primary hover:opacity-90 text-white"
+                      className="w-full bg-gradient-primary hover:opacity-90 text-white text-sm md:text-base h-9 md:h-10"
                     >
-                      {sentimentMutation.isPending ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Wand2 className="w-4 h-4 mr-2" />}
+                      {sentimentMutation.isPending ? <Loader2 className="w-3 md:w-4 h-3 md:h-4 mr-2 animate-spin" /> : <Wand2 className="w-3 md:w-4 h-3 md:h-4 mr-2" />}
                       Analyze Sentiment
                     </Button>
                   </CardContent>
                 </Card>
 
                 <Card className="bg-card/50 backdrop-blur-sm border-border">
-                  <CardHeader>
-                    <CardTitle>Analysis Result</CardTitle>
+                  <CardHeader className="p-4 md:p-6">
+                    <CardTitle className="text-lg md:text-xl">Analysis Result</CardTitle>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="p-4 md:p-6 pt-0">
                     {results.sentiment ? (
-                      <div className="p-4 rounded-lg bg-primary/10 border border-primary/20">
-                        <p className="text-sm">{results.sentiment}</p>
+                      <div className="p-3 md:p-4 rounded-lg bg-primary/10 border border-primary/20">
+                        <p className="text-xs md:text-sm whitespace-pre-wrap">{results.sentiment}</p>
                       </div>
                     ) : (
-                      <div className="text-center text-muted-foreground py-8">
+                      <div className="text-center text-muted-foreground py-6 md:py-8 text-sm">
                         Run sentiment analysis to see results here
                       </div>
                     )}
@@ -224,7 +228,7 @@ const Playground = () => {
                     </CardDescription>
                     <div className="mt-3 p-3 rounded-lg bg-orange-500/10 border border-orange-500/20">
                       <p className="text-sm text-orange-600 font-medium flex items-center gap-2">
-                        ⚠️ Dalton has not paid for image gen credits yet
+                        ⚠️ Dalton has not paid for image gen credits
                       </p>
                       <p className="text-xs text-muted-foreground mt-1">
                         This feature is currently disabled as image generation credits have been used up. The demo shows the processing pipeline though. Have fun!! :)
