@@ -5,6 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Github, Linkedin, Mail, ExternalLink, Send, Sparkles, MapPin, Clock } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
+import profileData from "@/data/profile.json";
 
 const Contact = () => {
   const { toast } = useToast();
@@ -23,29 +24,31 @@ const Contact = () => {
     setFormData({ name: "", email: "", message: "" });
   };
 
+  const socials = profileData.socials;
+
   const socialLinks = [
     {
       name: "GitHub",
       icon: <Github className="h-5 w-5" />,
-      href: "https://github.com/GabuGravin41",
-      label: "github.com/GabuGravin41",
+      href: socials.github,
+      label: socials.github.replace("https://", ""),
     },
     {
       name: "LinkedIn",
       icon: <Linkedin className="h-5 w-5" />,
-      href: "https://www.linkedin.com/in/dalton-opondo/",
-      label: "linkedin.com/in/dalton-opondo",
+      href: socials.linkedin,
+      label: socials.linkedin.replace("https://www.", "").replace("https://", ""),
     },
     {
       name: "Email",
       icon: <Mail className="h-5 w-5" />,
-      href: "mailto:daltonomondi588@gmail.com",
-      label: "daltonomondi588@gmail.com",
+      href: `mailto:${socials.email}`,
+      label: socials.email,
     },
     {
       name: "Fiverr",
       icon: <ExternalLink className="h-5 w-5" />,
-      href: "https://www.fiverr.com/sellers/daltongab561",
+      href: socials.fiverr,
       label: "Freelance Services",
     },
   ];

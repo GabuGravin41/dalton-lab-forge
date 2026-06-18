@@ -3,57 +3,12 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ExternalLink, Github, Sparkles } from "lucide-react";
+import projectsData from "@/data/projects.json";
 
 const Projects = () => {
   const [activeFilter, setActiveFilter] = useState("all");
 
-  const projects = [
-    {
-      title: "Real-Time Object Detection System",
-      description: "Built a computer vision system using YOLOv8 for real-time object detection with edge deployment on Raspberry Pi. Achieved 30+ FPS performance.",
-      tags: ["Machine Learning", "Computer Vision", "Python", "Edge AI"],
-      github: "#",
-      demo: "#",
-      category: "ml",
-    },
-    {
-      title: "IoT Weather Station with LoRa",
-      description: "Designed and fabricated a custom PCB for a low-power IoT weather station using LoRa for long-range data transmission. Integrated multiple environmental sensors.",
-      tags: ["IoT", "PCB Design", "LoRa", "Embedded C"],
-      github: "#",
-      category: "hardware",
-    },
-    {
-      title: "RISC-V CPU Design",
-      description: "Implemented a 5-stage pipelined RISC-V processor in Verilog with hazard detection and forwarding. Simulated and synthesized for FPGA deployment.",
-      tags: ["VLSI", "Verilog", "Computer Architecture", "FPGA"],
-      github: "#",
-      category: "chip",
-    },
-    {
-      title: "Smart Home Automation Hub",
-      description: "Developed a centralized smart home system with ESP32 microcontrollers, MQTT protocol, and a custom Android app. Supports voice control integration.",
-      tags: ["IoT", "ESP32", "MQTT", "Mobile Dev"],
-      github: "#",
-      demo: "#",
-      category: "iot",
-    },
-    {
-      title: "Music Generation with AI",
-      description: "Trained a transformer-based model to generate original music compositions. Explored attention mechanisms and sequence modeling for creative applications.",
-      tags: ["Deep Learning", "Transformers", "Audio ML", "PyTorch"],
-      github: "#",
-      demo: "#",
-      category: "ml",
-    },
-    {
-      title: "Multi-Layer PCB for Drone Controller",
-      description: "Designed a 4-layer PCB for a custom drone flight controller with IMU integration, motor drivers, and telemetry modules. Optimized for signal integrity.",
-      tags: ["PCB Design", "Embedded Systems", "Altium", "Hardware"],
-      github: "#",
-      category: "hardware",
-    },
-  ];
+  const projects = projectsData;
 
   const categories = [
     { id: "all", label: "All Projects", icon: "🎯" },

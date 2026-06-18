@@ -1,0 +1,83 @@
+{
+  "name": "Dalton Omondi",
+  "roles": [
+    "ML Engineer",
+    "Hardware Designer",
+    "Researcher",
+    "Kaggle Expert"
+  ],
+  "bio": "Engineering at the intersection of artificial intelligence and physical systems. From neural networks to circuit boards, I create technology that thinks and works.",
+  "about": {
+    "approach": "Whether I'm optimizing a machine learning pipeline, laying out a multi-layer PCB, or prototyping an IoT sensor node, I'm driven by the same question: 'How can we make technology more intelligent, more capable, and more meaningful?' I believe the most groundbreaking innovations emerge when we refuse to stay in our lane — when we bring the precision of hardware design to AI systems, or the adaptability of machine learning to embedded devices.",
+    "lookingFor": "Currently seeking opportunities in hardware engineering, embedded AI, and research positions where I can contribute to projects that push boundaries and create meaningful impact.",
+    "lookingForTags": [
+      "Hardware Engineering",
+      "Embedded AI",
+      "Research"
+    ],
+    "beyond": "When I'm not designing circuits or training models, I explore philosophy, listen to diverse music, and reflect on the meaning we assign to what we create. Good engineering, I believe, demands both technical precision and human insight."
+  },
+  "skills": [
+    {
+      "icon": "Cpu",
+      "title": "Machine Learning",
+      "description": "Computer vision, neural networks, and AI model deployment"
+    },
+    {
+      "icon": "Zap",
+      "title": "Hardware Engineering",
+      "description": "PCB design, fabrication, and embedded systems development"
+    },
+    {
+      "icon": "Code2",
+      "title": "Chip Design",
+      "description": "VLSI design, simulation, and digital circuit architecture"
+    },
+    {
+      "icon": "Lightbulb",
+      "title": "IoT & Research",
+      "description": "Connected devices, sensor networks, and academic exploration"
+    }
+  ],
+  "researchInterests": [
+    "Hardware-Software Co-Design for AI",
+    "Neuromorphic Computing",
+    "Efficient Neural Network Architectures",
+    "Low-Power Embedded Systems",
+    "Photonic Chip Design",
+    "Autonomous Systems"
+  ],
+  "socials": {
+    "github": "https://github.com/GabuGravin41",
+    "linkedin": "https://www.linkedin.com/in/dalton-opondo/",
+    "email": "daltonomondi588@gmail.com",
+    "fiverr": "https://www.fiverr.com/sellers/daltongab561"
+  },
+  "experience": [
+    {
+      "role": "Machine Learning & Hardware Systems Engineer",
+      "company": "Freelance & Research Collaborations",
+      "period": "2023 - Present",
+      "description": "Designing custom multi-layer PCBs for drone controllers and IoT systems. Training and deploying custom YOLOv8 object detection pipelines on edge hardware (Raspberry Pi/ESP32). Writing and collaborating on peer-reviewed research exploring numeric-theoretic sparse neural networks (ZPSN) and silicon photonics models."
+    },
+    {
+      "role": "Embedded Systems Developer",
+      "company": "Lab Forge Projects",
+      "period": "2021 - 2023",
+      "description": "Developed firmware in Verilog for 5-stage pipelined RISC-V processors. Fabricated low-power IoT weather stations utilizing LoRa modules for long-range sensor telemetry. Created MQTT smart hubs with integrated Android app controls."
+    }
+  ],
+  "education": [
+    {
+      "degree": "Bachelor of Science in Electrical and Electronics Engineering",
+      "school": "Technical University / Research Institution",
+      "period": "2019 - 2023",
+      "description": "Specialized in VLSI circuit design, embedded computing, and hardware description languages. Graduated with honors."
+    }
+  ],
+  "certifications": [
+    "Kaggle Competition Expert",
+    "Altium Certified PCB Designer",
+    "TensorFlow Certified Developer"
+  ]
+}

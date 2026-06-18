@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, Sparkles } from "lucide-react";
+import { Menu, X, Sparkles, FileText } from "lucide-react";
 
 const Navigation = () => {
   const [scrolled, setScrolled] = useState(false);
@@ -10,6 +10,8 @@ const Navigation = () => {
   const [activeSection, setActiveSection] = useState("");
   const location = useLocation();
   const isPlayground = location.pathname === '/playground';
+  const isResume = location.pathname === '/resume';
+  const isAdmin = location.pathname === '/admin';
 
   useEffect(() => {
     const handleScroll = () => {
@@ -77,7 +79,7 @@ const Navigation = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-6">
-            {!isPlayground && (
+            {!isPlayground && !isResume && !isAdmin && (
               <>
                 {navLinks.map((link) => (
                   <button
@@ -100,9 +102,16 @@ const Navigation = () => {
               </>
             )}
             
+            <Link to="/resume">
+              <button className={`group relative text-sm font-medium transition-colors flex items-center gap-1.5 ${isResume ? 'text-primary' : 'text-foreground/90 hover:text-foreground'}`}>
+                <FileText className={`w-3.5 h-3.5 group-hover:text-primary transition-colors ${isResume ? 'text-primary' : ''}`} />
+                Resume / CV
+              </button>
+            </Link>
+
             <Link to="/playground">
-              <button className="group relative text-sm font-medium text-foreground/90 hover:text-foreground transition-colors flex items-center gap-1.5">
-                <Sparkles className="w-3.5 h-3.5 group-hover:text-primary transition-colors" />
+              <button className={`group relative text-sm font-medium transition-colors flex items-center gap-1.5 ${isPlayground ? 'text-primary' : 'text-foreground/90 hover:text-foreground'}`}>
+                <Sparkles className={`w-3.5 h-3.5 group-hover:text-primary transition-colors ${isPlayground ? 'text-primary' : ''}`} />
                 Playground
               </button>
             </Link>
@@ -111,7 +120,7 @@ const Navigation = () => {
             
             <ThemeToggle />
             
-            {!isPlayground && (
+            {!isPlayground && !isResume && !isAdmin && (
               <Button
                 onClick={() => scrollToSection("contact")}
                 className="bg-gradient-accent text-accent-foreground hover:opacity-90 shadow-lg shadow-accent/20 hover:shadow-accent/30 transition-all hover:scale-105"
@@ -142,7 +151,7 @@ const Navigation = () => {
         {mobileMenuOpen && (
           <div className="md:hidden absolute top-full left-0 right-0 bg-background/98 backdrop-blur-xl border-b border-border shadow-2xl animate-fade-in">
             <div className="container mx-auto px-6 py-6 space-y-4">
-              {!isPlayground && (
+              {!isPlayground && !isResume && !isAdmin && (
                 <>
                   {navLinks.map((link, idx) => (
                     <button
@@ -161,6 +170,13 @@ const Navigation = () => {
                 </>
               )}
               
+              <Link to="/resume" onClick={() => setMobileMenuOpen(false)}>
+                <button className="w-full text-left px-4 py-3 rounded-lg bg-card/50 border border-border hover:border-primary/50 transition-all text-sm font-medium hover:bg-primary/5 flex items-center gap-2">
+                  <FileText className="w-4 h-4 text-primary" />
+                  Resume / CV
+                </button>
+              </Link>
+
               <Link to="/playground" onClick={() => setMobileMenuOpen(false)}>
                 <button className="w-full text-left px-4 py-3 rounded-lg bg-card/50 border border-border hover:border-primary/50 transition-all text-sm font-medium hover:bg-primary/5 flex items-center gap-2">
                   <Sparkles className="w-4 h-4 text-primary" />
@@ -168,7 +184,7 @@ const Navigation = () => {
                 </button>
               </Link>
               
-              {!isPlayground && (
+              {!isPlayground && !isResume && !isAdmin && (
                 <Button
                   onClick={() => scrollToSection("contact")}
                   className="w-full bg-gradient-accent text-accent-foreground hover:opacity-90 shadow-lg"

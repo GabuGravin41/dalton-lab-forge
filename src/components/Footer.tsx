@@ -1,25 +1,40 @@
-import { Github, Linkedin, Mail, Heart, Code2 } from "lucide-react";
+import { Github, Linkedin, Mail, Heart, Code2, ExternalLink } from "lucide-react";
+import { Link } from "react-router-dom";
+import profileData from "@/data/profile.json";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
   
+  const socials = profileData.socials;
+
   const socialLinks = [
-    { icon: Github, href: "https://github.com", label: "GitHub" },
-    { icon: Linkedin, href: "https://linkedin.com", label: "LinkedIn" },
-    { icon: Mail, href: "mailto:dalton@example.com", label: "Email" },
+    { icon: Github, href: socials.github, label: "GitHub" },
+    { icon: Linkedin, href: socials.linkedin, label: "LinkedIn" },
+    { icon: Mail, href: `mailto:${socials.email}`, label: "Email" },
   ];
 
   const quickLinks = [
-    { label: "About", href: "#about" },
-    { label: "Projects", href: "#projects" },
-    { label: "Research", href: "#research" },
-    { label: "Contact", href: "#contact" },
+    { label: "About", href: "/#about" },
+    { label: "Projects", href: "/#projects" },
+    { label: "Research", href: "/#research" },
+    { label: "Contact", href: "/#contact" },
   ];
 
-  const scrollToSection = (id: string) => {
-    const element = document.getElementById(id);
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
+  const pageLinks = [
+    { label: "Resume Exporter", to: "/resume" },
+    { label: "AI Playground", to: "/playground" },
+    { label: "Admin Control Center", to: "/admin" },
+  ];
+
+  const handleScrollToHash = (href: string) => {
+    if (href.startsWith("/#")) {
+      const id = href.replace("/#", "");
+      const element = document.getElementById(id);
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth" });
+      } else {
+        window.location.href = href;
+      }
     }
   };
 
@@ -32,12 +47,12 @@ const Footer = () => {
       <div className="container mx-auto relative z-10">
         <div className="max-w-6xl mx-auto">
           {/* Main Footer Content */}
-          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-8 md:gap-10 lg:gap-12 mb-8 md:mb-10 lg:mb-12">
+          <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-8 md:gap-10 lg:gap-12 mb-8 md:mb-10 lg:mb-12">
             {/* Brand Section */}
             <div className="space-y-3 md:space-y-4 sm:col-span-2 md:col-span-1">
               <div className="space-y-1 md:space-y-2">
                 <h3 className="text-xl md:text-2xl font-bold bg-gradient-to-r from-[hsl(245,58%,51%)] to-[hsl(260,60%,45%)] bg-clip-text text-transparent">
-                  Dalton Omondi
+                  {profileData.name}
                 </h3>
                 <p className="text-xs md:text-sm text-muted-foreground leading-relaxed">
                   Machine Learning + Hardware Engineer
@@ -52,18 +67,37 @@ const Footer = () => {
             {/* Quick Links */}
             <div className="space-y-3 md:space-y-4">
               <h4 className="text-xs md:text-sm font-bold uppercase tracking-wider text-foreground/90">
-                Quick Links
+                Explore
               </h4>
               <nav className="flex flex-col space-y-1.5 md:space-y-2">
                 {quickLinks.map((link) => (
                   <button
                     key={link.label}
-                    onClick={() => scrollToSection(link.href.replace('#', ''))}
+                    onClick={() => handleScrollToHash(link.href)}
                     className="text-sm text-muted-foreground hover:text-primary transition-colors text-left group flex items-center gap-2"
                   >
                     <span className="w-0 h-px bg-primary group-hover:w-4 transition-all" />
                     {link.label}
                   </button>
+                ))}
+              </nav>
+            </div>
+
+            {/* Page Links */}
+            <div className="space-y-3 md:space-y-4">
+              <h4 className="text-xs md:text-sm font-bold uppercase tracking-wider text-foreground/90">
+                Features
+              </h4>
+              <nav className="flex flex-col space-y-1.5 md:space-y-2">
+                {pageLinks.map((link) => (
+                  <Link
+                    key={link.label}
+                    to={link.to}
+                    className="text-sm text-muted-foreground hover:text-primary transition-colors text-left group flex items-center gap-2"
+                  >
+                    <span className="w-0 h-px bg-primary group-hover:w-4 transition-all" />
+                    {link.label}
+                  </Link>
                 ))}
               </nav>
             </div>

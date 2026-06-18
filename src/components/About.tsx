@@ -1,29 +1,27 @@
 import { Card } from "@/components/ui/card";
 import { Cpu, Zap, Lightbulb, Code2 } from "lucide-react";
+import profileData from "@/data/profile.json";
 
 const About = () => {
-  const skills = [
-    {
-      icon: <Cpu className="h-6 w-6" />,
-      title: "Machine Learning",
-      description: "Computer vision, neural networks, and AI model deployment",
-    },
-    {
-      icon: <Zap className="h-6 w-6" />,
-      title: "Hardware Engineering",
-      description: "PCB design, fabrication, and embedded systems development",
-    },
-    {
-      icon: <Code2 className="h-6 w-6" />,
-      title: "Chip Design",
-      description: "VLSI design, simulation, and digital circuit architecture",
-    },
-    {
-      icon: <Lightbulb className="h-6 w-6" />,
-      title: "IoT & Research",
-      description: "Connected devices, sensor networks, and academic exploration",
-    },
-  ];
+  const getIcon = (iconName: string) => {
+    switch (iconName) {
+      case "Cpu":
+        return <Cpu className="h-6 w-6" />;
+      case "Zap":
+        return <Zap className="h-6 w-6" />;
+      case "Code2":
+        return <Code2 className="h-6 w-6" />;
+      case "Lightbulb":
+        return <Lightbulb className="h-6 w-6" />;
+      default:
+        return <Cpu className="h-6 w-6" />;
+    }
+  };
+
+  const skills = profileData.skills.map(skill => ({
+    ...skill,
+    icon: getIcon(skill.icon)
+  }));
 
   return (
     <section id="about" className="py-16 md:py-24 lg:py-32 px-4 sm:px-6 relative overflow-hidden bg-background z-10">
@@ -70,14 +68,7 @@ const About = () => {
                     My Approach
                   </h3>
                   <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
-                    Whether I'm optimizing a machine learning pipeline, laying out a multi-layer PCB, or prototyping 
-                    an IoT sensor node, I'm driven by the same question: <span className="text-accent font-semibold italic">
-                    "How can we make technology more intelligent, more capable, and more meaningful?"</span>
-                  </p>
-                  <p className="text-sm md:text-base text-muted-foreground/90 leading-relaxed">
-                    I believe the most groundbreaking innovations emerge when we refuse to stay in our lane — when we 
-                    bring the precision of hardware design to AI systems, or the adaptability of machine learning to 
-                    embedded devices.
+                    {profileData.about.approach}
                   </p>
                 </div>
               </div>
@@ -89,16 +80,14 @@ const About = () => {
                     What I'm Looking For
                   </h3>
                   <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
-                    Currently seeking opportunities in <span className="font-semibold text-primary">hardware engineering</span>, 
-                    <span className="font-semibold text-accent"> embedded AI</span>, and{" "}
-                    <span className="font-semibold text-primary">research positions</span> where I can contribute to projects 
-                    that push boundaries and create meaningful impact.
+                    {profileData.about.lookingFor}
                   </p>
                   <div className="flex flex-wrap gap-2 pt-2">
-                    <span className="px-3 py-1 text-xs font-medium bg-primary/20 text-primary rounded-full">Hardware Engineering</span>
-                    <span className="px-3 py-1 text-xs font-medium bg-accent/20 text-accent rounded-full">Embedded AI</span>
-                    <span className="px-3 py-1 text-xs font-medium bg-primary/20 text-primary rounded-full">Research</span>
-                    <span className="px-3 py-1 text-xs font-medium bg-accent/20 text-accent rounded-full">Freelance</span>
+                    {profileData.about.lookingForTags.map(tag => (
+                      <span key={tag} className="px-3 py-1 text-xs font-medium bg-primary/20 text-primary rounded-full">
+                        {tag}
+                      </span>
+                    ))}
                   </div>
                 </div>
               </div>
@@ -109,9 +98,7 @@ const About = () => {
                 <div className="relative space-y-3 md:space-y-4">
                   <h3 className="text-xl md:text-2xl font-bold">Beyond Engineering</h3>
                   <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
-                    When I'm not designing circuits or training models, I explore philosophy, listen to diverse music, 
-                    and reflect on the meaning we assign to what we create. Good engineering, I believe, demands both 
-                    technical precision and human insight.
+                    {profileData.about.beyond}
                   </p>
                 </div>
               </div>

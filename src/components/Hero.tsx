@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Download } from "lucide-react";
+import profileData from "@/data/profile.json";
 
 const Hero = () => {
   const scrollToSection = (id: string) => {
@@ -9,8 +10,12 @@ const Hero = () => {
     }
   };
 
+  const nameParts = profileData.name.split(" ");
+  const firstName = nameParts[0];
+  const lastName = nameParts.slice(1).join(" ");
+
   return (
-    <section id="hero" className="min-h-screen flex items-center justify-center px-6 relative overflow-hidden">
+    <section id="hero" className="min-h-screen flex items-center justify-center pt-24 md:pt-28 pb-12 px-6 relative overflow-hidden">
       {/* Grid pattern background - More visible */}
       <div className="absolute inset-0 opacity-[0.04]">
         <div className="absolute inset-0" style={{
@@ -30,35 +35,24 @@ const Hero = () => {
         <div className="grid lg:grid-cols-[1fr,auto] gap-8 items-center min-h-[70vh]">
           {/* Left side - Main content */}
           <div className="space-y-6 md:space-y-8 animate-fade-in lg:pr-16 lg:max-w-2xl">
-            {/*
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 border border-primary/20 rounded-full backdrop-blur-sm">
-              <div className="w-2 h-2 rounded-full bg-accent animate-pulse" />
-              <span className="text-sm font-medium text-foreground">Available for Opportunities</span>
-            </div>*/}
 
             <div className="space-y-3 md:space-y-4">
               <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold leading-[0.9] tracking-tight">
-                <span className="block text-foreground">Dalton</span>
-                <span className="block bg-gradient-to-r from-[hsl(245,58%,51%)] to-[hsl(260,60%,45%)] bg-clip-text text-transparent">Omondi</span>
+                <span className="block text-foreground">{firstName}</span>
+                <span className="block bg-gradient-to-r from-[hsl(245,58%,51%)] to-[hsl(260,60%,45%)] bg-clip-text text-transparent">{lastName}</span>
               </h1>
               
               <div className="flex flex-wrap gap-2 pt-2">
-                <span className="px-3 py-1 text-xs font-medium bg-primary/20 text-primary rounded-full border border-primary/30">
-                  ML Engineer
-                </span>
-                <span className="px-3 py-1 text-xs font-medium bg-accent/20 text-accent rounded-full border border-accent/30">
-                  Hardware Designer
-                </span>
-                <span className="px-3 py-1 text-xs font-medium bg-primary/20 text-primary rounded-full border border-primary/30">
-                  Researcher
-                </span>
+                {profileData.roles.map((role) => (
+                  <span key={role} className="px-3 py-1 text-xs font-medium bg-primary/20 text-primary rounded-full border border-primary/30">
+                    {role}
+                  </span>
+                ))}
               </div>
             </div>
 
             <p className="text-base md:text-lg text-muted-foreground leading-relaxed max-w-lg">
-              Engineering at the intersection of <span className="text-primary font-medium">artificial intelligence</span> and{" "}
-              <span className="text-accent font-medium">physical systems</span>. From neural networks to circuit boards, 
-              I create technology that thinks and works.
+              {profileData.bio}
             </p>
 
             <div className="flex flex-wrap gap-3 md:gap-4 pt-2 md:pt-4">

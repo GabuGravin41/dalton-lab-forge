@@ -1,4 +1,7 @@
 import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold, GenerationConfig, ChatSession } from "@google/generative-ai";
+import profileData from "../data/profile.json";
+import projectsData from "../data/projects.json";
+import papersData from "../data/papers.json";
 
 // 1. Get API Key from environment variables
 const apiKey = import.meta.env.VITE_GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY;
@@ -7,8 +10,6 @@ if (!apiKey) {
   const errorMsg = "VITE_GEMINI_API_KEY is not defined in environment variables. " +
                   "Please check your .env file and make sure it's properly configured.";
   console.error(errorMsg);
-  // Instead of throwing, we'll log the error and the app will show appropriate UI
-  // This prevents the whole app from crashing in production
   if (import.meta.env.DEV) {
     throw new Error(errorMsg);
   }
@@ -37,12 +38,35 @@ const safetySettings = [
   },
 ];
 
-// 4. Define the system prompt for your chatbot
-const systemInstruction = {
-  role: "system",
-  parts: [{
-    text: "You're a friendly AI assistant helping people learn about Dalton Omondi. Be brief, conversational, and to-the-point. Tell them about Dalton's background as an ML engineer and hardware designer who works at the intersection of AI and physical systems. Cover his projects (ML models, PCB designs, chip architecture, IoT), skills (Python, C/C++, TensorFlow, PyTorch, Verilog, KiCAD), and passion for building smart hardware. Keep responses under 3 sentences unless they ask for details. Use a casual, engaging tone. If they ask about specific topics, point them to relevant portfolio sections."
-  }],
+// Helper to generate dynamic system prompt representing Dalton Omondi
+const getSystemPrompt = (): string => {
+  return `You're a friendly AI assistant helping people learn about ${profileData.name}.
+Be brief, conversational, and to-the-point. Keep responses under 3 sentences unless they ask for details. Use a casual, engaging tone.
+If they ask about specific projects, publications, or credentials, answer accurately using the data below.
+
+Here is Dalton's current professional profile:
+- Name: ${profileData.name}
+- Roles: ${profileData.roles.join(", ")}
+- Bio: ${profileData.bio}
+- Approach: ${profileData.about.approach}
+- Seeking: ${profileData.about.lookingFor}
+
+Core Skills & Expertise:
+${profileData.skills.map(s => `- ${s.title}: ${s.description}`).join("\n")}
+
+Professional Experience:
+${profileData.experience.map(e => `- ${e.role} at ${e.company} (${e.period}): ${e.description}`).join("\n")}
+
+Featured Projects:
+${projectsData.map(p => `- ${p.title} (${p.category}): ${p.description}`).join("\n")}
+
+Research Publications:
+${papersData.map(paper => `- ${paper.title} (${paper.year}, Status: ${paper.status}): ${paper.abstract}`).join("\n")}
+
+Certifications & Achievements:
+${profileData.certifications.map(c => `- ${c}`).join("\n")}
+
+Answer questions from visitors based on this information. If you don't know something, just say so.`;
 };
 
 // 5. Configuration for the generative model
@@ -62,6 +86,7 @@ export const geminiModel = genAI.getGenerativeModel({
   model: "gemini-2.0-flash",
   safetySettings,
   generationConfig,
+  systemInstruction: getSystemPrompt(),
 });
 
 /**
@@ -72,17 +97,18 @@ export const getChatSession = (): ChatSession => {
     model: "gemini-2.0-flash",
     safetySettings,
     generationConfig,
+    systemInstruction: getSystemPrompt(),
   });
 
   return model.startChat({
     history: [
       {
         role: "user",
-        parts: [{ text: "You're a friendly AI assistant helping people learn about Dalton Omondi. Be brief, conversational, and to-the-point. Tell them about Dalton's background as an ML engineer and hardware designer who works at the intersection of AI and physical systems. Cover his projects (ML models, PCB designs, chip architecture, IoT), skills (Python, C/C++, TensorFlow, PyTorch, Verilog, KiCAD), and passion for building smart hardware. Keep responses under 3 sentences unless they ask for details. Use a casual, engaging tone." }],
+        parts: [{ text: `You are a friendly AI assistant helping people learn about Dalton Omondi.` }],
       },
       {
         role: "model",
-        parts: [{ text: "Got it! I'll keep things brief and conversational while telling people about Dalton - his AI + hardware projects, skills, and experience. Ready to help! 👍" }],
+        parts: [{ text: `Got it! I will answer questions about Dalton Omondi, his machine learning projects, PCB designs, publications, and credentials in a brief, conversational manner. How can I help you today? 👍` }],
       },
     ],
   });
