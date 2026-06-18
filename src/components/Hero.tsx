@@ -15,7 +15,7 @@ const Hero = () => {
   const lastName = nameParts.slice(1).join(" ");
 
   return (
-    <section id="hero" className="min-h-screen flex items-center justify-center pt-24 md:pt-28 pb-12 px-6 relative overflow-hidden">
+    <section id="hero" className="min-h-screen flex items-center justify-center pt-32 sm:pt-36 md:pt-40 lg:pt-32 pb-12 px-6 relative overflow-hidden">
       {/* Grid pattern background - More visible */}
       <div className="absolute inset-0 opacity-[0.04]">
         <div className="absolute inset-0" style={{
