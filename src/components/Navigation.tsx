@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X, Sparkles, FileText, Settings, Palette, LayoutGrid } from "lucide-react";
+import { useTheme } from "next-themes";
 import {
   Dialog,
   DialogContent,
@@ -38,8 +39,8 @@ const SettingsButton = ({ activeTheme, activeFocus, handleThemeChange, handleFoc
           <Settings className="w-[1.2rem] h-[1.2rem] transition-transform hover:rotate-45 duration-300" />
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[450px] bg-background/95 backdrop-blur-xl border border-border/80 shadow-2xl text-foreground">
-        <DialogHeader className="pb-2 border-b border-border/50">
+      <DialogContent className="sm:max-w-[450px] max-h-[85vh] bg-background/95 backdrop-blur-xl border border-border/80 shadow-2xl text-foreground flex flex-col p-0 overflow-hidden">
+        <DialogHeader className="p-6 pb-4 border-b border-border/50">
           <DialogTitle className="text-xl font-bold flex items-center gap-2 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
             <Settings className="w-5 h-5 text-primary" />
             Appearance & Layout
@@ -49,7 +50,7 @@ const SettingsButton = ({ activeTheme, activeFocus, handleThemeChange, handleFoc
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-6 py-4">
+        <div className="flex-1 overflow-y-auto p-6 space-y-6 scrollbar-thin">
           {/* Theme selection */}
           <div className="space-y-3">
             <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
@@ -60,6 +61,7 @@ const SettingsButton = ({ activeTheme, activeFocus, handleThemeChange, handleFoc
               {themes.map((t) => (
                 <button
                   key={t.id}
+                  type="button"
                   onClick={() => handleThemeChange(t.id)}
                   className={`flex items-center justify-between p-3 rounded-lg border text-left transition-all ${
                     activeTheme === t.id
@@ -90,6 +92,7 @@ const SettingsButton = ({ activeTheme, activeFocus, handleThemeChange, handleFoc
             </h4>
             <div className="grid grid-cols-2 gap-3">
               <button
+                type="button"
                 onClick={() => handleFocusChange("engineering")}
                 className={`p-3 rounded-lg border text-left transition-all flex flex-col justify-between h-24 ${
                   activeFocus === "engineering"
@@ -106,6 +109,7 @@ const SettingsButton = ({ activeTheme, activeFocus, handleThemeChange, handleFoc
                 </span>
               </button>
               <button
+                type="button"
                 onClick={() => handleFocusChange("research")}
                 className={`p-3 rounded-lg border text-left transition-all flex flex-col justify-between h-24 ${
                   activeFocus === "research"
@@ -130,6 +134,7 @@ const SettingsButton = ({ activeTheme, activeFocus, handleThemeChange, handleFoc
 };
 
 const Navigation = () => {
+  const { theme: nextTheme, setTheme: setNextTheme } = useTheme();
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("");
@@ -179,6 +184,11 @@ const Navigation = () => {
   const handleThemeChange = (theme: string) => {
     setActiveTheme(theme);
     localStorage.setItem("portfolio_theme", theme);
+    
+    // Automatically switch next-themes to dark mode for custom color templates
+    if (nextTheme === "light") {
+      setNextTheme("dark");
+    }
     
     const savedProfile = localStorage.getItem("portfolio_profile");
     if (savedProfile) {
