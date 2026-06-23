@@ -3,6 +3,7 @@ import type { Config } from "tailwindcss";
 export default {
   darkMode: ["class"],
   content: ["./pages/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}", "./app/**/*.{ts,tsx}", "./src/**/*.{ts,tsx}"],
+  safelist: ["theme-indigo", "theme-emerald", "theme-rose", "theme-cyberpunk", "theme-steel"],
   prefix: "",
   theme: {
     container: {
