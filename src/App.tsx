@@ -32,14 +32,18 @@ const App = () => {
       }
 
       const classes = document.documentElement.classList;
-      const themeClasses: string[] = [];
-      classes.forEach((c) => {
-        if (c.startsWith("theme-")) {
-          themeClasses.push(c);
-        }
-      });
-      themeClasses.forEach(c => classes.remove(c));
-      classes.add(`theme-${theme}`);
+      const expectedClass = `theme-${theme}`;
+
+      if (!classes.contains(expectedClass)) {
+        const themeClasses: string[] = [];
+        classes.forEach((c) => {
+          if (c.startsWith("theme-") && c !== expectedClass) {
+            themeClasses.push(c);
+          }
+        });
+        themeClasses.forEach(c => classes.remove(c));
+        classes.add(expectedClass);
+      }
     };
 
     applyActiveTheme();
@@ -47,9 +51,23 @@ const App = () => {
     window.addEventListener("storage", applyActiveTheme);
     window.addEventListener("portfolio-theme-change", applyActiveTheme);
 
+    // MutationObserver guarantees custom theme classes survive next-themes updates/resets
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.attributeName === "class") {
+          observer.disconnect();
+          applyActiveTheme();
+          observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+        }
+      });
+    });
+
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+
     return () => {
       window.removeEventListener("storage", applyActiveTheme);
       window.removeEventListener("portfolio-theme-change", applyActiveTheme);
+      observer.disconnect();
     };
   }, []);
 
