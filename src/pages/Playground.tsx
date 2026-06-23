@@ -1,12 +1,12 @@
-import { useState, useRef, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Brain, ImageIcon, MessageSquare, Wand2, Loader2, ArrowLeft, Camera, Network } from "lucide-react";
+import { Brain, ImageIcon, MessageSquare, Wand2, Loader2, ArrowLeft, Camera, Network, Info } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useGeminiChat, useSentimentAnalysis } from '@/hooks/useGemini';
+import { generateAIResponse } from "@/utils/aiClient";
 import Navigation from "@/components/Navigation";
 import NeuralNetworkVisualizer from "@/components/NeuralNetworkVisualizer";
 import ObjectDetection from "@/components/ObjectDetection";
@@ -15,31 +15,37 @@ const Playground = () => {
   const [textInput, setTextInput] = useState("");
   const [imagePrompt, setImagePrompt] = useState("");
   const [chatPrompt, setChatPrompt] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  
+  const [isTextLoading, setIsTextLoading] = useState(false);
+  const [isImageLoading, setIsImageLoading] = useState(false);
+  const [isChatLoading, setIsChatLoading] = useState(false);
+  const [isTestLoading, setIsTestLoading] = useState(false);
+  
   const [chatHistory, setChatHistory] = useState<Array<{role: 'user' | 'model', text: string}>>([]);
   const [results, setResults] = useState<{[key: string]: string}>({});
 
-  const chatSessionRef = useRef<any>(null);
-  const sentimentMutation = useSentimentAnalysis();
-  const chatMutation = useGeminiChat();
-
-  // Initialize chat session on mount
-  useEffect(() => {
-    const initChat = async () => {
-      const { getChatSession } = await import('@/utils/gemini');
-      chatSessionRef.current = getChatSession();
-    };
-    initChat();
-  }, []);
-
-
   const handleTextAnalysis = async () => {
-    if (!textInput.trim()) return;
+    if (!textInput.trim() || isTextLoading) return;
+    setIsTextLoading(true);
     try {
-      const data = await sentimentMutation.mutateAsync(textInput);
+      const prompt = `
+Analyze the sentiment of the following text. Provide your analysis in a JSON object format.
+The JSON object should have three keys:
+1. "emotion": A single dominant emotion (e.g., "Positive", "Negative", "Neutral", "Joy", "Anger", "Surprise").
+2. "confidence": A number between 0 and 1 representing your confidence in the emotion analysis.
+3. "feedback": A brief, constructive feedback or summary of the text's tone (20 words or less).
+
+Text to analyze: "${textInput}"
+`;
+      const systemInstruction = "You are a Sentiment Analysis Assistant. Return ONLY a valid JSON object matching the requested schema. Do not include markdown wraps.";
+      const rawResult = await generateAIResponse(prompt, systemInstruction, true);
+      
+      const cleanJson = rawResult.replace(/^```json\s*/i, "").replace(/```\s*$/, "").trim();
+      const data = JSON.parse(cleanJson);
+      
       setResults(prev => ({
         ...prev,
-        sentiment: `Emotion: ${data.emotion}\nConfidence: ${(data.confidence * 100).toFixed(0)}%\nFeedback: ${data.feedback}\nWord count: ${textInput.split(' ').length} words.`
+        sentiment: `Emotion: ${data.emotion}\nConfidence: ${(data.confidence * 100).toFixed(0)}%\nFeedback: ${data.feedback}\nWord count: ${textInput.trim().split(/\s+/).length} words.`
       }));
     } catch (error) {
       console.error('Sentiment analysis error:', error);
@@ -47,11 +53,13 @@ const Playground = () => {
         ...prev,
         sentiment: `Error: ${error instanceof Error ? error.message : 'Unknown error occurred'}`
       }));
+    } finally {
+      setIsTextLoading(false);
     }
   };
 
   const handleImageGeneration = async () => {
-    setIsLoading(true);
+    setIsImageLoading(true);
     setTimeout(() => {
       const words = imagePrompt.split(' ').length;
       const style = imagePrompt.toLowerCase().includes('realistic') ? 'photorealistic' :
@@ -60,53 +68,53 @@ const Playground = () => {
                     'digital art';
       setResults(prev => ({
         ...prev,
-        image: `✨ Image generation processed successfully!\n\n📝 Your prompt: "${imagePrompt}"\n🎨 Detected style: ${style}\n📊 Complexity: ${words > 10 ? 'High' : words > 5 ? 'Medium' : 'Low'}\n⏱️ Estimated generation time: ${words * 0.5}s\n\n🚀 Ready to integrate with Google Imagen API for actual image generation.`
+        image: `✨ Image generation processed successfully!\n\n📝 Your prompt: "${imagePrompt}"\n🎨 Detected style: ${style}\n📊 Complexity: ${words > 10 ? 'High' : words > 5 ? 'Medium' : 'Low'}\n⏱️ Estimated generation time: ${words * 0.5}s\n\n🚀 Ready to integrate with Google Imagen API or Stable Diffusion via OpenRouter for actual image generation.`
       }));
-      setIsLoading(false);
+      setIsImageLoading(false);
     }, 2000);
   };
 
   const handleChatCompletion = async () => {
-    if (!chatPrompt.trim() || !chatSessionRef.current) return;
+    if (!chatPrompt.trim() || isChatLoading) return;
+    
     const userMessage = { role: 'user' as const, text: chatPrompt };
     setChatHistory(prev => [...prev, userMessage]);
+    const promptText = chatPrompt;
     setChatPrompt('');
+    setIsChatLoading(true);
+
     try {
-      const response = await chatMutation.mutateAsync({ prompt: userMessage.text, chatSession: chatSessionRef.current });
+      // Build conversation history format for the prompt
+      const recentHistory = chatHistory
+        .slice(-6)
+        .map(m => `${m.role === 'user' ? 'User' : 'Model'}: ${m.text}`)
+        .join("\n");
+      
+      const fullPrompt = `${recentHistory}\nUser: ${promptText}\nModel:`;
+      const systemInstruction = `You are a helpful AI assistant. Answer the user's questions in a friendly, conversational, and direct manner. Keep responses brief and relevant.`;
+
+      const response = await generateAIResponse(fullPrompt, systemInstruction);
       const modelMessage = { role: 'model' as const, text: response };
       setChatHistory(prev => [...prev, modelMessage]);
     } catch (error) {
       console.error('Chat error:', error);
-      const errorMessage = { role: 'model' as const, text: `Sorry, I encountered an error: ${error instanceof Error ? error.message : 'Unknown error'}. Please try again.` };
+      const errorMessage = { role: 'model' as const, text: `Sorry, I encountered an error: ${error instanceof Error ? error.message : 'Unknown error'}. Please check your connection and try again.` };
       setChatHistory(prev => [...prev, errorMessage]);
+    } finally {
+      setIsChatLoading(false);
     }
   };
 
-
   const handleTestAPI = async () => {
+    setIsTestLoading(true);
     try {
-      const { GoogleGenerativeAI } = await import("@google/generative-ai");
-      const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-
-      if (!apiKey) {
-        throw new Error("API key not found in environment variables");
-      }
-
-      const genAI = new GoogleGenerativeAI(apiKey);
-      const testModel = genAI.getGenerativeModel({
-        model: "gemini-2.0-flash",
-      });
-
-      const result = await testModel.generateContent("Hello, just testing the API. Please respond with 'API test successful'");
-      const response = result.response;
-      const text = response.text();
-
-      console.log("✅ Gemini API test successful:", text);
-      alert("✅ Gemini API test successful! " + text);
-
+      const response = await generateAIResponse("Say 'API connection successful!' in 4 words.");
+      alert("✅ AI test successful: " + response);
     } catch (error) {
-      console.error("❌ Gemini API test failed:", error);
-      alert("❌ Gemini API test failed: " + (error instanceof Error ? error.message : 'Unknown error'));
+      console.error("AI test failed:", error);
+      alert("❌ AI test failed: " + (error instanceof Error ? error.message : 'Unknown error'));
+    } finally {
+      setIsTestLoading(false);
     }
   };
 
@@ -116,13 +124,24 @@ const Playground = () => {
       
       <section className="pt-24 md:pt-28 lg:pt-32 pb-16 md:pb-20 px-4 sm:px-6">
         <div className="max-w-6xl mx-auto">
-          {/* Back Button */}
-          <Link to="/">
-            <Button variant="ghost" className="mb-6 md:mb-8 group text-sm md:text-base">
-              <ArrowLeft className="w-3 md:w-4 h-3 md:h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
-              Back to Portfolio
+          {/* Back Button & Test Button */}
+          <div className="flex items-center justify-between mb-6 md:mb-8">
+            <Link to="/">
+              <Button variant="ghost" className="group text-sm md:text-base">
+                <ArrowLeft className="w-3 md:w-4 h-3 md:h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
+                Back to Portfolio
+              </Button>
+            </Link>
+            <Button 
+              variant="outline" 
+              onClick={handleTestAPI}
+              disabled={isTestLoading}
+              className="border-primary/20 text-primary hover:bg-primary/5 text-xs md:text-sm"
+            >
+              {isTestLoading ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : null}
+              Test Active AI Config
             </Button>
-          </Link>
+          </div>
 
           {/* Section Header */}
           <div className="text-center mb-10 md:mb-12 lg:mb-16">
@@ -130,8 +149,8 @@ const Playground = () => {
               AI <span className="bg-gradient-to-r from-[hsl(245,58%,51%)] to-[hsl(260,60%,45%)] bg-clip-text text-transparent">Playground</span>
             </h1>
             <p className="text-base md:text-lg lg:text-xl text-muted-foreground max-w-3xl mx-auto">
-              Experience interactive AI capabilities firsthand. Test sentiment analysis, 
-              image generation, and language models in real-time.
+              Experience interactive AI capabilities firsthand. Run real-time edge object detection, 
+              test sentiment analysis, and chat with AI using active config settings.
             </p>
           </div>
 
@@ -140,18 +159,15 @@ const Playground = () => {
             <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 bg-card/50 backdrop-blur-sm border border-border p-2 h-auto">
               <TabsTrigger value="text" className="flex items-center gap-1.5 md:gap-2 text-xs md:text-sm py-2 md:py-2.5">
                 <MessageSquare className="w-3 md:w-4 h-3 md:h-4" />
-                <span className="hidden sm:inline">Sentiment</span>
-                <span className="sm:hidden">Sentiment</span>
+                <span>Sentiment</span>
               </TabsTrigger>
               <TabsTrigger value="image" className="flex items-center gap-1.5 md:gap-2 text-xs md:text-sm py-2 md:py-2.5">
                 <ImageIcon className="w-3 md:w-4 h-3 md:h-4" />
-                <span className="hidden sm:inline">Image Gen</span>
-                <span className="sm:hidden">Image</span>
+                <span>Image Gen</span>
               </TabsTrigger>
               <TabsTrigger value="detection" className="flex items-center gap-1.5 md:gap-2 text-xs md:text-sm py-2 md:py-2.5">
                 <Camera className="w-3 md:w-4 h-3 md:h-4" />
-                <span className="hidden sm:inline">Detection</span>
-                <span className="sm:hidden">Detect</span>
+                <span>Detection</span>
               </TabsTrigger>
               <TabsTrigger value="chat" className="flex items-center gap-1.5 md:gap-2 text-xs md:text-sm py-2 md:py-2.5">
                 <Brain className="w-3 md:w-4 h-3 md:h-4" />
@@ -159,8 +175,7 @@ const Playground = () => {
               </TabsTrigger>
               <TabsTrigger value="neural" className="flex items-center gap-1.5 md:gap-2 text-xs md:text-sm py-2 md:py-2.5 col-span-2 sm:col-span-1">
                 <Network className="w-3 md:w-4 h-3 md:h-4" />
-                <span className="hidden sm:inline">NN Visualizer</span>
-                <span className="sm:hidden">Neural Net</span>
+                <span>NN Visualizer</span>
               </TabsTrigger>
             </TabsList>
 
@@ -174,7 +189,7 @@ const Playground = () => {
                       Sentiment Analysis
                     </CardTitle>
                     <CardDescription className="text-xs md:text-sm">
-                      Analyze the emotional tone and sentiment of any text using advanced NLP models.
+                      Analyze the emotional tone of text input using generative AI structured output models.
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-3 md:space-y-4 p-4 md:p-6 pt-0">
@@ -186,10 +201,10 @@ const Playground = () => {
                     />
                     <Button
                       onClick={handleTextAnalysis}
-                      disabled={!textInput.trim() || sentimentMutation.isPending}
+                      disabled={!textInput.trim() || isTextLoading}
                       className="w-full bg-gradient-primary hover:opacity-90 text-white text-sm md:text-base h-9 md:h-10"
                     >
-                      {sentimentMutation.isPending ? <Loader2 className="w-3 md:w-4 h-3 md:h-4 mr-2 animate-spin" /> : <Wand2 className="w-3 md:w-4 h-3 md:h-4 mr-2" />}
+                      {isTextLoading ? <Loader2 className="w-3 md:w-4 h-3 md:h-4 mr-2 animate-spin" /> : <Wand2 className="w-3 md:w-4 h-3 md:h-4 mr-2" />}
                       Analyze Sentiment
                     </Button>
                   </CardContent>
@@ -228,10 +243,11 @@ const Playground = () => {
                     </CardDescription>
                     <div className="mt-3 p-3 rounded-lg bg-orange-500/10 border border-orange-500/20">
                       <p className="text-sm text-orange-600 font-medium flex items-center gap-2">
-                        ⚠️ Dalton has not paid for image gen credits
+                        <Info className="w-4 h-4" />
+                        Imagen & Stable Diffusion Sandbox
                       </p>
                       <p className="text-xs text-muted-foreground mt-1">
-                        This feature is currently disabled as image generation credits have been used up. The demo shows the processing pipeline though. Have fun!! :)
+                        Image credits are currently configured to demonstration mode. Play with the prompt details below to see the image pipeline.
                       </p>
                     </div>
                   </CardHeader>
@@ -244,10 +260,10 @@ const Playground = () => {
                     />
                     <Button
                       onClick={handleImageGeneration}
-                      disabled={!imagePrompt.trim() || isLoading}
+                      disabled={!imagePrompt.trim() || isImageLoading}
                       className="w-full bg-gradient-primary hover:opacity-90 text-white"
                     >
-                      {isLoading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <ImageIcon className="w-4 h-4 mr-2" />}
+                      {isImageLoading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <ImageIcon className="w-4 h-4 mr-2" />}
                       Demo Processing Pipeline
                     </Button>
                   </CardContent>
@@ -287,10 +303,10 @@ const Playground = () => {
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <Brain className="w-5 h-5 text-primary" />
-                      AI Chatbot
+                      AI Sandbox Chatbot
                     </CardTitle>
                     <CardDescription>
-                      Interact with advanced language models for text completion, Q&A, and creative writing.
+                      Chat with the model configured in your Control Center (Gemini or OpenRouter models).
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
@@ -302,10 +318,10 @@ const Playground = () => {
                     />
                     <Button
                       onClick={handleChatCompletion}
-                      disabled={!chatPrompt.trim() || chatMutation.isPending}
+                      disabled={!chatPrompt.trim() || isChatLoading}
                       className="w-full bg-gradient-primary hover:opacity-90 text-white"
                     >
-                      {chatMutation.isPending ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Brain className="w-4 h-4 mr-2" />}
+                      {isChatLoading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Brain className="w-4 h-4 mr-2" />}
                       Generate Response
                     </Button>
                   </CardContent>

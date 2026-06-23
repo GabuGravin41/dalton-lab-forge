@@ -219,7 +219,7 @@ const Contact = () => {
                   <Button
                     variant="outline"
                     className="w-full border-accent/30 hover:bg-accent/10 hover:border-accent/50 group mt-3 md:mt-4 text-sm md:text-base h-9 md:h-10"
-                    onClick={() => window.open("https://fiverr.com", "_blank")}
+                    onClick={() => window.open(socials.fiverr, "_blank")}
                   >
                     View Fiverr Profile
                     <ExternalLink className="ml-2 h-3 w-3 md:h-4 md:w-4 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />

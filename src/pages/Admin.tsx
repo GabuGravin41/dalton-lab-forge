@@ -42,6 +42,12 @@ const Admin = () => {
   const [gitOwner, setGitOwner] = useState("");
   const [gitRepo, setGitRepo] = useState("");
   const [gitBranch, setGitBranch] = useState("main");
+  const [adminPasscode, setAdminPasscode] = useState("daltonadmin");
+
+  // Passcode gate unlock states
+  const [isUnlocked, setIsUnlocked] = useState(false);
+  const [passcodeInput, setPasscodeInput] = useState("");
+  const [passcodeError, setPasscodeError] = useState(false);
 
   // Portfolio states
   const [profile, setProfile] = useState<any>(localProfile);
@@ -78,6 +84,12 @@ const Admin = () => {
     setGitOwner(localStorage.getItem("admin_github_owner") || "");
     setGitRepo(localStorage.getItem("admin_github_repo") || "");
     setGitBranch(localStorage.getItem("admin_github_branch") || "main");
+    setAdminPasscode(localStorage.getItem("admin_passcode") || "daltonadmin");
+
+    // Check if session is already unlocked
+    if (sessionStorage.getItem("admin_session_unlocked") === "true") {
+      setIsUnlocked(true);
+    }
 
     // Load locally saved data edits if they exist
     const savedProfile = localStorage.getItem("portfolio_profile");
@@ -99,7 +111,22 @@ const Admin = () => {
     localStorage.setItem("admin_github_owner", gitOwner);
     localStorage.setItem("admin_github_repo", gitRepo);
     localStorage.setItem("admin_github_branch", gitBranch);
+    localStorage.setItem("admin_passcode", adminPasscode);
     toast.success("Settings saved to browser local storage!");
+  };
+
+  const handleUnlock = (e: React.FormEvent) => {
+    e.preventDefault();
+    const storedPasscode = localStorage.getItem("admin_passcode") || "daltonadmin";
+    if (passcodeInput === storedPasscode) {
+      setIsUnlocked(true);
+      sessionStorage.setItem("admin_session_unlocked", "true");
+      setPasscodeError(false);
+      toast.success("Control Center unlocked!");
+    } else {
+      setPasscodeError(true);
+      toast.error("Incorrect passcode. Access denied.");
+    }
   };
 
   const getGitHubConfig = (): GitHubConfig => {
@@ -333,6 +360,63 @@ const Admin = () => {
       toast.success("Local edits reset to codebase defaults!");
     }
   };
+
+  if (!isUnlocked) {
+    return (
+      <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4 relative overflow-hidden">
+        {/* Glow decoration */}
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/20 rounded-full blur-[120px] animate-glow-pulse" />
+        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-accent/20 rounded-full blur-[100px] animate-glow-pulse" style={{ animationDelay: "2s" }} />
+
+        <Card className="w-full max-w-md bg-card/50 backdrop-blur-lg border-border shadow-2xl relative z-10 p-6 md:p-8 space-y-6">
+          <CardHeader className="text-center pb-2">
+            <div className="mx-auto w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+              <Settings className="w-6 h-6 text-primary animate-spin-slow" />
+            </div>
+            <CardTitle className="text-2xl font-bold">Admin Control Center</CardTitle>
+            <CardDescription>
+              Enter passcode to access Dalton's portfolio dashboard
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <form onSubmit={handleUnlock} className="space-y-4">
+              <div className="space-y-2">
+                <Input
+                  type="password"
+                  placeholder="Enter passcode..."
+                  value={passcodeInput}
+                  onChange={(e) => {
+                    setPasscodeInput(e.target.value);
+                    setPasscodeError(false);
+                  }}
+                  className={`bg-muted/30 border-border/70 text-center text-lg tracking-wider ${passcodeError ? 'border-destructive focus-visible:ring-destructive' : 'focus-visible:ring-primary'}`}
+                  autoFocus
+                />
+                {passcodeError && (
+                  <p className="text-xs text-destructive text-center font-medium animate-pulse">
+                    Incorrect passcode. Please try again.
+                  </p>
+                )}
+              </div>
+              <Button
+                type="submit"
+                className="w-full bg-gradient-primary hover:opacity-90 text-white font-semibold h-11 rounded-lg"
+              >
+                Unlock Control Center
+              </Button>
+            </form>
+            <div className="text-center pt-2">
+              <Link to="/">
+                <Button variant="ghost" className="text-xs text-muted-foreground hover:text-foreground">
+                  ← Return to Portfolio Home
+                </Button>
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -820,6 +904,17 @@ const Admin = () => {
                           value={gitBranch}
                           onChange={(e) => setGitBranch(e.target.value)}
                         />
+                      </div>
+
+                      <div className="space-y-1.5 border-t border-border pt-4">
+                        <label className="text-xs font-semibold text-muted-foreground uppercase">Control Center Passcode</label>
+                        <Input
+                          type="password"
+                          placeholder="daltonadmin"
+                          value={adminPasscode}
+                          onChange={(e) => setAdminPasscode(e.target.value)}
+                        />
+                        <p className="text-[10px] text-muted-foreground leading-relaxed">Passcode required to open this Admin Dashboard. Default: daltonadmin</p>
                       </div>
 
                       <Button type="submit" className="w-full mt-4">Save Configuration</Button>

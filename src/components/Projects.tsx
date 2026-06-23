@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ExternalLink, Github, Sparkles } from "lucide-react";
 import projectsData from "@/data/projects.json";
+import profileData from "@/data/profile.json";
 
 const Projects = () => {
   const [activeFilter, setActiveFilter] = useState("all");
@@ -148,7 +149,7 @@ const Projects = () => {
             <Button
               variant="outline"
               className="border-primary/30 hover:bg-primary/10 hover:border-primary/50 group"
-              onClick={() => window.open("https://github.com", "_blank")}
+              onClick={() => window.open(profileData.socials.github, "_blank")}
             >
               <Github className="w-4 h-4 mr-2 group-hover:rotate-12 transition-transform" />
               View GitHub Profile

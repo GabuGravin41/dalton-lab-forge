@@ -1,6 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { Cpu, Zap, Lightbulb, Code2 } from "lucide-react";
 import profileData from "@/data/profile.json";
+import GitHubStats from "./GitHubStats";
 
 const About = () => {
   const getIcon = (iconName: string) => {
@@ -101,6 +102,12 @@ const About = () => {
                     {profileData.about.beyond}
                   </p>
                 </div>
+              </div>
+
+              {/* Live GitHub & Kaggle Metrics */}
+              <div className="space-y-4 pt-2">
+                <h3 className="text-xs md:text-sm font-mono text-muted-foreground uppercase tracking-wider">Live Analytics & Standings</h3>
+                <GitHubStats />
               </div>
             </div>
 
