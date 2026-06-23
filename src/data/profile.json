@@ -1,5 +1,8 @@
 {
   "name": "Dalton Omondi",
+  "theme": "indigo",
+  "engineeringObjective": "Lead Machine Learning & Hardware Systems Engineer focused on translating complex neural network architectures into efficient physical silicon designs and edge hardware systems.",
+  "researchStatement": "Researcher at the intersection of analytic number theory, machine learning, and silicon photonics. Investigating mathematical priors for structured sparsity (ZPSN) and optical neural computing.",
   "roles": [
     "ML Engineer",
     "Hardware Designer",

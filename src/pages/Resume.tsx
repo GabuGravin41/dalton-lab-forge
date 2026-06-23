@@ -27,8 +27,23 @@ type ResumeTemplate = "modern" | "academic" | "minimal";
 
 const Resume = () => {
   const [template, setTemplate] = useState<ResumeTemplate>("modern");
+  const [focus, setFocus] = useState<"engineering" | "research">("engineering");
 
-  const socials = profileData.socials;
+  // Load from local storage (or fallback to static data files)
+  const [profile] = useState<any>(() => {
+    const saved = localStorage.getItem("portfolio_profile");
+    return saved ? JSON.parse(saved) : profileData;
+  });
+  const [projects] = useState<any[]>(() => {
+    const saved = localStorage.getItem("portfolio_projects");
+    return saved ? JSON.parse(saved) : projectsData;
+  });
+  const [papers] = useState<any[]>(() => {
+    const saved = localStorage.getItem("portfolio_papers");
+    return saved ? JSON.parse(saved) : papersData;
+  });
+
+  const socials = profile.socials || profileData.socials;
 
   const handlePrint = () => {
     toast.info("Opening system print dialog... Select 'Save as PDF' to export.");
@@ -37,8 +52,19 @@ const Resume = () => {
     }, 500);
   };
 
-  // Helper to filter tags for resume spacing
   const cleanUrl = (url: string) => url.replace("https://www.", "").replace("https://", "");
+
+  // Sort by priority descending (highest first)
+  const sortedProjects = [...projects].sort((a, b) => (b.priority || 1) - (a.priority || 1));
+  const sortedPapers = [...papers].sort((a, b) => (b.priority || 1) - (a.priority || 1));
+
+  // Slice arrays based on active focus to guarantee fit on single page
+  const displayProjects = focus === "engineering" ? sortedProjects.slice(0, 4) : sortedProjects.slice(0, 2);
+  const displayPapers = focus === "engineering" ? sortedPapers.slice(0, 2) : sortedPapers.slice(0, 4);
+
+  const activeBio = focus === "engineering"
+    ? (profile.engineeringObjective || profile.bio)
+    : (profile.researchStatement || profile.bio);
 
   return (
     <div className="min-h-screen bg-background">
@@ -51,7 +77,7 @@ const Resume = () => {
         <div className="max-w-4xl mx-auto space-y-6">
           
           {/* Header Action Bar - Hide on Print */}
-          <div className="print:hidden flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-6">
+          <div className="print:hidden flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-border pb-6">
             <div>
               <Link to="/">
                 <Button variant="ghost" className="mb-2 group text-sm pl-0">
@@ -67,7 +93,14 @@ const Resume = () => {
               </p>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
+              <Tabs value={focus} onValueChange={(val: any) => setFocus(val)} className="w-auto">
+                <TabsList className="bg-card border border-border p-1 gap-1 h-9">
+                  <TabsTrigger value="engineering" className="text-xs px-2.5 py-1">Engineering Focus</TabsTrigger>
+                  <TabsTrigger value="research" className="text-xs px-2.5 py-1">Research Focus</TabsTrigger>
+                </TabsList>
+              </Tabs>
+
               <Tabs value={template} onValueChange={(val: any) => setTemplate(val)} className="w-auto">
                 <TabsList className="bg-card border border-border p-1 gap-1 h-9">
                   <TabsTrigger value="modern" className="text-xs px-2.5 py-1">Modern</TabsTrigger>
@@ -82,17 +115,12 @@ const Resume = () => {
             </div>
           </div>
 
-          {/* ========================================================================= */}
-          {/* RESUME PAPER TEMPLATE CONTAINER */}
-          {/* ========================================================================= */}
           <div
             id="resume-canvas"
             className={`w-full bg-card border border-border shadow-2xl rounded-2xl p-6 md:p-12 print:shadow-none print:border-none print:p-0 print:m-0 print:bg-white print:text-black mx-auto relative overflow-hidden transition-all duration-300 ${
               template === "academic" ? "font-serif max-w-[800px]" : "font-sans max-w-[800px]"
             }`}
           >
-            {/* Template-dependent Layouts */}
-
             {/* ==================== 1. MODERN TEMPLATE ==================== */}
             {template === "modern" && (
               <div className="space-y-8 text-sm text-foreground">
@@ -100,9 +128,9 @@ const Resume = () => {
                 {/* Header Section */}
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-border pb-6">
                   <div className="space-y-2">
-                    <h2 className="text-4xl font-extrabold tracking-tight text-foreground">{profileData.name}</h2>
+                    <h2 className="text-4xl font-extrabold tracking-tight text-foreground">{profile.name}</h2>
                     <div className="flex flex-wrap gap-1.5">
-                      {profileData.roles.map((role) => (
+                      {profile.roles?.map((role: string) => (
                         <Badge key={role} variant="outline" className="text-xs border-primary/30 text-primary font-medium">{role}</Badge>
                       ))}
                     </div>
@@ -126,8 +154,10 @@ const Resume = () => {
 
                 {/* Subtitle / Objective */}
                 <div className="space-y-2">
-                  <h3 className="text-xs uppercase font-mono tracking-widest text-primary font-bold">Objective</h3>
-                  <p className="text-muted-foreground leading-relaxed">{profileData.bio}</p>
+                  <h3 className="text-xs uppercase font-mono tracking-widest text-primary font-bold">
+                    {focus === "engineering" ? "Professional Objective" : "Research Statement"}
+                  </h3>
+                  <p className="text-muted-foreground leading-relaxed">{activeBio}</p>
                 </div>
 
                 {/* Main Two-Column Layout */}
@@ -135,52 +165,100 @@ const Resume = () => {
                   {/* Left Column: Experience & Projects */}
                   <div className="space-y-6">
                     
-                    {/* Experience */}
-                    <div className="space-y-4">
-                      <h3 className="text-xs uppercase font-mono tracking-widest text-primary font-bold border-b border-border pb-1 flex items-center gap-2">
-                        <Briefcase className="w-4 h-4" />
-                        Experience
-                      </h3>
-                      <div className="space-y-4">
-                        {profileData.experience.map((exp) => (
-                          <div key={exp.role} className="space-y-1">
-                            <div className="flex justify-between items-start gap-2">
-                              <h4 className="font-bold text-foreground text-sm">{exp.role}</h4>
-                              <span className="text-xs text-muted-foreground font-mono flex-shrink-0">{exp.period}</span>
-                            </div>
-                            <div className="text-xs font-semibold text-primary/80">{exp.company}</div>
-                            <p className="text-xs text-muted-foreground leading-relaxed mt-1">{exp.description}</p>
+                    {focus === "engineering" ? (
+                      <>
+                        {/* Featured Projects */}
+                        <div className="space-y-4">
+                          <h3 className="text-xs uppercase font-mono tracking-widest text-primary font-bold border-b border-border pb-1 flex items-center gap-2">
+                            <Sparkles className="w-4 h-4" />
+                            Featured Projects
+                          </h3>
+                          <div className="space-y-4">
+                            {displayProjects.map((proj) => (
+                              <div key={proj.title} className="space-y-1">
+                                <div className="flex justify-between items-start gap-2">
+                                  <h4 className="font-bold text-foreground text-sm flex items-center gap-1">
+                                    {proj.title}
+                                    {proj.github && <a href={proj.github} className="text-primary hover:text-primary/75"><ExternalLink className="w-3 h-3" /></a>}
+                                  </h4>
+                                  <span className="text-[10px] bg-secondary px-2 py-0.5 rounded text-muted-foreground capitalize">{proj.category}</span>
+                                </div>
+                                <p className="text-xs text-muted-foreground leading-relaxed">{proj.description}</p>
+                                <div className="flex flex-wrap gap-1 pt-1">
+                                  {proj.tags.slice(0, 4).map((tag: string) => (
+                                    <span key={tag} className="text-[9px] bg-secondary/50 px-1.5 py-0.5 rounded text-muted-foreground">{tag}</span>
+                                  ))}
+                                </div>
+                              </div>
+                            ))}
                           </div>
-                        ))}
-                      </div>
-                    </div>
+                        </div>
 
-                    {/* Featured Projects */}
-                    <div className="space-y-4">
-                      <h3 className="text-xs uppercase font-mono tracking-widest text-primary font-bold border-b border-border pb-1 flex items-center gap-2">
-                        <Sparkles className="w-4 h-4" />
-                        Featured Projects
-                      </h3>
-                      <div className="space-y-4">
-                        {projectsData.slice(0, 3).map((proj) => (
-                          <div key={proj.title} className="space-y-1">
-                            <div className="flex justify-between items-start gap-2">
-                              <h4 className="font-bold text-foreground text-sm flex items-center gap-1">
-                                {proj.title}
-                                {proj.github && <a href={proj.github} className="text-primary hover:text-primary/75"><ExternalLink className="w-3 h-3" /></a>}
-                              </h4>
-                              <span className="text-[10px] bg-secondary px-2 py-0.5 rounded text-muted-foreground capitalize">{proj.category}</span>
-                            </div>
-                            <p className="text-xs text-muted-foreground leading-relaxed">{proj.description}</p>
-                            <div className="flex flex-wrap gap-1 pt-1">
-                              {proj.tags.slice(0, 4).map((tag: string) => (
-                                <span key={tag} className="text-[9px] bg-secondary/50 px-1.5 py-0.5 rounded text-muted-foreground">{tag}</span>
-                              ))}
-                            </div>
+                        {/* Experience */}
+                        <div className="space-y-4">
+                          <h3 className="text-xs uppercase font-mono tracking-widest text-primary font-bold border-b border-border pb-1 flex items-center gap-2">
+                            <Briefcase className="w-4 h-4" />
+                            Experience
+                          </h3>
+                          <div className="space-y-4">
+                            {profile.experience?.map((exp: any) => (
+                              <div key={exp.role} className="space-y-1">
+                                <div className="flex justify-between items-start gap-2">
+                                  <h4 className="font-bold text-foreground text-sm">{exp.role}</h4>
+                                  <span className="text-xs text-muted-foreground font-mono flex-shrink-0">{exp.period}</span>
+                                </div>
+                                <div className="text-xs font-semibold text-primary/80">{exp.company}</div>
+                                <p className="text-xs text-muted-foreground leading-relaxed mt-1">{exp.description}</p>
+                              </div>
+                            ))}
                           </div>
-                        ))}
-                      </div>
-                    </div>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        {/* Experience */}
+                        <div className="space-y-4">
+                          <h3 className="text-xs uppercase font-mono tracking-widest text-primary font-bold border-b border-border pb-1 flex items-center gap-2">
+                            <Briefcase className="w-4 h-4" />
+                            Research Experience
+                          </h3>
+                          <div className="space-y-4">
+                            {profile.experience?.map((exp: any) => (
+                              <div key={exp.role} className="space-y-1">
+                                <div className="flex justify-between items-start gap-2">
+                                  <h4 className="font-bold text-foreground text-sm">{exp.role}</h4>
+                                  <span className="text-xs text-muted-foreground font-mono flex-shrink-0">{exp.period}</span>
+                                </div>
+                                <div className="text-xs font-semibold text-primary/80">{exp.company}</div>
+                                <p className="text-xs text-muted-foreground leading-relaxed mt-1">{exp.description}</p>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Featured Projects */}
+                        <div className="space-y-4">
+                          <h3 className="text-xs uppercase font-mono tracking-widest text-primary font-bold border-b border-border pb-1 flex items-center gap-2">
+                            <Sparkles className="w-4 h-4" />
+                            Selected Technical Projects
+                          </h3>
+                          <div className="space-y-4">
+                            {displayProjects.map((proj) => (
+                              <div key={proj.title} className="space-y-1">
+                                <div className="flex justify-between items-start gap-2">
+                                  <h4 className="font-bold text-foreground text-sm flex items-center gap-1">
+                                    {proj.title}
+                                    {proj.github && <a href={proj.github} className="text-primary hover:text-primary/75"><ExternalLink className="w-3 h-3" /></a>}
+                                  </h4>
+                                  <span className="text-[10px] bg-secondary px-2 py-0.5 rounded text-muted-foreground capitalize">{proj.category}</span>
+                                </div>
+                                <p className="text-xs text-muted-foreground leading-relaxed">{proj.description}</p>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </>
+                    )}
 
                   </div>
 
@@ -193,7 +271,7 @@ const Resume = () => {
                         Core Expertise
                       </h3>
                       <div className="flex flex-wrap gap-1.5">
-                        {profileData.skills.map((skill) => (
+                        {profile.skills?.map((skill: any) => (
                           <Badge key={skill.title} variant="outline" className="text-xs border-border bg-card">{skill.title}</Badge>
                         ))}
                       </div>
@@ -206,7 +284,7 @@ const Resume = () => {
                         Research
                       </h3>
                       <div className="space-y-3">
-                        {papersData.slice(0, 3).map((pub) => (
+                        {displayPapers.map((pub) => (
                           <div key={pub.title} className="space-y-0.5">
                             <h4 className="font-bold text-foreground text-xs leading-normal">{pub.title}</h4>
                             <div className="text-[10px] text-muted-foreground font-mono">{pub.year} • {pub.status}</div>
@@ -222,7 +300,7 @@ const Resume = () => {
                         Education
                       </h3>
                       <div className="space-y-3">
-                        {profileData.education.map((edu) => (
+                        {profile.education?.map((edu: any) => (
                           <div key={edu.degree} className="space-y-0.5">
                             <h4 className="font-bold text-foreground text-xs">{edu.degree}</h4>
                             <div className="text-[10px] text-primary/80 font-medium">{edu.school}</div>
@@ -239,7 +317,7 @@ const Resume = () => {
                         Credentials
                       </h3>
                       <ul className="text-xs text-muted-foreground space-y-1.5 list-disc pl-4">
-                        {profileData.certifications.map((cert) => (
+                        {profile.certifications?.map((cert: string) => (
                           <li key={cert}>{cert}</li>
                         ))}
                       </ul>
@@ -252,13 +330,13 @@ const Resume = () => {
             )}
 
             {/* ==================== 2. ACADEMIC (LaTeX-STYLE) TEMPLATE ==================== */}
-            {template === "academic" && (
-              <div className="space-y-6 text-xs text-black leading-relaxed">
+            {template === "academic" && focus === "research" && (
+              <div className="space-y-6 text-xs text-black leading-relaxed font-serif">
                 
                 {/* Header */}
                 <div className="text-center space-y-1">
-                  <h2 className="text-2xl font-bold tracking-wide uppercase font-serif">{profileData.name}</h2>
-                  <div className="text-[10px] font-mono flex flex-wrap justify-center gap-x-4 gap-y-1">
+                  <h2 className="text-2xl font-bold tracking-wide uppercase">{profile.name}</h2>
+                  <div className="text-[10px] font-mono flex flex-wrap justify-center gap-x-4 gap-y-1 border-b border-black pb-2">
                     <span>Email: <a href={`mailto:${socials.email}`} className="underline">{socials.email}</a></span>
                     <span>GitHub: <a href={socials.github} target="_blank" rel="noreferrer" className="underline">{cleanUrl(socials.github)}</a></span>
                     <span>LinkedIn: <a href={socials.linkedin} target="_blank" rel="noreferrer" className="underline">{cleanUrl(socials.linkedin)}</a></span>
@@ -267,40 +345,47 @@ const Resume = () => {
 
                 {/* Objective */}
                 <div className="space-y-1">
-                  <h3 className="text-xs font-bold border-b border-black uppercase font-serif tracking-wider">Research Statement & Profile</h3>
-                  <p className="text-[11px] leading-relaxed text-black/90 font-serif italic">{profileData.bio}</p>
+                  <h3 className="text-xs font-bold border-b border-black uppercase tracking-wider">Research Statement & Profile</h3>
+                  <p className="text-[11px] leading-relaxed text-black/90 italic">{activeBio}</p>
                 </div>
 
-                {/* Experience */}
+                {/* Education */}
                 <div className="space-y-3">
-                  <h3 className="text-xs font-bold border-b border-black uppercase font-serif tracking-wider">Professional Experience</h3>
-                  <div className="space-y-3">
-                    {profileData.experience.map((exp) => (
-                      <div key={exp.role} className="space-y-0.5">
+                  <h3 className="text-xs font-bold border-b border-black uppercase tracking-wider">Education</h3>
+                  <div className="space-y-2">
+                    {profile.education?.map((edu: any) => (
+                      <div key={edu.degree} className="space-y-0.5">
                         <div className="flex justify-between items-center font-bold">
-                          <span className="font-serif">{exp.role} — {exp.company}</span>
-                          <span className="text-[10px] font-mono">{exp.period}</span>
+                          <span>{edu.degree}</span>
+                          <span className="text-[10px] font-mono">{edu.period}</span>
                         </div>
-                        <p className="text-[11px] text-black/80 font-serif">{exp.description}</p>
+                        <div className="text-[11px] text-black/90">{edu.school}</div>
+                        <p className="text-[10px] text-black/70">{edu.description}</p>
                       </div>
                     ))}
                   </div>
                 </div>
 
+                {/* Research Interests */}
+                <div className="space-y-1">
+                  <h3 className="text-xs font-bold border-b border-black uppercase tracking-wider">Research Interests</h3>
+                  <p className="text-[11px]">{profile.researchInterests ? profile.researchInterests.join(", ") : "Hardware-Software Co-Design for AI, Silicon Photonics, Neuromorphic Computing"}</p>
+                </div>
+
                 {/* Research papers */}
                 <div className="space-y-3">
-                  <h3 className="text-xs font-bold border-b border-black uppercase font-serif tracking-wider">Research & Publications</h3>
+                  <h3 className="text-xs font-bold border-b border-black uppercase tracking-wider">Research & Publications</h3>
                   <div className="space-y-3">
-                    {papersData.map((pub) => (
+                    {displayPapers.map((pub) => (
                       <div key={pub.title} className="space-y-0.5">
                         <div className="flex justify-between items-baseline gap-4">
-                          <span className="font-semibold font-serif">"{pub.title}"</span>
+                          <span className="font-semibold">"{pub.title}"</span>
                           <span className="text-[10px] font-mono flex-shrink-0">{pub.year}</span>
                         </div>
                         <div className="text-[10px] text-black/75 italic">
                           Authors: {pub.authors} • Status: <span className="capitalize">{pub.status}</span>
                         </div>
-                        <p className="text-[10px] text-black/70 font-serif line-clamp-3 leading-normal pl-4 border-l border-black/20">
+                        <p className="text-[10px] text-black/70 line-clamp-3 leading-normal pl-4 border-l border-black/20">
                           {pub.abstract}
                         </p>
                       </div>
@@ -308,46 +393,42 @@ const Resume = () => {
                   </div>
                 </div>
 
-                {/* Projects */}
+                {/* Experience */}
                 <div className="space-y-3">
-                  <h3 className="text-xs font-bold border-b border-black uppercase font-serif tracking-wider">Selected Technical Projects</h3>
+                  <h3 className="text-xs font-bold border-b border-black uppercase tracking-wider">Research & Professional Experience</h3>
                   <div className="space-y-3">
-                    {projectsData.map((proj) => (
-                      <div key={proj.title} className="space-y-0.5">
-                        <div className="flex justify-between items-baseline gap-4 font-bold">
-                          <span className="font-serif">{proj.title}</span>
-                          <span className="text-[10px] font-mono capitalize">{proj.category}</span>
+                    {profile.experience?.map((exp: any) => (
+                      <div key={exp.role} className="space-y-0.5">
+                        <div className="flex justify-between items-center font-bold">
+                          <span>{exp.role} — {exp.company}</span>
+                          <span className="text-[10px] font-mono">{exp.period}</span>
                         </div>
-                        <p className="text-[11px] text-black/80 font-serif">{proj.description}</p>
-                        <div className="text-[10px] text-black/60 font-mono">Technologies: {proj.tags.join(", ")}</div>
+                        <p className="text-[11px] text-black/80">{exp.description}</p>
                       </div>
                     ))}
                   </div>
                 </div>
 
-                {/* Education */}
-                <div className="space-y-3">
-                  <h3 className="text-xs font-bold border-b border-black uppercase font-serif tracking-wider">Education</h3>
-                  <div className="space-y-2">
-                    {profileData.education.map((edu) => (
-                      <div key={edu.degree} className="space-y-0.5">
-                        <div className="flex justify-between items-center font-bold">
-                          <span className="font-serif">{edu.degree}</span>
-                          <span className="text-[10px] font-mono">{edu.period}</span>
-                        </div>
-                        <div className="text-[11px] text-black/90 font-serif">{edu.school}</div>
-                        <p className="text-[10px] text-black/70 font-serif">{edu.description}</p>
-                      </div>
-                    ))}
+                {/* Projects */}
+                {displayProjects.length > 0 && (
+                  <div className="space-y-3">
+                    <h3 className="text-xs font-bold border-b border-black uppercase tracking-wider">Selected Technical Projects</h3>
+                    <ul className="list-disc pl-4 space-y-0.5 text-[11px]">
+                      {displayProjects.map((proj) => (
+                        <li key={proj.title}>
+                          <strong>{proj.title}</strong>: {proj.description}
+                        </li>
+                      ))}
+                    </ul>
                   </div>
-                </div>
+                )}
 
                 {/* Skills & Certs */}
                 <div className="grid grid-cols-2 gap-6 pt-2">
                   <div className="space-y-2">
-                    <h3 className="text-xs font-bold border-b border-black uppercase font-serif tracking-wider">Technical Expertise</h3>
-                    <ul className="list-disc pl-4 space-y-0.5 font-serif text-[11px]">
-                      {profileData.skills.map((skill) => (
+                    <h3 className="text-xs font-bold border-b border-black uppercase tracking-wider">Technical Expertise</h3>
+                    <ul className="list-disc pl-4 space-y-0.5 text-[11px]">
+                      {profile.skills?.map((skill: any) => (
                         <li key={skill.title}>
                           <strong>{skill.title}:</strong> {skill.description}
                         </li>
@@ -356,9 +437,9 @@ const Resume = () => {
                   </div>
 
                   <div className="space-y-2">
-                    <h3 className="text-xs font-bold border-b border-black uppercase font-serif tracking-wider">Certifications & Honors</h3>
-                    <ul className="list-disc pl-4 space-y-0.5 font-serif text-[11px]">
-                      {profileData.certifications.map((cert) => (
+                    <h3 className="text-xs font-bold border-b border-black uppercase tracking-wider">Certifications & Honors</h3>
+                    <ul className="list-disc pl-4 space-y-0.5 text-[11px]">
+                      {profile.certifications?.map((cert: string) => (
                         <li key={cert}>{cert}</li>
                       ))}
                     </ul>
@@ -368,13 +449,108 @@ const Resume = () => {
               </div>
             )}
 
+            {/* ==================== 2B. ACADEMIC LATEX STYLE (ENGINEERING CS FORMAT) ==================== */}
+            {template === "academic" && focus === "engineering" && (
+              <div className="space-y-5 text-xs text-black leading-relaxed font-serif">
+                
+                {/* Header */}
+                <div className="text-center space-y-1">
+                  <h2 className="text-xl font-bold tracking-wide uppercase">{profile.name}</h2>
+                  <div className="text-[10px] flex flex-wrap justify-center gap-x-4 gap-y-0.5 border-b border-black pb-2">
+                    <span>Email: <a href={`mailto:${socials.email}`} className="underline">{socials.email}</a></span>
+                    <span>GitHub: <a href={socials.github} target="_blank" rel="noreferrer" className="underline">{cleanUrl(socials.github)}</a></span>
+                    <span>LinkedIn: <a href={socials.linkedin} target="_blank" rel="noreferrer" className="underline">{cleanUrl(socials.linkedin)}</a></span>
+                  </div>
+                </div>
+
+                {/* Professional Objective */}
+                <div className="space-y-1">
+                  <h3 className="text-xs font-bold uppercase tracking-wider border-b border-black">Objective</h3>
+                  <p className="text-[11px] leading-relaxed text-black/90">{activeBio}</p>
+                </div>
+
+                {/* Technical Skills */}
+                <div className="space-y-1">
+                  <h3 className="text-xs font-bold uppercase tracking-wider border-b border-black">Technical Skills</h3>
+                  <div className="text-[11px] space-y-1">
+                    <div><strong>Languages & Frameworks:</strong> Python, Verilog, C/C++, TypeScript, React, PyTorch, TensorFlow</div>
+                    <div><strong>Tools & Hardwares:</strong> Altium Designer, PCB Design, RISC-V, FPGA, Edge AI (Raspberry Pi/ESP32), LoRa, MQTT</div>
+                    <div><strong>Core Expertise:</strong> {profile.skills?.map((s: any) => s.title).join(" • ")}</div>
+                  </div>
+                </div>
+
+                {/* Experience */}
+                <div className="space-y-2">
+                  <h3 className="text-xs font-bold uppercase tracking-wider border-b border-black">Experience</h3>
+                  <div className="space-y-2">
+                    {profile.experience?.map((exp: any) => (
+                      <div key={exp.role} className="space-y-0.5">
+                        <div className="flex justify-between items-center font-bold">
+                          <span>{exp.role} — {exp.company}</span>
+                          <span className="text-[10px] font-mono">{exp.period}</span>
+                        </div>
+                        <p className="text-[11px] text-black/85">{exp.description}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Projects */}
+                <div className="space-y-2">
+                  <h3 className="text-xs font-bold uppercase tracking-wider border-b border-black">Selected Technical Projects</h3>
+                  <div className="space-y-2">
+                    {displayProjects.map((proj) => (
+                      <div key={proj.title} className="space-y-0.5">
+                        <div className="flex justify-between items-baseline gap-4 font-bold">
+                          <span>{proj.title}</span>
+                          <span className="text-[10px] font-mono capitalize">{proj.category}</span>
+                        </div>
+                        <p className="text-[11px] text-black/85">{proj.description}</p>
+                        <div className="text-[9.5px] text-black/60 font-mono">Technologies: {proj.tags.join(", ")}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Education */}
+                <div className="space-y-2">
+                  <h3 className="text-xs font-bold uppercase tracking-wider border-b border-black">Education</h3>
+                  <div className="space-y-2">
+                    {profile.education?.map((edu: any) => (
+                      <div key={edu.degree} className="space-y-0.5">
+                        <div className="flex justify-between items-center font-bold">
+                          <span>{edu.degree}</span>
+                          <span className="text-[10px] font-mono">{edu.period}</span>
+                        </div>
+                        <div className="text-[11px] text-black/90">{edu.school}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Publications / Research */}
+                {displayPapers.length > 0 && (
+                  <div className="space-y-2">
+                    <h3 className="text-xs font-bold uppercase tracking-wider border-b border-black">Selected Publications</h3>
+                    <ul className="list-disc pl-4 space-y-0.5 text-[11px]">
+                      {displayPapers.map((pub) => (
+                        <li key={pub.title}>
+                          <strong>"{pub.title}"</strong> ({pub.year}) • {pub.status}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* ==================== 3. MINIMAL TEMPLATE ==================== */}
             {template === "minimal" && (
               <div className="space-y-8 text-sm text-foreground">
                 
                 {/* Header */}
                 <div className="space-y-3 border-b border-border pb-6">
-                  <h2 className="text-3xl font-light tracking-wide text-foreground">{profileData.name}</h2>
+                  <h2 className="text-3xl font-light tracking-wide text-foreground">{profile.name}</h2>
                   <div className="flex flex-wrap gap-y-1 gap-x-4 text-xs text-muted-foreground font-mono">
                     <span className="flex items-center gap-1"><Mail className="w-3.5 h-3.5" /> {socials.email}</span>
                     <span className="flex items-center gap-1"><Github className="w-3.5 h-3.5" /> {cleanUrl(socials.github)}</span>
@@ -383,7 +559,7 @@ const Resume = () => {
                 </div>
 
                 {/* Subtitle */}
-                <p className="text-muted-foreground leading-relaxed italic">{profileData.bio}</p>
+                <p className="text-muted-foreground leading-relaxed italic">{activeBio}</p>
 
                 {/* Experience */}
                 <div className="space-y-4">
@@ -391,7 +567,7 @@ const Resume = () => {
                     Experience
                   </h3>
                   <div className="space-y-6">
-                    {profileData.experience.map((exp) => (
+                    {profile.experience?.map((exp: any) => (
                       <div key={exp.role} className="space-y-1">
                         <div className="flex justify-between items-baseline gap-2">
                           <h4 className="font-bold text-foreground">{exp.role}</h4>
@@ -410,7 +586,7 @@ const Resume = () => {
                     Education
                   </h3>
                   <div className="space-y-4">
-                    {profileData.education.map((edu) => (
+                    {profile.education?.map((edu: any) => (
                       <div key={edu.degree} className="space-y-1">
                         <div className="flex justify-between items-baseline gap-2">
                           <h4 className="font-bold text-foreground">{edu.degree}</h4>
@@ -432,7 +608,7 @@ const Resume = () => {
                       Selected Projects
                     </h3>
                     <div className="space-y-3">
-                      {projectsData.slice(0, 4).map((proj) => (
+                      {displayProjects.map((proj) => (
                         <div key={proj.title} className="space-y-0.5">
                           <h4 className="font-semibold text-foreground text-xs">{proj.title}</h4>
                           <p className="text-[11px] text-muted-foreground line-clamp-2 leading-relaxed">{proj.description}</p>
@@ -447,7 +623,7 @@ const Resume = () => {
                       Selected Papers
                     </h3>
                     <div className="space-y-3">
-                      {papersData.slice(0, 4).map((pub) => (
+                      {displayPapers.map((pub) => (
                         <div key={pub.title} className="space-y-0.5">
                           <h4 className="font-semibold text-foreground text-xs leading-normal">{pub.title}</h4>
                           <div className="text-[10px] text-muted-foreground font-mono">{pub.year} • {pub.status}</div>
@@ -463,7 +639,7 @@ const Resume = () => {
 
             {/* Print Signature / URL */}
             <div className="hidden print:block text-center text-[9px] text-muted-foreground font-mono mt-12 border-t border-border pt-4">
-              Generated via Dalton Omondi's Portfolio Exporter • {window.location.origin}/resume
+              Generated via Portfolio Exporter • {window.location.origin}/resume
             </div>
 
           </div>

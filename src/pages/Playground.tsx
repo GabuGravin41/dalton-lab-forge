@@ -7,11 +7,20 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Brain, ImageIcon, MessageSquare, Wand2, Loader2, ArrowLeft, Camera, Network, Info } from "lucide-react";
 import { Link } from "react-router-dom";
 import { generateAIResponse } from "@/utils/aiClient";
+import { analyzeSentimentLocally } from "@/utils/localSentiment";
 import Navigation from "@/components/Navigation";
 import NeuralNetworkVisualizer from "@/components/NeuralNetworkVisualizer";
 import ObjectDetection from "@/components/ObjectDetection";
 
 const Playground = () => {
+  const [activeTheme, setActiveTheme] = useState(() => localStorage.getItem("portfolio_theme") || "indigo");
+
+  const changeTheme = (theme: string) => {
+    setActiveTheme(theme);
+    localStorage.setItem("portfolio_theme", theme);
+    window.dispatchEvent(new CustomEvent("portfolio-theme-change"));
+  };
+
   const [textInput, setTextInput] = useState("");
   const [imagePrompt, setImagePrompt] = useState("");
   const [chatPrompt, setChatPrompt] = useState("");
@@ -23,12 +32,20 @@ const Playground = () => {
   
   const [chatHistory, setChatHistory] = useState<Array<{role: 'user' | 'model', text: string}>>([]);
   const [results, setResults] = useState<{[key: string]: string}>({});
+  const [sentimentMode, setSentimentMode] = useState<"local" | "cloud">("local");
 
   const handleTextAnalysis = async () => {
     if (!textInput.trim() || isTextLoading) return;
     setIsTextLoading(true);
     try {
-      const prompt = `
+      if (sentimentMode === "local") {
+        const result = analyzeSentimentLocally(textInput);
+        setResults(prev => ({
+          ...prev,
+          sentiment: `Emotion: ${result.emotion}\nConfidence: ${(result.confidence * 100).toFixed(0)}%\nFeedback: ${result.feedback}\nScore: ${result.score > 0 ? '+' : ''}${result.score}\nWord count: ${textInput.trim().split(/\s+/).length} words.\n\n[Processed locally in browser cache]`
+        }));
+      } else {
+        const prompt = `
 Analyze the sentiment of the following text. Provide your analysis in a JSON object format.
 The JSON object should have three keys:
 1. "emotion": A single dominant emotion (e.g., "Positive", "Negative", "Neutral", "Joy", "Anger", "Surprise").
@@ -37,16 +54,17 @@ The JSON object should have three keys:
 
 Text to analyze: "${textInput}"
 `;
-      const systemInstruction = "You are a Sentiment Analysis Assistant. Return ONLY a valid JSON object matching the requested schema. Do not include markdown wraps.";
-      const rawResult = await generateAIResponse(prompt, systemInstruction, true);
-      
-      const cleanJson = rawResult.replace(/^```json\s*/i, "").replace(/```\s*$/, "").trim();
-      const data = JSON.parse(cleanJson);
-      
-      setResults(prev => ({
-        ...prev,
-        sentiment: `Emotion: ${data.emotion}\nConfidence: ${(data.confidence * 100).toFixed(0)}%\nFeedback: ${data.feedback}\nWord count: ${textInput.trim().split(/\s+/).length} words.`
-      }));
+        const systemInstruction = "You are a Sentiment Analysis Assistant. Return ONLY a valid JSON object matching the requested schema. Do not include markdown wraps.";
+        const rawResult = await generateAIResponse(prompt, systemInstruction, true);
+        
+        const cleanJson = rawResult.replace(/^```json\s*/i, "").replace(/```\s*$/, "").trim();
+        const data = JSON.parse(cleanJson);
+        
+        setResults(prev => ({
+          ...prev,
+          sentiment: `Emotion: ${data.emotion}\nConfidence: ${(data.confidence * 100).toFixed(0)}%\nFeedback: ${data.feedback}\nWord count: ${textInput.trim().split(/\s+/).length} words.\n\n[Processed via OpenRouter Cloud API]`
+        }));
+      }
     } catch (error) {
       console.error('Sentiment analysis error:', error);
       setResults(prev => ({
@@ -193,6 +211,14 @@ Text to analyze: "${textInput}"
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-3 md:space-y-4 p-4 md:p-6 pt-0">
+                    <div className="flex justify-end mb-2">
+                      <Tabs value={sentimentMode} onValueChange={(val: any) => setSentimentMode(val)} className="w-auto">
+                        <TabsList className="bg-muted/50 p-0.5 h-8">
+                          <TabsTrigger value="local" className="text-[10px] px-2 py-0.5">Local Model (Free)</TabsTrigger>
+                          <TabsTrigger value="cloud" className="text-[10px] px-2 py-0.5">Cloud API (DeepSeek)</TabsTrigger>
+                        </TabsList>
+                      </Tabs>
+                    </div>
                     <Textarea
                       placeholder="Enter text to analyze sentiment..."
                       value={textInput}
@@ -374,6 +400,30 @@ Text to analyze: "${textInput}"
 
         </div>
       </section>
+
+      {/* Floating Theme Swapper */}
+      <div className="fixed bottom-6 right-6 z-50 bg-card/90 backdrop-blur border border-border p-3 rounded-full shadow-2xl flex items-center gap-2 print:hidden">
+        <span className="text-[10px] uppercase font-mono px-2 text-muted-foreground font-bold">Theme Preview:</span>
+        <div className="flex gap-1.5">
+          {[
+            { id: "indigo", color: "bg-indigo-600", label: "Indigo" },
+            { id: "emerald", color: "bg-emerald-600", label: "Emerald" },
+            { id: "rose", color: "bg-rose-600", label: "Rose" },
+            { id: "cyberpunk", color: "bg-fuchsia-600", label: "Cyberpunk" },
+            { id: "steel", color: "bg-slate-500", label: "Steel" },
+          ].map((t) => (
+            <button
+              key={t.id}
+              onClick={() => changeTheme(t.id)}
+              className={`w-6 h-6 rounded-full ${t.color} border transition-all ${
+                activeTheme === t.id ? "scale-125 border-white ring-2 ring-primary" : "border-transparent hover:scale-110"
+              }`}
+              title={t.label}
+              aria-label={`Switch to ${t.label} theme`}
+            />
+          ))}
+        </div>
+      </div>
     </div>
   );
 };

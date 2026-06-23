@@ -21,6 +21,7 @@ import {
   Trash2,
   FileCode,
   Download,
+  Star,
 } from "lucide-react";
 import { fetchFileFromGitHub, commitFileToGitHub, uploadBinaryFileToGitHub, GitHubConfig } from "@/utils/github";
 import { getPortfolioUpdatesFromAI, UpdateAssistantResult } from "@/utils/adminGemini";
@@ -359,16 +360,66 @@ const Admin = () => {
     toast.success("Downloaded data configuration files!");
   };
 
+  const handleProfileUpdate = (key: string, value: string) => {
+    const updatedProfile = { ...profile, [key]: value };
+    setProfile(updatedProfile);
+    localStorage.setItem("portfolio_profile", JSON.stringify(updatedProfile));
+    
+    if (key === "theme") {
+      localStorage.setItem("portfolio_theme", value);
+      window.dispatchEvent(new CustomEvent("portfolio-theme-change"));
+    }
+  };
+
+  const handleProjectPriorityChange = (index: number, newPriority: number) => {
+    const updatedProjects = [...projects];
+    updatedProjects[index] = { ...updatedProjects[index], priority: newPriority };
+    setProjects(updatedProjects);
+    localStorage.setItem("portfolio_projects", JSON.stringify(updatedProjects));
+    toast.success(`Updated "${updatedProjects[index].title}" priority to ${newPriority} stars.`);
+  };
+
+  const handlePaperPriorityChange = (index: number, newPriority: number) => {
+    const updatedPapers = [...papers];
+    updatedPapers[index] = { ...updatedPapers[index], priority: newPriority };
+    setPapers(updatedPapers);
+    localStorage.setItem("portfolio_papers", JSON.stringify(updatedPapers));
+    toast.success(`Updated "${updatedPapers[index].title}" priority to ${newPriority} stars.`);
+  };
+
   const resetLocalEdits = () => {
     if (window.confirm("Are you sure you want to discard all unsaved edits and restore default files?")) {
       localStorage.removeItem("portfolio_profile");
       localStorage.removeItem("portfolio_projects");
       localStorage.removeItem("portfolio_papers");
+      localStorage.removeItem("portfolio_theme");
       setProfile(localProfile);
       setProjects(localProjects);
       setPapers(localPapers);
+      window.dispatchEvent(new CustomEvent("portfolio-theme-change"));
       toast.success("Local edits reset to codebase defaults!");
     }
+  };
+
+  const StarRating = ({ rating, onChange }: { rating: number; onChange: (rating: number) => void }) => {
+    return (
+      <div className="flex items-center gap-0.5">
+        {[1, 2, 3, 4, 5].map((star) => (
+          <button
+            key={star}
+            type="button"
+            onClick={() => onChange(star)}
+            className="focus:outline-none transition-transform hover:scale-110 p-0.5"
+          >
+            <Star
+              className={`w-3.5 h-3.5 ${
+                star <= rating ? "fill-yellow-500 text-yellow-500" : "text-muted-foreground/30"
+              }`}
+            />
+          </button>
+        ))}
+      </div>
+    );
   };
 
   if (!isUnlocked) {
@@ -573,6 +624,87 @@ const Admin = () => {
                       <Trash2 className="w-4 h-4" />
                       Reset to defaults
                     </Button>
+                  </CardContent>
+                </Card>
+
+                {/* Theme & Objectives Settings Card */}
+                <Card className="md:col-span-3 bg-card/50 backdrop-blur-sm border-border">
+                  <CardHeader>
+                    <CardTitle className="text-lg">Theme & Dual-Focus Objectives</CardTitle>
+                    <CardDescription>Select your active website theme and update the dual-focus resume bio objectives.</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-semibold text-muted-foreground uppercase">Active Website Theme</label>
+                        <select
+                          className="w-full bg-background border border-input rounded-md px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                          value={profile.theme || "indigo"}
+                          onChange={(e) => handleProfileUpdate("theme", e.target.value)}
+                        >
+                          <option value="indigo">Midnight Indigo (Indigo & Amber)</option>
+                          <option value="emerald">Emerald Aurora (Forest & Cyan)</option>
+                          <option value="rose">Cyber-Rose (Crimson & Gold)</option>
+                          <option value="cyberpunk">Neon Cyberpunk (Magenta & Cyan)</option>
+                          <option value="steel">Minimal Steel (Slate & Silver)</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-semibold text-muted-foreground uppercase">Engineering Focus Resume Objective</label>
+                        <Textarea
+                          value={profile.engineeringObjective || ""}
+                          onChange={(e) => handleProfileUpdate("engineeringObjective", e.target.value)}
+                          className="min-h-[80px] bg-background/50 leading-relaxed text-xs"
+                          placeholder="Engineering focus summary..."
+                        />
+                      </div>
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-semibold text-muted-foreground uppercase">Research Focus Resume Statement</label>
+                        <Textarea
+                          value={profile.researchStatement || ""}
+                          onChange={(e) => handleProfileUpdate("researchStatement", e.target.value)}
+                          className="min-h-[80px] bg-background/50 leading-relaxed text-xs"
+                          placeholder="Research focus statement..."
+                        />
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Priority Star Pickers Card */}
+                <Card className="md:col-span-3 bg-card/50 backdrop-blur-sm border-border">
+                  <CardHeader>
+                    <CardTitle className="text-lg">Project & Research Paper Priorities</CardTitle>
+                    <CardDescription>Assign weights (1-5 stars) to your projects and publications to determine their priority sorting and visibility constraints in the exported resumes.</CardDescription>
+                  </CardHeader>
+                  <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Projects Priority List */}
+                    <div className="space-y-3">
+                      <h4 className="font-semibold text-sm border-b border-border pb-1 text-primary">Technical Projects Priority</h4>
+                      <div className="space-y-2 max-h-[300px] overflow-y-auto pr-1">
+                        {projects.map((proj, idx) => (
+                          <div key={proj.title} className="flex items-center justify-between p-2 rounded-lg bg-background/30 border border-border/50 text-xs">
+                            <div className="truncate max-w-[200px] font-medium">{proj.title}</div>
+                            <StarRating rating={proj.priority || 1} onChange={(val) => handleProjectPriorityChange(idx, val)} />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Research Papers Priority List */}
+                    <div className="space-y-3">
+                      <h4 className="font-semibold text-sm border-b border-border pb-1 text-accent">Research Papers Priority</h4>
+                      <div className="space-y-2 max-h-[300px] overflow-y-auto pr-1">
+                        {papers.map((pub, idx) => (
+                          <div key={pub.title} className="flex items-center justify-between p-2 rounded-lg bg-background/30 border border-border/50 text-xs">
+                            <div className="truncate max-w-[200px] font-medium">{pub.title}</div>
+                            <StarRating rating={pub.priority || 1} onChange={(val) => handlePaperPriorityChange(idx, val)} />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
                   </CardContent>
                 </Card>
               </div>

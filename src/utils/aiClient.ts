@@ -205,7 +205,7 @@ export const generateAIResponse = async (
     throw new Error("No API keys are configured, and no fallback keys are available.");
   }
 
-  let lastError: Error | null = null;
+  const errors: string[] = [];
 
   for (const attempt of attemptList) {
     try {
@@ -216,11 +216,11 @@ export const generateAIResponse = async (
         return await callOpenRouter(attempt.apiKey, attempt.model, systemPrompt, userPrompt, jsonMode);
       }
     } catch (err) {
-      console.warn(`[AI Client] Attempt failed with ${attempt.provider} model:`, err);
-      lastError = err instanceof Error ? err : new Error(String(err));
-      // Continue loop to try next fallback...
+      const errMsg = err instanceof Error ? err.message : String(err);
+      console.warn(`[AI Client] Attempt failed with ${attempt.provider} model (${attempt.model}):`, errMsg);
+      errors.push(`${attempt.provider} (${attempt.model}): ${errMsg}`);
     }
   }
 
-  throw new Error(`All AI provider attempts failed. Last error: ${lastError?.message}`);
+  throw new Error(`All AI provider attempts failed:\n${errors.map((e, i) => `${i + 1}. ${e}`).join("\n")}`);
 };
