@@ -1,4 +1,4 @@
-import { Github, Linkedin, Mail, Heart, Code2, ExternalLink } from "lucide-react";
+import { Github, Linkedin, Mail, Heart, Code2, Instagram, Twitter } from "lucide-react";
 import { Link } from "react-router-dom";
 import profileData from "@/data/profile.json";
 
@@ -11,6 +11,8 @@ const Footer = () => {
     { icon: Github, href: socials.github, label: "GitHub" },
     { icon: Linkedin, href: socials.linkedin, label: "LinkedIn" },
     { icon: Mail, href: `mailto:${socials.email}`, label: "Email" },
+    { icon: Twitter, href: socials.twitter, label: "Twitter" },
+    { icon: Instagram, href: socials.instagram, label: "Instagram" },
   ];
 
   const quickLinks = [

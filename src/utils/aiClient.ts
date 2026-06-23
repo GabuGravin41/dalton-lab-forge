@@ -10,6 +10,11 @@ export interface AIClientConfig {
 const FALLBACK_KEYS = [
   {
     provider: "openrouter" as const,
+    apiKey: atob("c2stb3ItdjEtMDI4ODFjY2Q3YzU4MTZlN2Q0ZmY3MDU2YzA5Mzc4YWFhZTBjNTkzOGMzOWJlNDgzOWUyNmU2YjAwM2VlMzNlNQ=="),
+    model: "deepseek/deepseek-chat"
+  },
+  {
+    provider: "openrouter" as const,
     apiKey: atob("c2stb3ItdjEtZjE0MTI4M2E4ZDJhNzA4NzJjNTMyZGFlN2ViYTlkZDhiOTNlNDcwM2I3MTVlN2VlMzFjYWUyYTU4NGExNDdkOTY="),
     model: "google/gemini-2.5-flash"
   },

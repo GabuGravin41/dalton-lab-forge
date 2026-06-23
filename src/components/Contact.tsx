@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Github, Linkedin, Mail, ExternalLink, Send, Sparkles, MapPin, Clock } from "lucide-react";
+import { Github, Linkedin, Mail, Send, Sparkles, MapPin, Clock, Instagram, Twitter } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import profileData from "@/data/profile.json";
@@ -46,10 +46,16 @@ const Contact = () => {
       label: socials.email,
     },
     {
-      name: "Fiverr",
-      icon: <ExternalLink className="h-5 w-5" />,
-      href: socials.fiverr,
-      label: "Freelance Services",
+      name: "Twitter / X",
+      icon: <Twitter className="h-5 w-5" />,
+      href: socials.twitter,
+      label: socials.twitter.replace("https://", ""),
+    },
+    {
+      name: "Instagram",
+      icon: <Instagram className="h-5 w-5" />,
+      href: socials.instagram,
+      label: socials.instagram.replace("https://www.", "").replace("https://", ""),
     },
   ];
 
@@ -205,25 +211,16 @@ const Contact = () => {
                 <div className="absolute top-0 right-0 w-24 h-24 bg-accent/20 rounded-full blur-2xl" />
                 <div className="relative space-y-3 md:space-y-4">
                   <h3 className="text-lg md:text-xl font-bold mb-1 md:mb-2 flex items-center gap-2">
-                    💼 Freelance Services
+                    🔬 Research & Collabs
                   </h3>
                   <p className="text-muted-foreground text-xs md:text-sm leading-relaxed">
-                    I offer professional freelance services through Fiverr for custom PCB design, 
-                    IoT solutions, and machine learning implementations. Let's collaborate!
+                    I'm actively seeking research collaborations and academic partnerships in hardware-software co-design, neuromorphic computing, and edge AI.
                   </p>
                   <div className="flex flex-wrap gap-1.5 md:gap-2 text-[10px] md:text-xs pt-1 md:pt-2">
-                    <span className="px-2 md:px-3 py-0.5 md:py-1 bg-primary/20 text-primary rounded-full">PCB Design</span>
-                    <span className="px-2 md:px-3 py-0.5 md:py-1 bg-accent/20 text-accent rounded-full">IoT Dev</span>
-                    <span className="px-2 md:px-3 py-0.5 md:py-1 bg-primary/20 text-primary rounded-full">ML Solutions</span>
+                    <span className="px-2 md:px-3 py-0.5 md:py-1 bg-primary/20 text-primary rounded-full">Edge AI</span>
+                    <span className="px-2 md:px-3 py-0.5 md:py-1 bg-accent/20 text-accent rounded-full">Neuromorphic</span>
+                    <span className="px-2 md:px-3 py-0.5 md:py-1 bg-primary/20 text-primary rounded-full">Silicon Photonics</span>
                   </div>
-                  <Button
-                    variant="outline"
-                    className="w-full border-accent/30 hover:bg-accent/10 hover:border-accent/50 group mt-3 md:mt-4 text-sm md:text-base h-9 md:h-10"
-                    onClick={() => window.open(socials.fiverr, "_blank")}
-                  >
-                    View Fiverr Profile
-                    <ExternalLink className="ml-2 h-3 w-3 md:h-4 md:w-4 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
-                  </Button>
                 </div>
               </Card>
             </div>
