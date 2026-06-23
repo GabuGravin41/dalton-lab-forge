@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Github, Linkedin, Mail, Send, Sparkles, MapPin, Clock, Instagram, Twitter } from "lucide-react";
+import { Github, Linkedin, Mail, Send, Sparkles, MapPin, Clock, Instagram, Twitter, ExternalLink } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import profileData from "@/data/profile.json";
