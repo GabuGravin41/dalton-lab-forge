@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
@@ -14,6 +14,14 @@ import ObjectDetection from "@/components/ObjectDetection";
 
 const Playground = () => {
   const [activeTheme, setActiveTheme] = useState(() => localStorage.getItem("portfolio_theme") || "indigo");
+
+  useEffect(() => {
+    const handleThemeChange = () => {
+      setActiveTheme(localStorage.getItem("portfolio_theme") || "indigo");
+    };
+    window.addEventListener("portfolio-theme-change", handleThemeChange);
+    return () => window.removeEventListener("portfolio-theme-change", handleThemeChange);
+  }, []);
 
   const changeTheme = (theme: string) => {
     setActiveTheme(theme);

@@ -112,6 +112,19 @@ const Admin = () => {
     if (savedPapers) setPapers(JSON.parse(savedPapers));
   }, []);
 
+  useEffect(() => {
+    const handleThemeChange = () => {
+      const savedProfile = localStorage.getItem("portfolio_profile");
+      if (savedProfile) {
+        try {
+          setProfile(JSON.parse(savedProfile));
+        } catch (e) {}
+      }
+    };
+    window.addEventListener("portfolio-theme-change", handleThemeChange);
+    return () => window.removeEventListener("portfolio-theme-change", handleThemeChange);
+  }, []);
+
   const saveSettings = (e: React.FormEvent) => {
     e.preventDefault();
     localStorage.setItem("admin_ai_provider", aiProvider);

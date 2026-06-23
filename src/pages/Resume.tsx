@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -27,7 +27,31 @@ type ResumeTemplate = "modern" | "academic" | "minimal";
 
 const Resume = () => {
   const [template, setTemplate] = useState<ResumeTemplate>("modern");
-  const [focus, setFocus] = useState<"engineering" | "research">("engineering");
+  const [focus, setFocus] = useState<"engineering" | "research">(() => {
+    const saved = localStorage.getItem("portfolio_resume_focus");
+    return (saved === "engineering" || saved === "research") ? saved : "engineering";
+  });
+
+  useEffect(() => {
+    const syncFocus = () => {
+      const saved = localStorage.getItem("portfolio_resume_focus");
+      if (saved === "engineering" || saved === "research") {
+        setFocus(saved);
+      }
+    };
+    window.addEventListener("portfolio-focus-change", syncFocus);
+    window.addEventListener("storage", syncFocus);
+    return () => {
+      window.removeEventListener("portfolio-focus-change", syncFocus);
+      window.removeEventListener("storage", syncFocus);
+    };
+  }, []);
+
+  const updateFocus = (newFocus: "engineering" | "research") => {
+    setFocus(newFocus);
+    localStorage.setItem("portfolio_resume_focus", newFocus);
+    window.dispatchEvent(new CustomEvent("portfolio-focus-change"));
+  };
 
   // Load from local storage (or fallback to static data files)
   const [profile] = useState<any>(() => {
@@ -94,7 +118,7 @@ const Resume = () => {
             </div>
 
             <div className="flex flex-wrap items-center gap-2">
-              <Tabs value={focus} onValueChange={(val: any) => setFocus(val)} className="w-auto">
+              <Tabs value={focus} onValueChange={updateFocus} className="w-auto">
                 <TabsList className="bg-card border border-border p-1 gap-1 h-9">
                   <TabsTrigger value="engineering" className="text-xs px-2.5 py-1">Engineering Focus</TabsTrigger>
                   <TabsTrigger value="research" className="text-xs px-2.5 py-1">Research Focus</TabsTrigger>

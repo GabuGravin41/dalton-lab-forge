@@ -2,12 +2,139 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, Sparkles, FileText } from "lucide-react";
+import { Menu, X, Sparkles, FileText, Settings, Palette, LayoutGrid } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogDescription,
+} from "@/components/ui/dialog";
+
+const SettingsButton = ({ activeTheme, activeFocus, handleThemeChange, handleFocusChange }: {
+  activeTheme: string;
+  activeFocus: string;
+  handleThemeChange: (t: string) => void;
+  handleFocusChange: (f: "engineering" | "research") => void;
+}) => {
+  const themes = [
+    { id: "indigo", name: "Midnight Indigo", color: "bg-indigo-600", desc: "Deep Indigo & Amber accents" },
+    { id: "emerald", name: "Emerald Aurora", color: "bg-emerald-600", desc: "Forest background & Cyan highlights" },
+    { id: "rose", name: "Cyber-Rose", color: "bg-rose-600", desc: "Dark Crimson & Gold accents" },
+    { id: "cyberpunk", name: "Neon Cyberpunk", color: "bg-fuchsia-600", desc: "Pitch Black & electric Magenta/Cyan" },
+    { id: "steel", name: "Minimal Steel", color: "bg-slate-500", desc: "Slate background & Steel/Silver accents" },
+  ];
+
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="w-9 h-9 relative hover:bg-accent/10 focus-visible:ring-0 focus-visible:ring-offset-0"
+          aria-label="Site settings"
+        >
+          <Settings className="w-[1.2rem] h-[1.2rem] transition-transform hover:rotate-45 duration-300" />
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[450px] bg-background/95 backdrop-blur-xl border border-border/80 shadow-2xl text-foreground">
+        <DialogHeader className="pb-2 border-b border-border/50">
+          <DialogTitle className="text-xl font-bold flex items-center gap-2 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+            <Settings className="w-5 h-5 text-primary" />
+            Appearance & Layout
+          </DialogTitle>
+          <DialogDescription className="text-xs text-muted-foreground">
+            Configure site-wide visual templates and default resume layouts.
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="space-y-6 py-4">
+          {/* Theme selection */}
+          <div className="space-y-3">
+            <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
+              <Palette className="w-3.5 h-3.5 text-primary" />
+              Color Template
+            </h4>
+            <div className="grid gap-2.5">
+              {themes.map((t) => (
+                <button
+                  key={t.id}
+                  onClick={() => handleThemeChange(t.id)}
+                  className={`flex items-center justify-between p-3 rounded-lg border text-left transition-all ${
+                    activeTheme === t.id
+                      ? "bg-primary/10 border-primary shadow-sm shadow-primary/5"
+                      : "bg-card/40 border-border/50 hover:bg-card/70 hover:border-border"
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className={`w-4 h-4 rounded-full ${t.color} border border-white/20`} />
+                    <div>
+                      <div className="text-sm font-semibold">{t.name}</div>
+                      <div className="text-[11px] text-muted-foreground">{t.desc}</div>
+                    </div>
+                  </div>
+                  {activeTheme === t.id && (
+                    <div className="w-2 h-2 rounded-full bg-primary" />
+                  )}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Resume Focus selection */}
+          <div className="space-y-3 border-t border-border/50 pt-5">
+            <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
+              <LayoutGrid className="w-3.5 h-3.5 text-primary" />
+              Default Resume Focus
+            </h4>
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                onClick={() => handleFocusChange("engineering")}
+                className={`p-3 rounded-lg border text-left transition-all flex flex-col justify-between h-24 ${
+                  activeFocus === "engineering"
+                    ? "bg-primary/10 border-primary shadow-sm shadow-primary/5"
+                    : "bg-card/40 border-border/50 hover:bg-card/70 hover:border-border"
+                }`}
+              >
+                <div className="flex justify-between items-start w-full">
+                  <span className="text-sm font-semibold">Engineering</span>
+                  {activeFocus === "engineering" && <div className="w-2 h-2 rounded-full bg-primary" />}
+                </div>
+                <span className="text-[10px] text-muted-foreground leading-normal">
+                  Prioritizes ML/HW projects, engineering experience, and technical tools.
+                </span>
+              </button>
+              <button
+                onClick={() => handleFocusChange("research")}
+                className={`p-3 rounded-lg border text-left transition-all flex flex-col justify-between h-24 ${
+                  activeFocus === "research"
+                    ? "bg-primary/10 border-primary shadow-sm shadow-primary/5"
+                    : "bg-card/40 border-border/50 hover:bg-card/70 hover:border-border"
+                }`}
+              >
+                <div className="flex justify-between items-start w-full">
+                  <span className="text-sm font-semibold">Research</span>
+                  {activeFocus === "research" && <div className="w-2 h-2 rounded-full bg-primary" />}
+                </div>
+                <span className="text-[10px] text-muted-foreground leading-normal">
+                  Prioritizes papers, academic profile, research statement, and education.
+                </span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
 
 const Navigation = () => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("");
+  const [activeTheme, setActiveTheme] = useState(() => localStorage.getItem("portfolio_theme") || "indigo");
+  const [activeFocus, setActiveFocus] = useState(() => localStorage.getItem("portfolio_resume_focus") || "engineering");
   const location = useLocation();
   const isPlayground = location.pathname === '/playground';
   const isResume = location.pathname === '/resume';
@@ -31,9 +158,45 @@ const Navigation = () => {
       }
     };
     
+    const syncSettings = () => {
+      setActiveTheme(localStorage.getItem("portfolio_theme") || "indigo");
+      setActiveFocus(localStorage.getItem("portfolio_resume_focus") || "engineering");
+    };
+
     window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    window.addEventListener("portfolio-theme-change", syncSettings);
+    window.addEventListener("portfolio-focus-change", syncSettings);
+    window.addEventListener("storage", syncSettings);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("portfolio-theme-change", syncSettings);
+      window.removeEventListener("portfolio-focus-change", syncSettings);
+      window.removeEventListener("storage", syncSettings);
+    };
   }, []);
+
+  const handleThemeChange = (theme: string) => {
+    setActiveTheme(theme);
+    localStorage.setItem("portfolio_theme", theme);
+    
+    const savedProfile = localStorage.getItem("portfolio_profile");
+    if (savedProfile) {
+      try {
+        const profile = JSON.parse(savedProfile);
+        profile.theme = theme;
+        localStorage.setItem("portfolio_profile", JSON.stringify(profile));
+      } catch (e) {}
+    }
+    
+    window.dispatchEvent(new CustomEvent("portfolio-theme-change"));
+  };
+
+  const handleFocusChange = (focus: "engineering" | "research") => {
+    setActiveFocus(focus);
+    localStorage.setItem("portfolio_resume_focus", focus);
+    window.dispatchEvent(new CustomEvent("portfolio-focus-change"));
+  };
 
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id);
@@ -119,6 +282,13 @@ const Navigation = () => {
             <div className="h-4 w-px bg-border" />
             
             <ThemeToggle />
+
+            <SettingsButton
+              activeTheme={activeTheme}
+              activeFocus={activeFocus}
+              handleThemeChange={handleThemeChange}
+              handleFocusChange={handleFocusChange}
+            />
             
             {!isPlayground && !isResume && !isAdmin && (
               <Button
@@ -133,6 +303,12 @@ const Navigation = () => {
           {/* Mobile Menu Button */}
           <div className="md:hidden flex items-center gap-3">
             <ThemeToggle />
+            <SettingsButton
+              activeTheme={activeTheme}
+              activeFocus={activeFocus}
+              handleThemeChange={handleThemeChange}
+              handleFocusChange={handleFocusChange}
+            />
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="p-2 rounded-lg bg-card/50 border border-border hover:border-primary/50 transition-all"
