@@ -207,20 +207,20 @@ const GitHubStats = () => {
 
           {/* Gamified Medals */}
           <div className="grid grid-cols-3 gap-2 text-center pt-2">
-            <div className="p-2 bg-gradient-to-br from-yellow-500/10 to-yellow-500/5 border border-yellow-500/20 rounded-lg">
+            <div className="p-2 bg-gradient-to-br from-yellow-500/10 to-yellow-500/5 border border-yellow-500/20 rounded-lg opacity-40">
               <span className="text-base">🥇</span>
-              <span className="block text-[10px] font-bold text-yellow-500 mt-1">Gold Medals</span>
-              <span className="text-[9px] text-muted-foreground">1st Place</span>
+              <span className="block text-[10px] font-bold text-yellow-500 mt-1">0 Gold</span>
+              <span className="text-[9px] text-muted-foreground">Competitions</span>
             </div>
             <div className="p-2 bg-gradient-to-br from-slate-400/10 to-slate-400/5 border border-slate-400/20 rounded-lg">
               <span className="text-base">🥈</span>
-              <span className="block text-[10px] font-bold text-slate-400 mt-1">Silver Medals</span>
-              <span className="text-[9px] text-muted-foreground">Top Placements</span>
+              <span className="block text-[10px] font-bold text-slate-400 mt-1">1 Silver</span>
+              <span className="text-[9px] text-muted-foreground">Top Rank</span>
             </div>
             <div className="p-2 bg-gradient-to-br from-amber-700/10 to-amber-700/5 border border-amber-700/20 rounded-lg">
               <span className="text-base">🥉</span>
-              <span className="block text-[10px] font-bold text-amber-700 mt-1">Bronze Medals</span>
-              <span className="text-[9px] text-muted-foreground">Standings</span>
+              <span className="block text-[10px] font-bold text-amber-700 mt-1">1 Bronze</span>
+              <span className="text-[9px] text-muted-foreground">Placement</span>
             </div>
           </div>
 

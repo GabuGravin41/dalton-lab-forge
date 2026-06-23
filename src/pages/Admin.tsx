@@ -626,53 +626,6 @@ const Admin = () => {
                     </Button>
                   </CardContent>
                 </Card>
-
-                {/* Theme & Objectives Settings Card */}
-                <Card className="md:col-span-3 bg-card/50 backdrop-blur-sm border-border">
-                  <CardHeader>
-                    <CardTitle className="text-lg">Theme & Dual-Focus Objectives</CardTitle>
-                    <CardDescription>Select your active website theme and update the dual-focus resume bio objectives.</CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-1.5">
-                        <label className="text-xs font-semibold text-muted-foreground uppercase">Active Website Theme</label>
-                        <select
-                          className="w-full bg-background border border-input rounded-md px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                          value={profile.theme || "indigo"}
-                          onChange={(e) => handleProfileUpdate("theme", e.target.value)}
-                        >
-                          <option value="indigo">Midnight Indigo (Indigo & Amber)</option>
-                          <option value="emerald">Emerald Aurora (Forest & Cyan)</option>
-                          <option value="rose">Cyber-Rose (Crimson & Gold)</option>
-                          <option value="cyberpunk">Neon Cyberpunk (Magenta & Cyan)</option>
-                          <option value="steel">Minimal Steel (Slate & Silver)</option>
-                        </select>
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-1.5">
-                        <label className="text-xs font-semibold text-muted-foreground uppercase">Engineering Focus Resume Objective</label>
-                        <Textarea
-                          value={profile.engineeringObjective || ""}
-                          onChange={(e) => handleProfileUpdate("engineeringObjective", e.target.value)}
-                          className="min-h-[80px] bg-background/50 leading-relaxed text-xs"
-                          placeholder="Engineering focus summary..."
-                        />
-                      </div>
-                      <div className="space-y-1.5">
-                        <label className="text-xs font-semibold text-muted-foreground uppercase">Research Focus Resume Statement</label>
-                        <Textarea
-                          value={profile.researchStatement || ""}
-                          onChange={(e) => handleProfileUpdate("researchStatement", e.target.value)}
-                          className="min-h-[80px] bg-background/50 leading-relaxed text-xs"
-                          placeholder="Research focus statement..."
-                        />
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
                 {/* Priority Star Pickers Card */}
                 <Card className="md:col-span-3 bg-card/50 backdrop-blur-sm border-border">
                   <CardHeader>
@@ -1064,8 +1017,50 @@ const Admin = () => {
                   </CardContent>
                 </Card>
 
+                {/* Appearance Settings Card */}
+                <Card className="bg-card/50 backdrop-blur-sm border-border">
+                  <CardHeader>
+                    <CardTitle className="text-lg">Appearance & Customization</CardTitle>
+                    <CardDescription className="text-xs">Select your active website theme and update the dual-focus resume bio objectives.</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-semibold text-muted-foreground uppercase">Active Website Theme</label>
+                      <select
+                        className="w-full bg-background border border-input rounded-md px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                        value={profile.theme || "indigo"}
+                        onChange={(e) => handleProfileUpdate("theme", e.target.value)}
+                      >
+                        <option value="indigo">Midnight Indigo (Indigo & Amber)</option>
+                        <option value="emerald">Emerald Aurora (Forest & Cyan)</option>
+                        <option value="rose">Cyber-Rose (Crimson & Gold)</option>
+                        <option value="cyberpunk">Neon Cyberpunk (Magenta & Cyan)</option>
+                        <option value="steel">Minimal Steel (Slate & Silver)</option>
+                      </select>
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-semibold text-muted-foreground uppercase">Engineering Focus Resume Objective</label>
+                      <Textarea
+                        value={profile.engineeringObjective || ""}
+                        onChange={(e) => handleProfileUpdate("engineeringObjective", e.target.value)}
+                        className="min-h-[80px] bg-background/50 leading-relaxed text-xs"
+                        placeholder="Engineering focus summary..."
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-semibold text-muted-foreground uppercase">Research Focus Resume Statement</label>
+                      <Textarea
+                        value={profile.researchStatement || ""}
+                        onChange={(e) => handleProfileUpdate("researchStatement", e.target.value)}
+                        className="min-h-[80px] bg-background/50 leading-relaxed text-xs"
+                        placeholder="Research focus statement..."
+                      />
+                    </div>
+                  </CardContent>
+                </Card>
+
                 {/* Info and guidance */}
-                <Card className="bg-card/50 backdrop-blur-sm border-border flex flex-col justify-between">
+                <Card className="md:col-span-2 bg-card/50 backdrop-blur-sm border-border flex flex-col justify-between">
                   <CardHeader>
                     <CardTitle className="text-lg">Security & Serverless Model</CardTitle>
                     <CardDescription className="text-xs">How this control center maintains static principles.</CardDescription>
