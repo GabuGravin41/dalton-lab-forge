@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Github, Trophy, Star, GitFork, BookOpen, Users, Award, ShieldAlert } from "lucide-react";
-import profileData from "@/data/profile.json";
+import { usePortfolio } from "@/context/PortfolioContext";
 
 interface GitHubData {
   public_repos: number;
@@ -27,39 +27,36 @@ const GitHubStats = () => {
   const [repos, setRepos] = useState<RepoInfo[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const { profile } = usePortfolio();
 
   // Extract GitHub username dynamically
-  const gitUrl = profileData.socials.github;
+  const gitUrl = profile.socials?.github || "https://github.com/GabuGravin41";
   const username = gitUrl.split("/").pop() || "GabuGravin41";
 
   useEffect(() => {
     const fetchStats = async () => {
       try {
         setLoading(true);
-        // 1. Fetch user data
-        const userRes = await fetch(`https://api.github.com/users/${username}`);
-        if (!userRes.ok) throw new Error("Failed to fetch user");
-        const userData = await userRes.json();
-        setGitData(userData);
+        // Call the serverless proxy to avoid browser rate limits (403 Forbidden)
+        const res = await fetch(`/api/github-stats?username=${username}`);
+        if (!res.ok) throw new Error("Failed to fetch stats from proxy");
+        const data = await res.json();
+        
+        setGitData(data.user);
 
-        // 2. Fetch repos
-        const reposRes = await fetch(`https://api.github.com/users/${username}/repos?per_page=6&sort=updated`);
-        if (reposRes.ok) {
-          const reposData = await reposRes.json();
-          // Filter out forks and keep top repos
-          const filtered = reposData
-            .filter((r: any) => !r.fork)
-            .slice(0, 3)
-            .map((r: any) => ({
-              name: r.name,
-              description: r.description || "No description provided.",
-              stargazers_count: r.stargazers_count,
-              forks_count: r.forks_count,
-              language: r.language || "TypeScript",
-              html_url: r.html_url,
-            }));
-          setRepos(filtered);
-        }
+        // Filter out forks and keep top repos
+        const filtered = (data.repos || [])
+          .filter((r: any) => !r.fork)
+          .slice(0, 3)
+          .map((r: any) => ({
+            name: r.name,
+            description: r.description || "No description provided.",
+            stargazers_count: r.stargazers_count,
+            forks_count: r.forks_count,
+            language: r.language || "TypeScript",
+            html_url: r.html_url,
+          }));
+        setRepos(filtered);
       } catch (err) {
         console.warn("Failed to load GitHub stats, falling back to static cache:", err);
         setGitData({

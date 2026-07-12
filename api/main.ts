@@ -17,9 +17,19 @@ import adminCallbackHandler from './_admin/auth/callback.js';
 import adminLogoutHandler from './_admin/auth/logout.js';
 
 export default async function handler(req: any, res: any) {
-  // Parse the URL pathname
+  // Set CORS headers
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+
+  // Parse the URL pathname or get from query string (if rewritten by Vercel)
   const url = new URL(req.url || '', `http://${req.headers.host || 'localhost'}`);
-  const pathname = url.pathname.replace(/\/$/, ''); // Remove trailing slash
+  const pathParam = url.searchParams.get('path');
+  const pathname = pathParam ? `/api/${pathParam}`.replace(/\/$/, '') : url.pathname.replace(/\/$/, '');
 
   try {
     switch (pathname) {
@@ -41,6 +51,41 @@ export default async function handler(req: any, res: any) {
         return await uploadProjectImageHandler(req, res);
       case '/api/contact':
         return await contactHandler(req, res);
+
+      // GitHub Proxy to avoid rate limits (403 Forbidden)
+      case '/api/github-stats': {
+        const username = url.searchParams.get('username');
+        if (!username) {
+          return res.status(400).json({ error: 'Username query parameter is required' });
+        }
+        try {
+          const headers: Record<string, string> = {
+            'Accept': 'application/vnd.github.v3+json',
+            'User-Agent': 'Portfolio-GitHub-Stats-Proxy'
+          };
+          if (process.env.GITHUB_TOKEN) {
+            headers['Authorization'] = `token ${process.env.GITHUB_TOKEN}`;
+          }
+
+          const userRes = await fetch(`https://api.github.com/users/${username}`, { headers });
+          if (!userRes.ok) {
+            throw new Error(`GitHub user stats returned status ${userRes.status}`);
+          }
+          const userData = await userRes.json();
+
+          const reposRes = await fetch(`https://api.github.com/users/${username}/repos?per_page=15&sort=updated`, { headers });
+          let reposData = [];
+          if (reposRes.ok) {
+            reposData = await reposRes.json();
+          }
+
+          res.setHeader('Cache-Control', 'public, max-age=600, s-maxage=600, stale-while-revalidate=300');
+          return res.status(200).json({ user: userData, repos: reposData });
+        } catch (err: any) {
+          console.error(`GitHub Stats Proxy error for @${username}:`, err);
+          return res.status(500).json({ error: err.message || 'Failed to fetch GitHub stats' });
+        }
+      }
 
       // Admin paths
       case '/api/admin/content':
