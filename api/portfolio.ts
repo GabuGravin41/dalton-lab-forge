@@ -1,7 +1,5 @@
 import { getDbPool } from './db.js';
-import profileData from '../src/data/profile.json' assert { type: 'json' };
-import projectsData from '../src/data/projects.json' assert { type: 'json' };
-import papersData from '../src/data/papers.json' assert { type: 'json' };
+import { profileData, projectsData, papersData } from './defaults.js';
 
 export default async function handler(req: any, res: any) {
   // Set CORS headers

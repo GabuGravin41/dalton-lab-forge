@@ -1,9 +1,7 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { getDbPool } from './db.js';
-import profileData from '../src/data/profile.json' assert { type: 'json' };
-import projectsData from '../src/data/projects.json' assert { type: 'json' };
-import papersData from '../src/data/papers.json' assert { type: 'json' };
+import { profileData, projectsData, papersData } from './defaults.js';
 
 const JWT_SECRET = process.env.JWT_SECRET;
 if (!JWT_SECRET) throw new Error('FATAL: JWT_SECRET environment variable is not set.');
