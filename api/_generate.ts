@@ -115,18 +115,48 @@ Output ONLY valid, parseable JSON. Do not wrap the JSON in markdown code blocks 
 `;
 
   try {
-    const genAI = new GoogleGenerativeAI(apiKey);
-    // Use gemini-2.0-flash for fast and cost-effective text parsing
-    const model = genAI.getGenerativeModel({
-      model: 'gemini-2.0-flash',
-      generationConfig: {
-        temperature: 0.1,
-        responseMimeType: 'application/json'
-      }
-    });
+    let responseText = "";
+    const openrouterKey = process.env.OPENROUTER_API_KEY;
 
-    const result = await model.generateContent(systemInstructions);
-    const responseText = result.response.text().trim();
+    if (openrouterKey) {
+      const modelName = process.env.OPENROUTER_MODEL || "google/gemini-2.0-flash";
+      const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${openrouterKey}`,
+          "Content-Type": "application/json",
+          "HTTP-Referer": "https://dalton-omondi.vercel.app",
+          "X-Title": "LabForge Portfolio Builder"
+        },
+        body: JSON.stringify({
+          model: modelName,
+          messages: [{ role: "user", content: systemInstructions }],
+          temperature: 0.1,
+          response_format: { type: "json_object" }
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error?.message || `OpenRouter API error: ${response.statusText}`);
+      }
+
+      const resData = await response.json();
+      responseText = resData.choices?.[0]?.message?.content?.trim() || "";
+    } else {
+      const genAI = new GoogleGenerativeAI(apiKey);
+      // Use gemini-2.0-flash for fast and cost-effective text parsing
+      const model = genAI.getGenerativeModel({
+        model: 'gemini-2.0-flash',
+        generationConfig: {
+          temperature: 0.1,
+          responseMimeType: 'application/json'
+        }
+      });
+
+      const result = await model.generateContent(systemInstructions);
+      responseText = result.response.text().trim();
+    }
     
     // Validate that the output is indeed parseable JSON
     const parsedData = JSON.parse(responseText);
