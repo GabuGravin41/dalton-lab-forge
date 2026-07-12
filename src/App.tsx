@@ -1,18 +1,29 @@
-import { useEffect } from "react";
+import { useEffect, lazy, Suspense } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Loader2 } from "lucide-react";
 import Index from "./pages/Index";
-import Playground from "./pages/Playground";
-import Admin from "./pages/Admin";
-import Resume from "./pages/Resume";
-import Forge from "./pages/Forge";
-import UserPortfolio from "./pages/UserPortfolio";
 import NotFound from "./pages/NotFound";
 import profileData from "@/data/profile.json";
 import { PortfolioProvider } from "@/context/PortfolioContext";
+
+// Heavy pages are lazily loaded — each becomes its own chunk
+const Playground   = lazy(() => import("./pages/Playground"));
+const Admin        = lazy(() => import("./pages/Admin"));
+const Resume       = lazy(() => import("./pages/Resume"));
+const Forge        = lazy(() => import("./pages/Forge"));
+const Explore      = lazy(() => import("./pages/Explore"));
+const UserPortfolio = lazy(() => import("./pages/UserPortfolio"));
+
+const PageLoader = () => (
+  <div className="min-h-screen bg-background flex items-center justify-center">
+    <Loader2 className="w-7 h-7 text-primary animate-spin" />
+  </div>
+);
+
 
 const queryClient = new QueryClient();
 
@@ -81,15 +92,18 @@ const App = () => {
           <Toaster />
           <Sonner />
           <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/playground" element={<Playground />} />
-              <Route path="/admin" element={<Admin />} />
-              <Route path="/resume" element={<Resume />} />
-              <Route path="/forge" element={<Forge />} />
-              <Route path="/u/:username" element={<UserPortfolio />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
+            <Suspense fallback={<PageLoader />}>
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/playground" element={<Playground />} />
+                <Route path="/admin" element={<Admin />} />
+                <Route path="/resume" element={<Resume />} />
+                <Route path="/forge" element={<Forge />} />
+                <Route path="/explore" element={<Explore />} />
+                <Route path="/u/:username" element={<UserPortfolio />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </Suspense>
           </BrowserRouter>
         </PortfolioProvider>
       </TooltipProvider>

@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, Sparkles, FileText, Settings, Palette, LayoutGrid, Copy } from "lucide-react";
+import { Menu, X, Sparkles, FileText, Settings, Palette, LayoutGrid, Copy, Users } from "lucide-react";
 import { useTheme } from "next-themes";
 import {
   Dialog,
@@ -288,6 +288,13 @@ const Navigation = () => {
               <button className={`group relative text-sm font-medium transition-colors flex items-center gap-1.5 ${isPlayground ? 'text-primary' : 'text-foreground/90 hover:text-foreground'}`}>
                 <Sparkles className={`w-3.5 h-3.5 group-hover:text-primary transition-colors ${isPlayground ? 'text-primary' : ''}`} />
                 Playground
+              </button>
+            </Link>
+
+            <Link to="/explore">
+              <button className={`group relative text-sm font-medium transition-colors flex items-center gap-1.5 ${location.pathname === '/explore' ? 'text-primary' : 'text-foreground/90 hover:text-foreground'}`}>
+                <Users className={`w-3.5 h-3.5 group-hover:text-primary transition-colors ${location.pathname === '/explore' ? 'text-primary' : ''}`} />
+                Explore
               </button>
             </Link>
             

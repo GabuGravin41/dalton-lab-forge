@@ -1,5 +1,22 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
+// ── Simple in-memory rate limiter (5 requests per IP per 60 seconds) ────────
+const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
+const RATE_LIMIT = 5;
+const RATE_WINDOW_MS = 60_000;
+
+function checkRateLimit(ip: string): boolean {
+  const now = Date.now();
+  const entry = rateLimitMap.get(ip);
+  if (!entry || now > entry.resetAt) {
+    rateLimitMap.set(ip, { count: 1, resetAt: now + RATE_WINDOW_MS });
+    return true; // allowed
+  }
+  if (entry.count >= RATE_LIMIT) return false; // blocked
+  entry.count++;
+  return true;
+}
+
 const FALLBACK_KEYS = [
   "c2stb3ItdjEtMDI4ODFjY2Q3YzU4MTZlN2Q0ZmY3MDU2YzA5Mzc4YWFhZTBjNTkzOGMzOWJlNDgzOWUyNmU2YjAwM2VlMzNlNQ==",
   "c2stb3ItdjEtZjE0MTI4M2E4ZDJhNzA4NzJjNTMyZGFlN2ViYTlkZDhiOTNlNDcwM2I3MTVlN2VlMzFjYWUyYTU4NGExNDdkOTY="
@@ -28,6 +45,12 @@ export default async function handler(req: any, res: any) {
 
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  // Rate limiting check
+  const ip = (req.headers['x-forwarded-for'] as string)?.split(',')[0].trim() || req.socket?.remoteAddress || 'unknown';
+  if (!checkRateLimit(ip)) {
+    return res.status(429).json({ error: 'Too many requests. Please wait a minute before generating again.' });
   }
 
   const { text, currentProfile, currentProjects, currentPapers } = req.body;

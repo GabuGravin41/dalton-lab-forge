@@ -9,6 +9,7 @@ interface PortfolioContextType {
   projects: any[];
   papers: any[];
   isEditMode: boolean;
+  hasUnsavedChanges: boolean;
   username: string | null;
   token: string | null;
   loading: boolean;
@@ -33,6 +34,7 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [papers, setPapers] = useState<any[]>(papersDefault);
   
   const [isEditMode, setIsEditMode] = useState(false);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [username, setUsername] = useState<string | null>(() => localStorage.getItem("portfolio_user"));
   const [token, setToken] = useState<string | null>(() => localStorage.getItem("portfolio_token"));
   const [loading, setLoading] = useState(false);
@@ -44,6 +46,7 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       localStorage.setItem(`draft_profile_${username}`, JSON.stringify(profile));
       localStorage.setItem(`draft_projects_${username}`, JSON.stringify(projects));
       localStorage.setItem(`draft_papers_${username}`, JSON.stringify(papers));
+      setHasUnsavedChanges(true);
     }
   }, [profile, projects, papers, username, isEditMode]);
 
@@ -69,10 +72,12 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         setProjects(JSON.parse(savedDraftProjects || "[]"));
         setPapers(JSON.parse(savedDraftPapers || "[]"));
         setIsEditMode(true);
+        setHasUnsavedChanges(true);
       } else {
         setProfile(data.profile);
         setProjects(data.projects);
         setPapers(data.papers);
+        setHasUnsavedChanges(false);
       }
     } catch (err: any) {
       console.error(err);
@@ -199,6 +204,17 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
       const data = await res.json();
       if (!res.ok) {
+        // Session expired: clear auth and bounce to forge login
+        if (res.status === 401) {
+          setUsername(null);
+          setToken(null);
+          setIsEditMode(false);
+          localStorage.removeItem("portfolio_user");
+          localStorage.removeItem("portfolio_token");
+          toast.error("Session expired. Please log in again.");
+          window.location.href = '/forge';
+          return false;
+        }
         throw new Error(data.error || "Failed to publish changes");
       }
 
@@ -206,6 +222,7 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       localStorage.removeItem(`draft_profile_${username}`);
       localStorage.removeItem(`draft_projects_${username}`);
       localStorage.removeItem(`draft_papers_${username}`);
+      setHasUnsavedChanges(false);
 
       toast.success("Portfolio published live successfully!");
       return true;
@@ -259,6 +276,7 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         projects,
         papers,
         isEditMode,
+        hasUnsavedChanges,
         username,
         token,
         loading,

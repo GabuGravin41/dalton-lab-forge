@@ -4,15 +4,57 @@ import { usePortfolio } from "@/context/PortfolioContext";
 import Index from "./Index";
 import { Loader2 } from "lucide-react";
 
+// Helper: upsert a <meta> tag by attribute
+function setMeta(attr: string, value: string, content: string) {
+  let el = document.querySelector(`meta[${attr}="${value}"]`) as HTMLMetaElement | null;
+  if (!el) {
+    el = document.createElement("meta");
+    el.setAttribute(attr, value);
+    document.head.appendChild(el);
+  }
+  el.setAttribute("content", content);
+  return el;
+}
+
 export const UserPortfolio = () => {
   const { username } = useParams<{ username: string }>();
-  const { loadUserPortfolio, loading, error } = usePortfolio();
+  const { loadUserPortfolio, profile, loading, error } = usePortfolio();
 
   useEffect(() => {
     if (username) {
       loadUserPortfolio(username);
     }
+    // Cleanup: restore default meta on unmount
+    return () => {
+      document.title = "Dalton Omondi - Machine Learning + Hardware Engineer";
+      const tags = document.querySelectorAll("meta[data-user-og]");
+      tags.forEach(t => t.remove());
+    };
   }, [username]);
+
+  // Inject user-specific OG tags once profile is loaded
+  useEffect(() => {
+    if (!profile?.name || profile.name === "Dalton Omondi") return;
+    const name = profile.name;
+    const role = (profile.roles || [])[0] || "Portfolio";
+    const bio = profile.bio || `${name}'s portfolio — powered by LabForge.`;
+    const title = `${name} — ${role}`;
+    const origin = window.location.origin;
+    const url = `${origin}/u/${username}`;
+
+    document.title = title;
+    const metas = [
+      setMeta("name", "description", bio),
+      setMeta("property", "og:title", title),
+      setMeta("property", "og:description", bio),
+      setMeta("property", "og:url", url),
+      setMeta("property", "og:type", "profile"),
+      setMeta("name", "twitter:title", title),
+      setMeta("name", "twitter:description", bio),
+      setMeta("name", "twitter:card", "summary"),
+    ];
+    metas.forEach(m => m.setAttribute("data-user-og", "true"));
+  }, [profile, username]);
 
   if (loading) {
     return (
@@ -37,3 +79,4 @@ export const UserPortfolio = () => {
 };
 
 export default UserPortfolio;
+

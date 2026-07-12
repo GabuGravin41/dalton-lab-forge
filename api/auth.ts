@@ -5,7 +5,8 @@ import profileData from '../src/data/profile.json' assert { type: 'json' };
 import projectsData from '../src/data/projects.json' assert { type: 'json' };
 import papersData from '../src/data/papers.json' assert { type: 'json' };
 
-const JWT_SECRET = process.env.JWT_SECRET || 'labforge-dev-secret-key-1234';
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) throw new Error('FATAL: JWT_SECRET environment variable is not set.');
 
 export default async function handler(req: any, res: any) {
   // Set CORS headers

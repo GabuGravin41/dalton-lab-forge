@@ -1,7 +1,8 @@
 import jwt from 'jsonwebtoken';
 import { getDbPool } from './db.js';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'labforge-dev-secret-key-1234';
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) throw new Error('FATAL: JWT_SECRET environment variable is not set.');
 
 export default async function handler(req: any, res: any) {
   // Set CORS headers

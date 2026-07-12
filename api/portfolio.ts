@@ -34,7 +34,7 @@ export default async function handler(req: any, res: any) {
   try {
     const pool = getDbPool();
     const result = await pool.query(
-      'SELECT profile_data, projects_data, papers_data FROM users_portfolios WHERE username = $1',
+      'SELECT profile_data, projects_data, papers_data, view_count FROM users_portfolios WHERE username = $1',
       [cleanUsername]
     );
 
@@ -43,11 +43,22 @@ export default async function handler(req: any, res: any) {
     }
 
     const row = result.rows[0];
+
+    // Fire-and-forget view count increment — never blocks the response
+    pool.query(
+      'UPDATE users_portfolios SET view_count = COALESCE(view_count, 0) + 1 WHERE username = $1',
+      [cleanUsername]
+    ).catch(() => {/* ignore silently */});
+
+    // Cache publicly for 60s at the CDN edge, stale-while-revalidate for 30s more
+    res.setHeader('Cache-Control', 's-maxage=60, stale-while-revalidate=30');
+
     return res.status(200).json({
       username: cleanUsername,
       profile: row.profile_data,
       projects: row.projects_data,
-      papers: row.papers_data
+      papers: row.papers_data,
+      views: (row.view_count || 0) + 1
     });
   } catch (error: any) {
     console.error('Portfolio handler error:', error);
@@ -64,3 +75,4 @@ export default async function handler(req: any, res: any) {
     return res.status(500).json({ error: error.message || 'Server error' });
   }
 }
+

@@ -26,6 +26,8 @@ const Footer = () => {
   const pageLinks = [
     { label: "Resume Exporter", to: "/resume" },
     { label: "AI Playground", to: "/playground" },
+    { label: "Explore Portfolios", to: "/explore" },
+    { label: "Forge Your Portfolio", to: "/forge" },
     { label: "Admin Control Center", to: "/admin" },
   ];
 
