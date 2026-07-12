@@ -9,20 +9,54 @@ import { usePortfolio } from "@/context/PortfolioContext";
 
 const Contact = () => {
   const { toast } = useToast();
-  const { profile, updateProfile, isEditMode } = usePortfolio();
+  const { profile, updateProfile, isEditMode, username: contextUsername } = usePortfolio();
+  const [isSending, setIsSending] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     message: "",
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast({
-      title: "Message sent!",
-      description: "Thank you for reaching out. I'll get back to you soon.",
-    });
-    setFormData({ name: "", email: "", message: "" });
+    setIsSending(true);
+
+    // Determine target username from URL path or fallback to context username or 'dalton'
+    const pathParts = window.location.pathname.split("/");
+    const urlUsername = pathParts[1] === "u" ? pathParts[2] : null;
+    const targetUsername = urlUsername || contextUsername || "dalton";
+
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          username: targetUsername,
+          name: formData.name,
+          email: formData.email,
+          message: formData.message,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to send message");
+
+      toast({
+        title: "Message sent!",
+        description: data.devLogged 
+          ? "Message received! (Setup RESEND_API_KEY in Vercel to receive actual emails)"
+          : "Thank you for reaching out. Your message has been delivered.",
+      });
+      setFormData({ name: "", email: "", message: "" });
+    } catch (err: any) {
+      toast({
+        title: "Could not send message",
+        description: err.message || "Something went wrong. Please try again later.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSending(false);
+    }
   };
 
   const socials = profile.socials || { github: "", linkedin: "", email: "", twitter: "", instagram: "" };
@@ -164,10 +198,20 @@ const Contact = () => {
 
                 <Button 
                   type="submit" 
+                  disabled={isSending}
                   className="w-full bg-gradient-accent text-accent-foreground hover:opacity-90 shadow-lg shadow-accent/20 hover:shadow-accent/30 transition-all h-10 md:h-11 font-semibold group text-sm md:text-base"
                 >
-                  <Send className="w-3 md:w-4 h-3 md:h-4 mr-2 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
-                  Send Message
+                  {isSending ? (
+                    <span className="flex items-center gap-2">
+                      <span className="animate-spin h-4 w-4 border-2 border-accent-foreground border-t-transparent rounded-full" />
+                      Sending...
+                    </span>
+                  ) : (
+                    <>
+                      <Send className="w-3 md:w-4 h-3 md:h-4 mr-2 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+                      Send Message
+                    </>
+                  )}
                 </Button>
               </form>
             </Card>

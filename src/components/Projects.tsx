@@ -75,16 +75,80 @@ const Projects = () => {
             {filteredProjects.map((project, index) => (
               <Card
                 key={project.title + index}
-                className="group relative bg-card/50 backdrop-blur-sm border-border hover:border-primary/50 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/10 overflow-hidden hover:-translate-y-2"
+                className="group relative bg-card/50 backdrop-blur-sm border-border hover:border-primary/50 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/10 overflow-hidden hover:-translate-y-2 flex flex-col justify-between"
                 style={{ animationDelay: `${index * 100}ms` }}
               >
+                {/* Project Card Image / Header */}
+                <div className="relative w-full h-40 bg-muted overflow-hidden border-b border-border/40 group/projphoto">
+                  {project.imageUrl ? (
+                    <img
+                      src={project.imageUrl}
+                      alt={project.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-primary/10 via-accent/5 to-primary/20 flex items-center justify-center">
+                      <Sparkles className="w-8 h-8 text-primary/30 group-hover:scale-110 transition-transform" />
+                    </div>
+                  )}
+
+                  {isEditMode && (
+                    <label className="absolute inset-0 bg-black/75 opacity-0 group-hover/projphoto:opacity-100 transition-opacity flex flex-col items-center justify-center cursor-pointer text-white text-[10px] gap-1 font-semibold">
+                      <span>📸 Set Project Image</span>
+                      <span className="text-[8px] text-muted-foreground">(Max 2MB)</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={async (e) => {
+                          const file = e.target.files?.[0];
+                          if (!file) return;
+                          if (file.size > 2 * 1024 * 1024) {
+                            alert("Image too large. Maximum size is 2MB.");
+                            return;
+                          }
+                          const reader = new FileReader();
+                          reader.onloadend = async () => {
+                            const dataUrl = reader.result as string;
+                            try {
+                              const token = localStorage.getItem("portfolio_token");
+                              const res = await fetch("/api/upload-project-image", {
+                                method: "POST",
+                                headers: {
+                                  "Content-Type": "application/json",
+                                  "Authorization": `Bearer ${token}`,
+                                },
+                                body: JSON.stringify({ dataUrl, mimeType: file.type }),
+                              });
+                              if (!res.ok) {
+                                const err = await res.json();
+                                throw new Error(err.error || "Failed to upload");
+                              }
+                              const updated = [...projects];
+                              const projIndex = projects.findIndex(p => p.title === project.title);
+                              if (projIndex !== -1) {
+                                updated[projIndex] = { ...updated[projIndex], imageUrl: dataUrl };
+                                updateProjects(updated);
+                                toast.success("Project image uploaded!");
+                              }
+                            } catch (err: any) {
+                              alert(err.message || "Failed to upload image");
+                            }
+                          };
+                          reader.readAsDataURL(file);
+                        }}
+                      />
+                    </label>
+                  )}
+                </div>
+
                 {/* Gradient overlay on hover */}
-                <div className="absolute inset-0 bg-gradient-primary opacity-0 group-hover:opacity-5 transition-opacity duration-500" />
+                <div className="absolute inset-0 bg-gradient-primary opacity-0 group-hover:opacity-5 transition-opacity duration-500 pointer-events-none" />
                 
                 {/* Glow effect */}
-                <div className="absolute -top-20 -right-20 w-40 h-40 bg-primary/20 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-all duration-700 group-hover:scale-150" />
+                <div className="absolute -top-20 -right-20 w-40 h-40 bg-primary/20 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-all duration-700 group-hover:scale-150 pointer-events-none" />
                 
-                <div className="relative p-4 md:p-6 space-y-3 md:space-y-4">
+                <div className="relative p-4 md:p-6 space-y-3 md:space-y-4 flex-1 flex flex-col justify-between">
                   {isEditMode ? (
                     <div className="space-y-3">
                       <div className="flex items-center justify-between gap-2">

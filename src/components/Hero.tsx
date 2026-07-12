@@ -297,15 +297,59 @@ const Hero = () => {
                 </div>
 
                 {/* Profile Photo */}
-                <img
-                  src="/dalton.jpg"
-                  alt="Dalton Omondi - ML Engineer & Hardware Designer"
-                  className="w-full h-full object-cover object-center transition-transform duration-700 hover:scale-105"
-                  onError={(e) => {
-                    console.error('Failed to load image');
-                    e.currentTarget.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='800'%3E%3Crect width='400' height='800' fill='%23374151'/%3E%3Ctext x='50%25' y='50%25' font-size='80' text-anchor='middle' dy='.3em' fill='%239CA3AF' font-weight='bold'%3EDO%3C/text%3E%3C/svg%3E";
-                  }}
-                />
+                <div className="relative w-full h-full group/photo">
+                  <img
+                    src={profile.avatarUrl || "/dalton.jpg"}
+                    alt={`${profile.name} - ML Engineer & Hardware Designer`}
+                    className="w-full h-full object-cover object-center transition-transform duration-700 hover:scale-105"
+                    onError={(e) => {
+                      console.error('Failed to load image');
+                      e.currentTarget.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='800'%3E%3Crect width='400' height='800' fill='%23374151'/%3E%3Ctext x='50%25' y='50%25' font-size='80' text-anchor='middle' dy='.3em' fill='%239CA3AF' font-weight='bold'%3EDO%3C/text%3E%3C/svg%3E";
+                    }}
+                  />
+                  {isEditMode && (
+                    <label className="absolute inset-0 bg-black/60 opacity-0 group-hover/photo:opacity-100 transition-opacity flex flex-col items-center justify-center cursor-pointer text-white text-xs gap-2 font-semibold">
+                      <span>📸 Change Photo</span>
+                      <span className="text-[10px] text-muted-foreground">(Max 2MB, square works best)</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={async (e) => {
+                          const file = e.target.files?.[0];
+                          if (!file) return;
+                          if (file.size > 2 * 1024 * 1024) {
+                            alert("Image too large. Maximum size is 2MB.");
+                            return;
+                          }
+                          const reader = new FileReader();
+                          reader.onloadend = async () => {
+                            const dataUrl = reader.result as string;
+                            try {
+                              const token = localStorage.getItem("portfolio_token");
+                              const res = await fetch("/api/upload-avatar", {
+                                method: "POST",
+                                headers: {
+                                  "Content-Type": "application/json",
+                                  "Authorization": `Bearer ${token}`,
+                                },
+                                body: JSON.stringify({ dataUrl, mimeType: file.type }),
+                              });
+                              if (!res.ok) {
+                                const err = await res.json();
+                                throw new Error(err.error || "Failed to upload");
+                              }
+                              updateProfile("avatarUrl", dataUrl);
+                            } catch (err: any) {
+                              alert(err.message || "Failed to upload photo");
+                            }
+                          };
+                          reader.readAsDataURL(file);
+                        }}
+                      />
+                    </label>
+                  )}
+                </div>
 
                 {/* Gradient overlays for depth */}
                 <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-[#FF1493]/10" />
@@ -341,17 +385,59 @@ const Hero = () => {
 
           {/* Mobile Photo Section - Simple and clean */}
           <div className="lg:hidden relative mt-8 mx-auto max-w-sm">
-            <div className="relative aspect-[3/4] rounded-2xl overflow-hidden border-2 border-primary/30 shadow-2xl">
+            <div className="relative aspect-[3/4] rounded-2xl overflow-hidden border-2 border-primary/30 shadow-2xl group/photo-mobile">
               {/* Profile Photo */}
               <img
-                src="/dalton.jpg"
-                alt="Dalton Omondi - ML Engineer & Hardware Designer"
+                src={profile.avatarUrl || "/dalton.jpg"}
+                alt={`${profile.name} - ML Engineer & Hardware Designer`}
                 className="w-full h-full object-cover object-center"
                 onError={(e) => {
                   console.error('Failed to load image');
                   e.currentTarget.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='600'%3E%3Crect width='400' height='600' fill='%23374151'/%3E%3Ctext x='50%25' y='50%25' font-size='80' text-anchor='middle' dy='.3em' fill='%239CA3AF' font-weight='bold'%3EDO%3C/text%3E%3C/svg%3E";
                 }}
               />
+              
+              {isEditMode && (
+                <label className="absolute inset-0 bg-black/60 opacity-0 group-hover/photo-mobile:opacity-100 transition-opacity flex flex-col items-center justify-center cursor-pointer text-white text-xs gap-2 font-semibold z-20">
+                  <span>📸 Change Photo</span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      if (file.size > 2 * 1024 * 1024) {
+                        alert("Image too large. Maximum size is 2MB.");
+                        return;
+                      }
+                      const reader = new FileReader();
+                      reader.onloadend = async () => {
+                        const dataUrl = reader.result as string;
+                        try {
+                          const token = localStorage.getItem("portfolio_token");
+                          const res = await fetch("/api/upload-avatar", {
+                            method: "POST",
+                            headers: {
+                              "Content-Type": "application/json",
+                              "Authorization": `Bearer ${token}`,
+                            },
+                            body: JSON.stringify({ dataUrl, mimeType: file.type }),
+                          });
+                          if (!res.ok) {
+                            const err = await res.json();
+                            throw new Error(err.error || "Failed to upload");
+                          }
+                          updateProfile("avatarUrl", dataUrl);
+                        } catch (err: any) {
+                          alert(err.message || "Failed to upload photo");
+                        }
+                      };
+                      reader.readAsDataURL(file);
+                    }}
+                  />
+                </label>
+              )}
               
               {/* Gradient overlay */}
               <div className="absolute inset-0 bg-gradient-to-t from-background/60 via-transparent to-transparent" />
