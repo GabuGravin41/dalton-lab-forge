@@ -1,4 +1,4 @@
-import { getDbPool } from './db.js';
+import { getDbPool } from './_db.js';
 import jwt from 'jsonwebtoken';
 
 const JWT_SECRET = process.env.JWT_SECRET;

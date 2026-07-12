@@ -1,4 +1,4 @@
-import { getDbPool } from './db.js';
+import { getDbPool } from './_db.js';
 import { Resend } from 'resend';
 
 // IP rate limiter for contact form submissions (3 per minute per IP)
