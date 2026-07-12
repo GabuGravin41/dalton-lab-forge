@@ -1,10 +1,14 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { FileText, ExternalLink, BookOpen, Award, TrendingUp, Eye } from "lucide-react";
+import { FileText, ExternalLink, BookOpen, Award, TrendingUp, Eye, Star, Trash2, Plus } from "lucide-react";
 import { useState } from "react";
 import PaperModal from "./PaperModal";
-import papersData from "@/data/papers.json";
-import profileData from "@/data/profile.json";
+import { usePortfolio } from "@/context/PortfolioContext";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { toast } from "sonner";
 
 interface Paper {
   title: string;
@@ -20,10 +24,11 @@ interface Paper {
 const Research = () => {
   const [selectedPaper, setSelectedPaper] = useState<Paper | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const { papers, updatePapers, profile, updateProfile, isEditMode } = usePortfolio();
 
-  const publications: Paper[] = papersData as Paper[];
+  const publications: Paper[] = [...papers].sort((a, b) => (b.priority || 0) - (a.priority || 0)) as Paper[];
 
-  const interests = profileData.researchInterests;
+  const interests = profile.researchInterests || [];
 
   const handlePaperClick = (paper: Paper) => {
     setSelectedPaper(paper);
@@ -112,21 +117,34 @@ const Research = () => {
                   </span>
                 </div>
               )}
-              <div className="flex items-center gap-2">
-                <TrendingUp className="w-5 h-5 text-primary" />
-                <span className="text-sm text-muted-foreground">
-                  <span className="font-bold text-foreground text-lg">{interests.length}</span> Research Interests
-                </span>
-              </div>
+              {isEditMode ? (
+                <div className="flex items-center gap-2">
+                  <TrendingUp className="w-4 h-4 text-primary" />
+                  <span className="text-xs text-muted-foreground mr-1">Interests:</span>
+                  <Input
+                    value={(profile.researchInterests || []).join(", ")}
+                    onChange={(e) => updateProfile("researchInterests", e.target.value.split(",").map((i: string) => i.trim()))}
+                    className="h-7 text-[10px] w-48 bg-background/50 border-primary/20"
+                    placeholder="Interests (comma separated)"
+                  />
+                </div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <TrendingUp className="w-5 h-5 text-primary" />
+                  <span className="text-sm text-muted-foreground">
+                    <span className="font-bold text-foreground text-lg">{interests.length}</span> Research Interests
+                  </span>
+                </div>
+              )}
             </div>
           </div>
 
           {/* Publications List */}
           <div className="space-y-5 md:space-y-6 lg:space-y-8">
-            {publications.length > 0 ? (
+            {publications.length > 0 &&
               publications.map((pub, index) => (
                 <Card
-                  key={pub.title}
+                  key={pub.title + index}
                   className="group relative p-4 md:p-6 lg:p-8 bg-card/50 backdrop-blur-sm border-border hover:border-accent/50 transition-all duration-500 hover:shadow-2xl hover:shadow-accent/10 overflow-hidden"
                   style={{ animationDelay: `${index * 150}ms` }}
                 >
@@ -143,53 +161,238 @@ const Research = () => {
                     
                     {/* Content */}
                     <div className="flex-1 space-y-3 md:space-y-4">
-                      <div>
-                        <h3 className="text-lg md:text-xl lg:text-2xl font-bold mb-2 md:mb-3 group-hover:text-accent transition-colors">
-                          {pub.title}
-                        </h3>
-                        <div className="flex flex-wrap items-center gap-2 md:gap-3 text-xs md:text-sm mb-2 md:mb-3">
-                          <span className="text-muted-foreground font-medium">{pub.authors}</span>
-                          <span className="text-muted-foreground hidden sm:inline">•</span>
-                          <span className="text-muted-foreground font-medium">{pub.year}</span>
-                          {pub.venue && (
-                            <>
-                              <span className="text-muted-foreground hidden sm:inline">•</span>
-                              <span className="font-semibold text-foreground/90 px-2 md:px-3 py-0.5 md:py-1 bg-accent/10 rounded-full text-xs">{pub.venue}</span>
-                            </>
-                          )}
+                      {isEditMode ? (
+                        <div className="space-y-3">
+                          <div className="flex items-center justify-between gap-2">
+                            <span className="text-[10px] font-bold text-muted-foreground uppercase">Priority Rating</span>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              type="button"
+                              onClick={() => {
+                                const updated = papers.filter((_, idx) => papers.findIndex(p => p.title === pub.title) !== idx);
+                                updatePapers(updated);
+                                toast.success("Paper card removed.");
+                              }}
+                              className="h-6 w-6 text-destructive hover:bg-destructive/10"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </Button>
+                          </div>
+
+                          {/* Stars */}
+                          <div className="flex items-center gap-1">
+                            {[1, 2, 3, 4, 5].map((star) => (
+                              <button
+                                key={star}
+                                type="button"
+                                onClick={() => {
+                                  const updated = [...papers];
+                                  const paperIndex = papers.findIndex(p => p.title === pub.title);
+                                  if (paperIndex !== -1) {
+                                    updated[paperIndex] = { ...updated[paperIndex], priority: star };
+                                    updatePapers(updated);
+                                  }
+                                }}
+                                className="focus:outline-none hover:scale-110 transition-transform"
+                              >
+                                <Star className={`w-4.5 h-4.5 ${star <= (pub.priority || 0) ? "fill-yellow-500 text-yellow-500" : "text-muted-foreground"}`} />
+                              </button>
+                            ))}
+                          </div>
+
+                          <div className="grid grid-cols-[2fr,1fr] gap-2">
+                            <div className="space-y-1">
+                              <Label className="text-[9px] uppercase tracking-wider text-muted-foreground">Title</Label>
+                              <Input
+                                value={pub.title || ""}
+                                onChange={(e) => {
+                                  const updated = [...papers];
+                                  const paperIndex = papers.findIndex(p => p.title === pub.title);
+                                  if (paperIndex !== -1) {
+                                    updated[paperIndex] = { ...updated[paperIndex], title: e.target.value };
+                                    updatePapers(updated);
+                                  }
+                                }}
+                                className="h-8 bg-background/40 border-accent/20 text-xs font-bold"
+                              />
+                            </div>
+                            <div className="space-y-1">
+                              <Label className="text-[9px] uppercase tracking-wider text-muted-foreground">Year</Label>
+                              <Input
+                                value={pub.year || ""}
+                                onChange={(e) => {
+                                  const updated = [...papers];
+                                  const paperIndex = papers.findIndex(p => p.title === pub.title);
+                                  if (paperIndex !== -1) {
+                                    updated[paperIndex] = { ...updated[paperIndex], year: e.target.value };
+                                    updatePapers(updated);
+                                  }
+                                }}
+                                className="h-8 bg-background/40 border-accent/20 text-xs"
+                              />
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-[1fr,1fr] gap-2">
+                            <div className="space-y-1">
+                              <Label className="text-[9px] uppercase tracking-wider text-muted-foreground">Authors</Label>
+                              <Input
+                                value={pub.authors || ""}
+                                onChange={(e) => {
+                                  const updated = [...papers];
+                                  const paperIndex = papers.findIndex(p => p.title === pub.title);
+                                  if (paperIndex !== -1) {
+                                    updated[paperIndex] = { ...updated[paperIndex], authors: e.target.value };
+                                    updatePapers(updated);
+                                  }
+                                }}
+                                className="h-8 bg-background/40 border-accent/20 text-xs"
+                              />
+                            </div>
+                            <div className="space-y-1">
+                              <Label className="text-[9px] uppercase tracking-wider text-muted-foreground">Venue / Journal</Label>
+                              <Input
+                                value={pub.venue || ""}
+                                onChange={(e) => {
+                                  const updated = [...papers];
+                                  const paperIndex = papers.findIndex(p => p.title === pub.title);
+                                  if (paperIndex !== -1) {
+                                    updated[paperIndex] = { ...updated[paperIndex], venue: e.target.value };
+                                    updatePapers(updated);
+                                  }
+                                }}
+                                className="h-8 bg-background/40 border-accent/20 text-xs"
+                              />
+                            </div>
+                          </div>
+
+                          <div className="space-y-1">
+                            <Label className="text-[9px] uppercase tracking-wider text-muted-foreground">Abstract</Label>
+                            <Textarea
+                              value={pub.abstract || ""}
+                              onChange={(e) => {
+                                const updated = [...papers];
+                                const paperIndex = papers.findIndex(p => p.title === pub.title);
+                                if (paperIndex !== -1) {
+                                  updated[paperIndex] = { ...updated[paperIndex], abstract: e.target.value };
+                                  updatePapers(updated);
+                                }
+                              }}
+                              className="min-h-[80px] bg-background/40 border-accent/20 text-xs"
+                            />
+                          </div>
+
+                          <div className="grid grid-cols-[1fr,1fr] gap-2">
+                            <div className="space-y-1">
+                              <Label className="text-[9px] uppercase tracking-wider text-muted-foreground">Status</Label>
+                              <Select
+                                value={pub.status}
+                                onValueChange={(val: any) => {
+                                  const updated = [...papers];
+                                  const paperIndex = papers.findIndex(p => p.title === pub.title);
+                                  if (paperIndex !== -1) {
+                                    updated[paperIndex] = { ...updated[paperIndex], status: val };
+                                    updatePapers(updated);
+                                  }
+                                }}
+                              >
+                                <SelectTrigger className="h-8 text-xs bg-background/40 border-accent/20">
+                                  <SelectValue placeholder="Status" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="published">Published</SelectItem>
+                                  <SelectItem value="submitted">Submitted</SelectItem>
+                                  <SelectItem value="preprint">Preprint</SelectItem>
+                                  <SelectItem value="draft">Draft</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                            <div className="space-y-1">
+                              <Label className="text-[9px] uppercase tracking-wider text-muted-foreground">Paper Link / pdfPath</Label>
+                              <Input
+                                value={pub.pdfPath || ""}
+                                onChange={(e) => {
+                                  const updated = [...papers];
+                                  const paperIndex = papers.findIndex(p => p.title === pub.title);
+                                  if (paperIndex !== -1) {
+                                    updated[paperIndex] = { ...updated[paperIndex], pdfPath: e.target.value };
+                                    updatePapers(updated);
+                                  }
+                                }}
+                                className="h-8 bg-background/40 border-accent/20 text-xs"
+                              />
+                            </div>
+                          </div>
+
+                          <div className="space-y-1">
+                            <Label className="text-[9px] uppercase tracking-wider text-muted-foreground">Tags (comma separated)</Label>
+                            <Input
+                              value={(pub.tags || []).join(", ")}
+                              onChange={(e) => {
+                                const updated = [...papers];
+                                const paperIndex = papers.findIndex(p => p.title === pub.title);
+                                if (paperIndex !== -1) {
+                                  updated[paperIndex] = { ...updated[paperIndex], tags: e.target.value.split(",").map((t: string) => t.trim()) };
+                                  updatePapers(updated);
+                                }
+                              }}
+                              className="h-8 bg-background/40 border-accent/20 text-xs"
+                            />
+                          </div>
                         </div>
-                      </div>
-                      <p className="text-xs md:text-sm lg:text-base text-foreground/80 leading-relaxed">
-                        {pub.abstract.length > 200 ? `${pub.abstract.substring(0, 200)}...` : pub.abstract}
-                      </p>
-                      <div className="flex flex-wrap items-center gap-2 md:gap-3 pt-2">
-                        <Badge className={`text-[10px] md:text-xs px-2 md:px-3 py-0.5 md:py-1 ${getStatusColor(pub.status)}`}>
-                          {getStatusText(pub.status)}
-                        </Badge>
-                        {pub.tags.slice(0, 3).map((tag) => (
-                          <Badge key={tag} variant="secondary" className="text-[10px] md:text-xs px-2 md:px-3 py-0.5 md:py-1.5 bg-secondary/50 hover:bg-accent/20 hover:text-accent transition-colors">
-                            {tag}
-                          </Badge>
-                        ))}
-                        {pub.tags.length > 3 && (
-                          <Badge variant="secondary" className="text-[10px] md:text-xs px-2 md:px-3 py-0.5 md:py-1.5 bg-secondary/50">
-                            +{pub.tags.length - 3}
-                          </Badge>
-                        )}
-                        <button
-                          onClick={() => handlePaperClick(pub)}
-                          className="ml-auto flex items-center gap-1.5 md:gap-2 text-xs md:text-sm font-medium text-accent hover:text-accent/80 transition-all group/link px-3 md:px-4 py-1.5 md:py-2 rounded-lg hover:bg-accent/10"
-                        >
-                          <span className="hidden sm:inline">View Paper</span>
-                          <span className="sm:hidden">View</span>
-                          <Eye className="h-3 w-3 md:h-4 md:w-4 group-hover/link:scale-110 transition-transform" />
-                        </button>
-                      </div>
+                      ) : (
+                        <>
+                          <div>
+                            <h3 className="text-lg md:text-xl lg:text-2xl font-bold mb-2 md:mb-3 group-hover:text-accent transition-colors">
+                              {pub.title}
+                            </h3>
+                            <div className="flex flex-wrap items-center gap-2 md:gap-3 text-xs md:text-sm mb-2 md:mb-3">
+                              <span className="text-muted-foreground font-medium">{pub.authors}</span>
+                              <span className="text-muted-foreground hidden sm:inline">•</span>
+                              <span className="text-muted-foreground font-medium">{pub.year}</span>
+                              {pub.venue && (
+                                <>
+                                  <span className="text-muted-foreground hidden sm:inline">•</span>
+                                  <span className="font-semibold text-foreground/90 px-2 md:px-3 py-0.5 md:py-1 bg-accent/10 rounded-full text-xs">{pub.venue}</span>
+                                </>
+                              )}
+                            </div>
+                          </div>
+                          <p className="text-xs md:text-sm lg:text-base text-foreground/80 leading-relaxed">
+                            {pub.abstract.length > 200 ? `${pub.abstract.substring(0, 200)}...` : pub.abstract}
+                          </p>
+                          <div className="flex flex-wrap items-center gap-2 md:gap-3 pt-2">
+                            <Badge className={`text-[10px] md:text-xs px-2 md:px-3 py-0.5 md:py-1 ${getStatusColor(pub.status)}`}>
+                              {getStatusText(pub.status)}
+                            </Badge>
+                            {(pub.tags || []).slice(0, 3).map((tag) => (
+                              <Badge key={tag} variant="secondary" className="text-[10px] md:text-xs px-2 md:px-3 py-0.5 md:py-1.5 bg-secondary/50 hover:bg-accent/20 hover:text-accent transition-colors">
+                                {tag}
+                              </Badge>
+                            ))}
+                            {(pub.tags || []).length > 3 && (
+                              <Badge variant="secondary" className="text-[10px] md:text-xs px-2 md:px-3 py-0.5 md:py-1.5 bg-secondary/50">
+                                +{(pub.tags || []).length - 3}
+                              </Badge>
+                            )}
+                            <button
+                              onClick={() => handlePaperClick(pub)}
+                              className="ml-auto flex items-center gap-1.5 md:gap-2 text-xs md:text-sm font-medium text-accent hover:text-accent/80 transition-all group/link px-3 md:px-4 py-1.5 md:py-2 rounded-lg hover:bg-accent/10"
+                            >
+                              <span className="hidden sm:inline">View Paper</span>
+                              <span className="sm:hidden">View</span>
+                              <Eye className="h-3 w-3 md:h-4 md:w-4 group-hover/link:scale-110 transition-transform" />
+                            </button>
+                          </div>
+                        </>
+                      )}
                     </div>
                   </div>
                 </Card>
-              ))
-            ) : (
+            ))}
+
+            {publications.length === 0 && (
               <Card className="relative p-8 md:p-12 bg-card/30 backdrop-blur-sm border-dashed border-2 border-accent/30 text-center">
                 <div className="space-y-6">
                   <div className="mx-auto w-16 h-16 rounded-full bg-accent/10 flex items-center justify-center">
@@ -208,6 +411,29 @@ const Research = () => {
                     <Badge variant="outline" className="text-xs px-3 py-1.5">Submissions Planned</Badge>
                   </div>
                 </div>
+              </Card>
+            )}
+
+            {isEditMode && (
+              <Card 
+                className="flex flex-col items-center justify-center p-8 border-2 border-dashed border-accent/30 hover:border-accent/60 bg-accent/5 hover:bg-accent/10 cursor-pointer min-h-[120px] transition-all duration-300 rounded-xl"
+                onClick={() => {
+                  const newPaper = {
+                    title: `New Research Publication ${papers.length + 1}`,
+                    authors: profile.name || "Authors",
+                    year: new Date().getFullYear().toString(),
+                    abstract: "Provide a detailed summary abstract of your research findings and methodology here.",
+                    tags: ["Research", "Methodology"],
+                    pdfPath: "",
+                    status: "draft",
+                    priority: 3
+                  };
+                  updatePapers([...papers, newPaper]);
+                  toast.success("New research paper card added! Fill in its details.");
+                }}
+              >
+                <Plus className="w-8 h-8 text-accent mb-2 animate-pulse" />
+                <span className="text-xs font-semibold uppercase tracking-wider text-accent">Add Research Paper Card</span>
               </Card>
             )}
           </div>

@@ -2,14 +2,17 @@ import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ExternalLink, Github, Sparkles } from "lucide-react";
-import projectsData from "@/data/projects.json";
-import profileData from "@/data/profile.json";
+import { ExternalLink, Github, Sparkles, Star, Trash2, Plus } from "lucide-react";
+import { usePortfolio } from "@/context/PortfolioContext";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
 
 const Projects = () => {
   const [activeFilter, setActiveFilter] = useState("all");
-
-  const projects = projectsData;
+  const { projects, updateProjects, profile, isEditMode } = usePortfolio();
 
   const categories = [
     { id: "all", label: "All Projects", icon: "🎯" },
@@ -19,9 +22,11 @@ const Projects = () => {
     { id: "iot", label: "IoT", icon: "📡" },
   ];
 
+  const sortedProjects = [...projects].sort((a, b) => (b.priority || 0) - (a.priority || 0));
+
   const filteredProjects = activeFilter === "all" 
-    ? projects 
-    : projects.filter(p => p.category === activeFilter);
+    ? sortedProjects 
+    : sortedProjects.filter(p => p.category === activeFilter);
 
   return (
     <section id="projects" className="py-16 md:py-24 lg:py-32 px-4 sm:px-6 bg-gradient-subtle relative overflow-hidden z-10">
@@ -69,7 +74,7 @@ const Projects = () => {
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6 lg:gap-8">
             {filteredProjects.map((project, index) => (
               <Card
-                key={project.title}
+                key={project.title + index}
                 className="group relative bg-card/50 backdrop-blur-sm border-border hover:border-primary/50 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/10 overflow-hidden hover:-translate-y-2"
                 style={{ animationDelay: `${index * 100}ms` }}
               >
@@ -80,58 +85,229 @@ const Projects = () => {
                 <div className="absolute -top-20 -right-20 w-40 h-40 bg-primary/20 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-all duration-700 group-hover:scale-150" />
                 
                 <div className="relative p-4 md:p-6 space-y-3 md:space-y-4">
-                  {/* Header */}
-                  <div className="flex items-start justify-between gap-2 md:gap-3">
-                    <h3 className="text-base md:text-lg lg:text-xl font-bold group-hover:text-primary transition-colors flex-1">
-                      {project.title}
-                    </h3>
-                    <div className="flex gap-1 md:gap-2 flex-shrink-0">
-                      {project.github && (
-                        <a
-                          href={project.github}
-                          className="p-1.5 md:p-2 rounded-lg bg-background/50 hover:bg-primary/20 hover:text-primary transition-all hover:scale-110"
-                          aria-label="View on GitHub"
-                          onClick={(e) => e.stopPropagation()}
+                  {isEditMode ? (
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="text-[10px] font-bold text-muted-foreground uppercase">Priority Rating</span>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          type="button"
+                          onClick={() => {
+                            const updated = projects.filter((_, idx) => projects.findIndex(p => p.title === project.title) !== idx);
+                            updateProjects(updated);
+                            toast.success("Project card removed.");
+                          }}
+                          className="h-6 w-6 text-destructive hover:bg-destructive/10"
                         >
-                          <Github className="h-3 w-3 md:h-4 md:w-4" />
-                        </a>
-                      )}
-                      {project.demo && (
-                        <a
-                          href={project.demo}
-                          className="p-1.5 md:p-2 rounded-lg bg-background/50 hover:bg-accent/20 hover:text-accent transition-all hover:scale-110"
-                          aria-label="View live demo"
-                          onClick={(e) => e.stopPropagation()}
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </Button>
+                      </div>
+
+                      {/* Stars */}
+                      <div className="flex items-center gap-1">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <button
+                            key={star}
+                            type="button"
+                            onClick={() => {
+                              const updated = [...projects];
+                              const projIndex = projects.findIndex(p => p.title === project.title);
+                              if (projIndex !== -1) {
+                                updated[projIndex] = { ...updated[projIndex], priority: star };
+                                updateProjects(updated);
+                              }
+                            }}
+                            className="focus:outline-none hover:scale-110 transition-transform"
+                          >
+                            <Star className={`w-4.5 h-4.5 ${star <= (project.priority || 0) ? "fill-yellow-500 text-yellow-500" : "text-muted-foreground"}`} />
+                          </button>
+                        ))}
+                      </div>
+
+                      <div className="space-y-1">
+                        <Label className="text-[9px] uppercase tracking-wider text-muted-foreground">Title</Label>
+                        <Input
+                          value={project.title || ""}
+                          onChange={(e) => {
+                            const updated = [...projects];
+                            const projIndex = projects.findIndex(p => p.title === project.title);
+                            if (projIndex !== -1) {
+                              updated[projIndex] = { ...updated[projIndex], title: e.target.value };
+                              updateProjects(updated);
+                            }
+                          }}
+                          className="h-8 bg-background/40 border-primary/20 text-xs font-bold"
+                        />
+                      </div>
+
+                      <div className="space-y-1">
+                        <Label className="text-[9px] uppercase tracking-wider text-muted-foreground">Description</Label>
+                        <Textarea
+                          value={project.description || ""}
+                          onChange={(e) => {
+                            const updated = [...projects];
+                            const projIndex = projects.findIndex(p => p.title === project.title);
+                            if (projIndex !== -1) {
+                              updated[projIndex] = { ...updated[projIndex], description: e.target.value };
+                              updateProjects(updated);
+                            }
+                          }}
+                          className="min-h-[60px] bg-background/40 border-primary/20 text-xs"
+                        />
+                      </div>
+
+                      <div className="space-y-1">
+                        <Label className="text-[9px] uppercase tracking-wider text-muted-foreground">Category</Label>
+                        <Select 
+                          value={project.category} 
+                          onValueChange={(val) => {
+                            const updated = [...projects];
+                            const projIndex = projects.findIndex(p => p.title === project.title);
+                            if (projIndex !== -1) {
+                              updated[projIndex] = { ...updated[projIndex], category: val };
+                              updateProjects(updated);
+                            }
+                          }}
                         >
-                          <ExternalLink className="h-3 w-3 md:h-4 md:w-4" />
-                        </a>
-                      )}
+                          <SelectTrigger className="h-8 text-xs bg-background/40 border-primary/20">
+                            <SelectValue placeholder="Category" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="ml">Machine Learning</SelectItem>
+                            <SelectItem value="hardware">Hardware</SelectItem>
+                            <SelectItem value="chip">Chip Design</SelectItem>
+                            <SelectItem value="iot">IoT</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div className="space-y-1">
+                        <Label className="text-[9px] uppercase tracking-wider text-muted-foreground">Skills Tags (comma separated)</Label>
+                        <Input
+                          value={(project.tags || []).join(", ")}
+                          onChange={(e) => {
+                            const updated = [...projects];
+                            const projIndex = projects.findIndex(p => p.title === project.title);
+                            if (projIndex !== -1) {
+                              updated[projIndex] = { ...updated[projIndex], tags: e.target.value.split(",").map((t: string) => t.trim()) };
+                              updateProjects(updated);
+                            }
+                          }}
+                          className="h-8 bg-background/40 border-primary/20 text-xs"
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-2">
+                        <div className="space-y-1">
+                          <Label className="text-[9px] uppercase tracking-wider text-muted-foreground">GitHub Link</Label>
+                          <Input
+                            value={project.github || ""}
+                            onChange={(e) => {
+                              const updated = [...projects];
+                              const projIndex = projects.findIndex(p => p.title === project.title);
+                              if (projIndex !== -1) {
+                                updated[projIndex] = { ...updated[projIndex], github: e.target.value };
+                                updateProjects(updated);
+                              }
+                            }}
+                            className="h-7 bg-background/40 border-primary/20 text-[10px]"
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <Label className="text-[9px] uppercase tracking-wider text-muted-foreground">Demo Link</Label>
+                          <Input
+                            value={project.demo || ""}
+                            onChange={(e) => {
+                              const updated = [...projects];
+                              const projIndex = projects.findIndex(p => p.title === project.title);
+                              if (projIndex !== -1) {
+                                updated[projIndex] = { ...updated[projIndex], demo: e.target.value };
+                                updateProjects(updated);
+                              }
+                            }}
+                            className="h-7 bg-background/40 border-primary/20 text-[10px]"
+                          />
+                        </div>
+                      </div>
                     </div>
-                  </div>
+                  ) : (
+                    <>
+                      {/* Header */}
+                      <div className="flex items-start justify-between gap-2 md:gap-3">
+                        <h3 className="text-base md:text-lg lg:text-xl font-bold group-hover:text-primary transition-colors flex-1">
+                          {project.title}
+                        </h3>
+                        <div className="flex gap-1 md:gap-2 flex-shrink-0">
+                          {project.github && (
+                            <a
+                              href={project.github}
+                              className="p-1.5 md:p-2 rounded-lg bg-background/50 hover:bg-primary/20 hover:text-primary transition-all hover:scale-110"
+                              aria-label="View on GitHub"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <Github className="h-3 w-3 md:h-4 md:w-4" />
+                            </a>
+                          )}
+                          {project.demo && (
+                            <a
+                              href={project.demo}
+                              className="p-1.5 md:p-2 rounded-lg bg-background/50 hover:bg-accent/20 hover:text-accent transition-all hover:scale-110"
+                              aria-label="View live demo"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <ExternalLink className="h-3 w-3 md:h-4 md:w-4" />
+                            </a>
+                          )}
+                        </div>
+                      </div>
 
-                  {/* Description */}
-                  <p className="text-xs md:text-sm text-muted-foreground leading-relaxed min-h-[3rem] md:min-h-[4rem]">
-                    {project.description}
-                  </p>
+                      {/* Description */}
+                      <p className="text-xs md:text-sm text-muted-foreground leading-relaxed min-h-[3rem] md:min-h-[4rem]">
+                        {project.description}
+                      </p>
 
-                  {/* Tags */}
-                  <div className="flex flex-wrap gap-2 pt-2">
-                    {project.tags.map((tag) => (
-                      <Badge 
-                        key={tag} 
-                        variant="secondary" 
-                        className="text-xs px-3 py-1 bg-secondary/50 hover:bg-primary/20 hover:text-primary transition-colors"
-                      >
-                        {tag}
-                      </Badge>
-                    ))}
-                  </div>
+                      {/* Tags */}
+                      <div className="flex flex-wrap gap-2 pt-2">
+                        {(project.tags || []).map((tag) => (
+                          <Badge 
+                            key={tag} 
+                            variant="secondary" 
+                            className="text-xs px-3 py-1 bg-secondary/50 hover:bg-primary/20 hover:text-primary transition-colors"
+                          >
+                            {tag}
+                          </Badge>
+                        ))}
+                      </div>
+                    </>
+                  )}
                 </div>
                 
                 {/* Bottom accent line */}
                 <div className="h-1 bg-gradient-primary opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               </Card>
             ))}
+            {isEditMode && (
+              <Card 
+                className="flex flex-col items-center justify-center p-8 border-2 border-dashed border-primary/30 hover:border-primary/60 bg-primary/5 hover:bg-primary/10 cursor-pointer min-h-[250px] transition-all duration-300 rounded-xl"
+                onClick={() => {
+                  const newProj = {
+                    title: `New Project ${projects.length + 1}`,
+                    description: "Provide a description of your custom project features here.",
+                    tags: ["System", "Design"],
+                    github: "",
+                    demo: "",
+                    category: activeFilter === "all" ? "ml" : activeFilter,
+                    priority: 3
+                  };
+                  updateProjects([...projects, newProj]);
+                  toast.success("New project card added! Fill in its details.");
+                }}
+              >
+                <Plus className="w-10 h-10 text-primary mb-2 animate-bounce" />
+                <span className="text-xs font-semibold uppercase tracking-wider text-primary">Add Project Card</span>
+              </Card>
+            )}
           </div>
 
           {/* Empty state */}
@@ -149,7 +325,7 @@ const Projects = () => {
             <Button
               variant="outline"
               className="border-primary/30 hover:bg-primary/10 hover:border-primary/50 group"
-              onClick={() => window.open(profileData.socials.github, "_blank")}
+              onClick={() => window.open(profile?.socials?.github || "https://github.com", "_blank")}
             >
               <Github className="w-4 h-4 mr-2 group-hover:rotate-12 transition-transform" />
               View GitHub Profile

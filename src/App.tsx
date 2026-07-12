@@ -8,8 +8,11 @@ import Index from "./pages/Index";
 import Playground from "./pages/Playground";
 import Admin from "./pages/Admin";
 import Resume from "./pages/Resume";
+import Forge from "./pages/Forge";
+import UserPortfolio from "./pages/UserPortfolio";
 import NotFound from "./pages/NotFound";
 import profileData from "@/data/profile.json";
+import { PortfolioProvider } from "@/context/PortfolioContext";
 
 const queryClient = new QueryClient();
 
@@ -74,17 +77,21 @@ const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/playground" element={<Playground />} />
-            <Route path="/admin" element={<Admin />} />
-            <Route path="/resume" element={<Resume />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
+        <PortfolioProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/playground" element={<Playground />} />
+              <Route path="/admin" element={<Admin />} />
+              <Route path="/resume" element={<Resume />} />
+              <Route path="/forge" element={<Forge />} />
+              <Route path="/u/:username" element={<UserPortfolio />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </PortfolioProvider>
       </TooltipProvider>
     </QueryClientProvider>
   );

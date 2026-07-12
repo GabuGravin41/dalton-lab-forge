@@ -1,18 +1,19 @@
 import { Github, Linkedin, Mail, Heart, Code2, Instagram, Twitter } from "lucide-react";
 import { Link } from "react-router-dom";
-import profileData from "@/data/profile.json";
+import { usePortfolio } from "@/context/PortfolioContext";
 
 const Footer = () => {
+  const { profile } = usePortfolio();
   const currentYear = new Date().getFullYear();
   
-  const socials = profileData.socials;
+  const socials = profile.socials || { github: "", linkedin: "", email: "", twitter: "", instagram: "" };
 
   const socialLinks = [
-    { icon: Github, href: socials.github, label: "GitHub" },
-    { icon: Linkedin, href: socials.linkedin, label: "LinkedIn" },
-    { icon: Mail, href: `mailto:${socials.email}`, label: "Email" },
-    { icon: Twitter, href: socials.twitter, label: "Twitter" },
-    { icon: Instagram, href: socials.instagram, label: "Instagram" },
+    { icon: Github, href: socials.github || "#", label: "GitHub" },
+    { icon: Linkedin, href: socials.linkedin || "#", label: "LinkedIn" },
+    { icon: Mail, href: socials.email ? `mailto:${socials.email}` : "#", label: "Email" },
+    { icon: Twitter, href: socials.twitter || "#", label: "Twitter" },
+    { icon: Instagram, href: socials.instagram || "#", label: "Instagram" },
   ];
 
   const quickLinks = [
@@ -54,10 +55,10 @@ const Footer = () => {
             <div className="space-y-3 md:space-y-4 sm:col-span-2 md:col-span-1">
               <div className="space-y-1 md:space-y-2">
                 <h3 className="text-xl md:text-2xl font-bold bg-gradient-to-r from-[hsl(245,58%,51%)] to-[hsl(260,60%,45%)] bg-clip-text text-transparent">
-                  {profileData.name}
+                  {profile.name}
                 </h3>
-                <p className="text-xs md:text-sm text-muted-foreground leading-relaxed">
-                  Machine Learning + Hardware Engineer
+                <p className="text-xs md:text-sm text-muted-foreground leading-relaxed font-mono">
+                  {(profile.roles || [])[0] || "Hardware & Software Builder"}
                 </p>
               </div>
               <p className="text-xs md:text-sm text-foreground/80 leading-relaxed">

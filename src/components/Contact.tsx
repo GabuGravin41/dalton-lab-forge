@@ -5,10 +5,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { Github, Linkedin, Mail, Send, Sparkles, MapPin, Clock, Instagram, Twitter, ExternalLink } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
-import profileData from "@/data/profile.json";
+import { usePortfolio } from "@/context/PortfolioContext";
 
 const Contact = () => {
   const { toast } = useToast();
+  const { profile, updateProfile, isEditMode } = usePortfolio();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -24,7 +25,7 @@ const Contact = () => {
     setFormData({ name: "", email: "", message: "" });
   };
 
-  const socials = profileData.socials;
+  const socials = profile.socials || { github: "", linkedin: "", email: "", twitter: "", instagram: "" };
 
   const socialLinks = [
     {

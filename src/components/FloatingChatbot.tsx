@@ -4,9 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Send, Mic, MicOff, Volume2, VolumeX, Bot, User, X, MessageCircle } from "lucide-react";
 
-import profileData from "@/data/profile.json";
-import projectsData from "@/data/projects.json";
-import papersData from "@/data/papers.json";
+import { usePortfolio } from "@/context/PortfolioContext";
 import { generateAIResponse } from "@/utils/aiClient";
 
 interface Message {
@@ -17,16 +15,21 @@ interface Message {
 }
 
 const FloatingChatbot = () => {
+  const { profile, projects, papers } = usePortfolio();
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: '1',
-      text: `Hey! 👋 I'm Dalton's AI Assistant. Ask me anything about his projects, skills, research, or experience!`,
-      sender: 'bot',
-      timestamp: new Date()
-    }
-  ]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState("");
+
+  useEffect(() => {
+    setMessages([
+      {
+        id: '1',
+        text: `Hey! 👋 I'm ${profile.name || "the builder"}'s AI Assistant. Ask me anything about their projects, skills, research, or experience!`,
+        sender: 'bot',
+        timestamp: new Date()
+      }
+    ]);
+  }, [profile.name]);
   const [isRecording, setIsRecording] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -51,24 +54,24 @@ const FloatingChatbot = () => {
   }, []);
 
   const systemPrompt = `
-You are Dalton Omondi's Portfolio Virtual Assistant, a friendly and highly capable AI.
-Your purpose is to answer visitor questions about Dalton Omondi's work, experience, background, research papers, projects, and skills.
-Use the following structured JSON data representing Dalton's background as your ground truth source of information:
+You are ${profile.name || "the builder"}'s Portfolio Virtual Assistant, a friendly and highly capable AI.
+Your purpose is to answer visitor questions about ${profile.name || "the builder"}'s work, experience, background, research papers, projects, and skills.
+Use the following structured JSON data representing their background as your ground truth source of information:
 
 --- PROFILE DATA ---
-${JSON.stringify(profileData, null, 2)}
+${JSON.stringify(profile, null, 2)}
 
 --- PROJECTS DATA ---
-${JSON.stringify(projectsData, null, 2)}
+${JSON.stringify(projects, null, 2)}
 
 --- RESEARCH PAPERS DATA ---
-${JSON.stringify(papersData, null, 2)}
+${JSON.stringify(papers, null, 2)}
 
 --- BEHAVIOR GUIDELINES ---
-1. Speak in first-person (plural) or third-person on behalf of Dalton, or as his virtual assistant. A warm, professional, and slightly enthusiastic builder tone (using occasional tech emojis) is preferred.
-2. Be honest and accurate. If the answer to a question cannot be inferred from the provided profile data, politely state that you don't have that information but invite them to reach out to Dalton directly at: ${profileData.socials.email}
+1. Speak in first-person (plural) or third-person on behalf of ${profile.name || "the builder"}, or as their virtual assistant. A warm, professional, and slightly enthusiastic builder tone (using occasional tech emojis) is preferred.
+2. Be honest and accurate. If the answer to a question cannot be inferred from the provided data, politely state that you don't have that information but invite them to reach out directly at: ${profile.socials?.email || ""}
 3. Keep responses concise and readable (typically 2-4 sentences or bullet points) suitable for a small chat widget.
-4. Highlight Dalton's expertise in Machine Learning, Hardware systems, Chip design, and IoT, pointing to specific projects or papers from the data where relevant.
+4. Highlight their expertise, pointing to specific projects or papers from the data where relevant.
 `;
 
   const handleSendMessage = async () => {
@@ -193,17 +196,23 @@ Assistant response:
     <>
       {/* Floating Chat Button */}
       {!isOpen && (
-        <Button
-          onClick={() => setIsOpen(true)}
-          className="fixed bottom-4 right-4 md:bottom-6 md:right-6 h-12 w-12 md:h-14 md:w-14 rounded-full bg-gradient-primary hover:opacity-90 text-white shadow-lg hover:shadow-glow transition-all z-50 animate-fade-in"
-        >
-          <MessageCircle className="w-5 h-5 md:w-6 md:h-6" />
-        </Button>
+        <div className="fixed bottom-4 right-4 md:bottom-6 md:right-6 flex items-center gap-2.5 z-50 print:hidden">
+          <div className="bg-card/95 backdrop-blur-md border border-primary/20 py-1.5 px-3 rounded-xl shadow-lg text-[10px] md:text-xs font-semibold text-foreground animate-bounce hidden sm:block pointer-events-none select-none max-w-[180px] truncate">
+            Ask my AI Assistant! 💬
+          </div>
+          <Button
+            onClick={() => setIsOpen(true)}
+            className="h-12 w-12 md:h-14 md:w-14 rounded-full bg-gradient-primary hover:opacity-95 text-white shadow-xl hover:shadow-glow transition-all animate-fade-in relative flex items-center justify-center"
+          >
+            <span className="absolute top-0 right-0 w-3.5 h-3.5 bg-red-500 rounded-full border-2 border-background animate-pulse" />
+            <MessageCircle className="w-5 h-5 md:w-6 md:h-6" />
+          </Button>
+        </div>
       )}
 
       {/* Chat Window */}
       {isOpen && (
-        <Card className="fixed bottom-4 right-4 md:bottom-6 md:right-6 w-[calc(100vw-2rem)] max-w-[380px] md:w-96 h-[500px] md:h-[32rem] bg-card/95 backdrop-blur-lg border-border shadow-2xl z-50 flex flex-col animate-slide-in">
+        <Card className="fixed bottom-4 right-4 md:bottom-6 md:right-6 w-[calc(100vw-2rem)] max-w-[380px] md:w-96 h-[500px] md:h-[32rem] bg-card/95 backdrop-blur-lg border-border shadow-2xl z-50 flex flex-col animate-slide-in print:hidden">
           <CardHeader className="border-b border-border flex-shrink-0 p-3 md:p-4">
             <CardTitle className="flex items-center justify-between">
               <div className="flex items-center gap-1.5 md:gap-2">
@@ -211,7 +220,7 @@ Assistant response:
                   <Bot className="w-3.5 h-3.5 md:w-4 md:h-4 text-white" />
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-sm md:text-base font-semibold">Dalton's Assistant</span>
+                  <span className="text-sm md:text-base font-semibold">{profile.name || "Dalton"}'s Assistant</span>
                   <span className="text-[10px] text-muted-foreground flex items-center gap-1">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                     Online & Ready

@@ -23,7 +23,6 @@ import {
   Download,
   Star,
 } from "lucide-react";
-import { fetchFileFromGitHub, commitFileToGitHub, uploadBinaryFileToGitHub, GitHubConfig } from "@/utils/github";
 import { getPortfolioUpdatesFromAI, UpdateAssistantResult } from "@/utils/adminGemini";
 import Navigation from "@/components/Navigation";
 import { toast } from "sonner";
@@ -33,30 +32,18 @@ import localProfile from "@/data/profile.json";
 import localProjects from "@/data/projects.json";
 import localPapers from "@/data/papers.json";
 
-// Obfuscated GitHub fallback token to bypass static scanner rules
-const getGitHubFallbackToken = () => {
-  const p1 = "github_";
-  const p2 = "pat_";
-  const body = "11BADFSBI0Pg8SJRWgZr78_eRmiTJWXw5G5xg8Ia27hL5eO7uowFWYpVeUYjtUHIT03YJDHT5YSdtUBf7B";
-  return p1 + p2 + body;
-};
-
 const Admin = () => {
-  // Config state (API keys & GitHub settings stored in localStorage or default fallbacks)
+  // Config state (AI keys stored in localStorage or default fallbacks)
   const [aiProvider, setAiProvider] = useState<"gemini" | "openrouter">("openrouter");
   const [geminiKey, setGeminiKey] = useState("");
   const [openrouterKey, setOpenrouterKey] = useState(() => localStorage.getItem("admin_openrouter_key") || atob("c2stb3ItdjEtMDI4ODFjY2Q3YzU4MTZlN2Q0ZmY3MDU2YzA5Mzc4YWFhZTBjNTkzOGMzOWJlNDgzOWUyNmU2YjAwM2VlMzNlNQ=="));
   const [openrouterModel, setOpenrouterModel] = useState(() => localStorage.getItem("admin_openrouter_model") || "deepseek/deepseek-chat");
-  const [gitToken, setGitToken] = useState(() => localStorage.getItem("admin_github_token") || getGitHubFallbackToken());
-  const [gitOwner, setGitOwner] = useState(() => localStorage.getItem("admin_github_owner") || "GabuGravin41");
-  const [gitRepo, setGitRepo] = useState(() => localStorage.getItem("admin_github_repo") || "dalton-lab-forge");
-  const [gitBranch, setGitBranch] = useState(() => localStorage.getItem("admin_github_branch") || "main");
-  const [adminPasscode, setAdminPasscode] = useState(() => localStorage.getItem("admin_passcode") || "daltonadmin");
 
-  // Passcode gate unlock states
+  // GitHub OAuth session states
+  const [gitUser, setGitUser] = useState<{ login: string; avatar_url: string; name: string; targetRepo?: string } | null>(null);
+  const [loadingMe, setLoadingMe] = useState(true);
   const [isUnlocked, setIsUnlocked] = useState(false);
-  const [passcodeInput, setPasscodeInput] = useState("");
-  const [passcodeError, setPasscodeError] = useState(false);
+  const [shas, setShas] = useState({ profile: "", projects: "", papers: "" });
 
   // Portfolio states
   const [profile, setProfile] = useState<any>(localProfile);
@@ -83,33 +70,53 @@ const Admin = () => {
   const [isSyncing, setIsSyncing] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
 
-  // Load configs from localStorage on mount
+  // Load configs and verify authentication on mount
   useEffect(() => {
     setAiProvider((localStorage.getItem("admin_ai_provider") as any) || "openrouter");
     setGeminiKey(localStorage.getItem("admin_gemini_key") || "");
-    
-    // Dynamic fallbacks for owner ease-of-use
     setOpenrouterKey(localStorage.getItem("admin_openrouter_key") || atob("c2stb3ItdjEtMDI4ODFjY2Q3YzU4MTZlN2Q0ZmY3MDU2YzA5Mzc4YWFhZTBjNTkzOGMzOWJlNDgzOWUyNmU2YjAwM2VlMzNlNQ=="));
     setOpenrouterModel(localStorage.getItem("admin_openrouter_model") || "deepseek/deepseek-chat");
-    setGitToken(localStorage.getItem("admin_github_token") || getGitHubFallbackToken());
-    setGitOwner(localStorage.getItem("admin_github_owner") || "GabuGravin41");
-    setGitRepo(localStorage.getItem("admin_github_repo") || "dalton-lab-forge");
-    setGitBranch(localStorage.getItem("admin_github_branch") || "main");
-    setAdminPasscode(localStorage.getItem("admin_passcode") || "daltonadmin");
 
-    // Check if session is already unlocked
-    if (sessionStorage.getItem("admin_session_unlocked") === "true") {
-      setIsUnlocked(true);
-    }
+    const checkAuth = async () => {
+      try {
+        const res = await fetch("/api/admin/me");
+        if (res.ok) {
+          const data = await res.json();
+          if (data.authenticated) {
+            setGitUser(data);
+            setIsUnlocked(true);
+            
+            // Load live content from GitHub on successful authentication
+            setIsSyncing(true);
+            const [profileRes, projectsRes, papersRes] = await Promise.all([
+              fetch("/api/admin/content?file=profile").then(r => r.json()),
+              fetch("/api/admin/content?file=projects").then(r => r.json()),
+              fetch("/api/admin/content?file=papers").then(r => r.json()),
+            ]);
 
-    // Load locally saved data edits if they exist
-    const savedProfile = localStorage.getItem("portfolio_profile");
-    const savedProjects = localStorage.getItem("portfolio_projects");
-    const savedPapers = localStorage.getItem("portfolio_papers");
+            if (profileRes.data) {
+              setProfile(profileRes.data);
+              setShas(prev => ({ ...prev, profile: profileRes.sha }));
+            }
+            if (projectsRes.data) {
+              setProjects(projectsRes.data);
+              setShas(prev => ({ ...prev, projects: projectsRes.sha }));
+            }
+            if (papersRes.data) {
+              setPapers(papersRes.data);
+              setShas(prev => ({ ...prev, papers: papersRes.sha }));
+            }
+          }
+        }
+      } catch (err) {
+        console.error("Auth verification error:", err);
+      } finally {
+        setLoadingMe(false);
+        setIsSyncing(false);
+      }
+    };
 
-    if (savedProfile) setProfile(JSON.parse(savedProfile));
-    if (savedProjects) setProjects(JSON.parse(savedProjects));
-    if (savedPapers) setPapers(JSON.parse(savedPapers));
+    checkAuth();
   }, []);
 
   useEffect(() => {
@@ -131,71 +138,39 @@ const Admin = () => {
     localStorage.setItem("admin_gemini_key", geminiKey);
     localStorage.setItem("admin_openrouter_key", openrouterKey);
     localStorage.setItem("admin_openrouter_model", openrouterModel);
-    localStorage.setItem("admin_github_token", gitToken);
-    localStorage.setItem("admin_github_owner", gitOwner);
-    localStorage.setItem("admin_github_repo", gitRepo);
-    localStorage.setItem("admin_github_branch", gitBranch);
-    localStorage.setItem("admin_passcode", adminPasscode);
-    toast.success("Settings saved to browser local storage!");
-  };
-
-  const handleUnlock = (e: React.FormEvent) => {
-    e.preventDefault();
-    const storedPasscode = localStorage.getItem("admin_passcode") || "daltonadmin";
-    if (passcodeInput === storedPasscode) {
-      setIsUnlocked(true);
-      sessionStorage.setItem("admin_session_unlocked", "true");
-      setPasscodeError(false);
-      toast.success("Control Center unlocked!");
-    } else {
-      setPasscodeError(true);
-      toast.error("Incorrect passcode. Access denied.");
-    }
-  };
-
-  const getGitHubConfig = (): GitHubConfig => {
-    return {
-      token: gitToken,
-      owner: gitOwner,
-      repo: gitRepo,
-      branch: gitBranch,
-    };
-  };
-
-  const isGitHubConfigured = () => {
-    return gitToken && gitOwner && gitRepo;
+    toast.success("AI settings saved to browser local storage!");
   };
 
   // Sync configuration from GitHub
   const syncWithGitHub = async () => {
-    if (!isGitHubConfigured()) {
-      toast.error("Please configure GitHub settings first.");
-      return;
-    }
     setIsSyncing(true);
     try {
-      const config = getGitHubConfig();
-
       toast.info("Fetching configurations from GitHub...");
 
-      const profileRes = await fetchFileFromGitHub(config, "src/data/profile.json");
-      const projectsRes = await fetchFileFromGitHub(config, "src/data/projects.json");
-      const papersRes = await fetchFileFromGitHub(config, "src/data/papers.json");
+      const [profileRes, projectsRes, papersRes] = await Promise.all([
+        fetch("/api/admin/content?file=profile").then(r => r.json()),
+        fetch("/api/admin/content?file=projects").then(r => r.json()),
+        fetch("/api/admin/content?file=papers").then(r => r.json()),
+      ]);
 
-      if (profileRes) {
-        const parsed = JSON.parse(profileRes.content);
-        setProfile(parsed);
-        localStorage.setItem("portfolio_profile", JSON.stringify(parsed));
+      if (profileRes.error || projectsRes.error || papersRes.error) {
+        throw new Error(profileRes.error || projectsRes.error || papersRes.error || "Failed to load files from GitHub");
       }
-      if (projectsRes) {
-        const parsed = JSON.parse(projectsRes.content);
-        setProjects(parsed);
-        localStorage.setItem("portfolio_projects", JSON.stringify(parsed));
+
+      if (profileRes.data) {
+        setProfile(profileRes.data);
+        localStorage.setItem("portfolio_profile", JSON.stringify(profileRes.data));
+        setShas(prev => ({ ...prev, profile: profileRes.sha }));
       }
-      if (papersRes) {
-        const parsed = JSON.parse(papersRes.content);
-        setPapers(parsed);
-        localStorage.setItem("portfolio_papers", JSON.stringify(parsed));
+      if (projectsRes.data) {
+        setProjects(projectsRes.data);
+        localStorage.setItem("portfolio_projects", JSON.stringify(projectsRes.data));
+        setShas(prev => ({ ...prev, projects: projectsRes.sha }));
+      }
+      if (papersRes.data) {
+        setPapers(papersRes.data);
+        localStorage.setItem("portfolio_papers", JSON.stringify(papersRes.data));
+        setShas(prev => ({ ...prev, papers: papersRes.sha }));
       }
 
       toast.success("Synchronized successfully with GitHub!");
@@ -209,19 +184,37 @@ const Admin = () => {
 
   // Publish all current local edits to GitHub
   const publishToGitHub = async () => {
-    if (!isGitHubConfigured()) {
-      toast.error("Please configure GitHub settings first.");
-      return;
-    }
     setIsPublishing(true);
     try {
-      const config = getGitHubConfig();
-
       toast.info("Committing configurations to GitHub...");
 
-      await commitFileToGitHub(config, "src/data/profile.json", JSON.stringify(profile, null, 2), "Update profile configurations via Admin Panel");
-      await commitFileToGitHub(config, "src/data/projects.json", JSON.stringify(projects, null, 2), "Update projects configurations via Admin Panel");
-      await commitFileToGitHub(config, "src/data/papers.json", JSON.stringify(papers, null, 2), "Update publications configurations via Admin Panel");
+      const [profileRes, projectsRes, papersRes] = await Promise.all([
+        fetch("/api/admin/content?file=profile", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ data: profile, sha: shas.profile, message: "Update profile configurations via Admin Panel" })
+        }).then(r => r.json()),
+        fetch("/api/admin/content?file=projects", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ data: projects, sha: shas.projects, message: "Update projects configurations via Admin Panel" })
+        }).then(r => r.json()),
+        fetch("/api/admin/content?file=papers", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ data: papers, sha: shas.papers, message: "Update publications configurations via Admin Panel" })
+        }).then(r => r.json())
+      ]);
+
+      if (profileRes.error || projectsRes.error || papersRes.error) {
+        throw new Error(profileRes.error || projectsRes.error || papersRes.error || "Failed to commit changes");
+      }
+
+      setShas({
+        profile: profileRes.sha,
+        projects: projectsRes.sha,
+        papers: papersRes.sha
+      });
 
       toast.success("All updates committed and published to GitHub! Deployment triggered.");
     } catch (error) {
@@ -322,20 +315,48 @@ const Admin = () => {
 
       const updatedPapersList = [newPaper, ...papers];
 
-      if (isGitHubConfigured()) {
-        const config = getGitHubConfig();
+      if (gitUser) {
         toast.info("Uploading PDF file directly to GitHub...");
         
         // 1. Upload the PDF file
-        await uploadBinaryFileToGitHub(config, `public/papers/${fileName}`, pdfBase64, `Upload research paper PDF: ${paperTitle}`);
+        const uploadRes = await fetch("/api/admin/upload", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            path: `public/papers/${fileName}`,
+            content: pdfBase64,
+            message: `Upload research paper PDF: ${paperTitle}`
+          })
+        });
+
+        if (!uploadRes.ok) {
+          const errorData = await uploadRes.json().catch(() => ({}));
+          throw new Error(errorData.error || "Failed to upload PDF to GitHub");
+        }
         
         // 2. Commit updated papers list JSON
         toast.info("Updating papers config on GitHub...");
-        await commitFileToGitHub(config, "src/data/papers.json", JSON.stringify(updatedPapersList, null, 2), `Add research paper: ${paperTitle}`);
+        const contentRes = await fetch("/api/admin/content?file=papers", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            data: updatedPapersList,
+            sha: shas.papers,
+            message: `Add research paper: ${paperTitle}`
+          })
+        });
+
+        if (!contentRes.ok) {
+          const errorData = await contentRes.json().catch(() => ({}));
+          throw new Error(errorData.error || "Failed to update publications metadata config");
+        }
+        
+        const contentData = await contentRes.json();
+        setShas(prev => ({ ...prev, papers: contentData.sha }));
         
         toast.success("Paper uploaded and committed to GitHub successfully!");
       } else {
-        toast.warning("GitHub not configured. Edits saved locally. Download JSON to update manually.");
+        toast.warning("Not logged in. Edits saved locally. Download JSON to update manually.");
       }
 
       // Update states
@@ -449,43 +470,35 @@ const Admin = () => {
             </div>
             <CardTitle className="text-2xl font-bold">Admin Control Center</CardTitle>
             <CardDescription>
-              Enter passcode to access Dalton's portfolio dashboard
+              Sign in with GitHub to access Dalton's portfolio dashboard
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <form onSubmit={handleUnlock} className="space-y-4">
-              <div className="space-y-2">
-                <Input
-                  type="password"
-                  placeholder="Enter passcode..."
-                  value={passcodeInput}
-                  onChange={(e) => {
-                    setPasscodeInput(e.target.value);
-                    setPasscodeError(false);
-                  }}
-                  className={`bg-muted/30 border-border/70 text-center text-lg tracking-wider ${passcodeError ? 'border-destructive focus-visible:ring-destructive' : 'focus-visible:ring-primary'}`}
-                  autoFocus
-                />
-                {passcodeError && (
-                  <p className="text-xs text-destructive text-center font-medium animate-pulse">
-                    Incorrect passcode. Please try again.
-                  </p>
-                )}
+            {loadingMe ? (
+              <div className="flex flex-col items-center justify-center py-6 gap-3">
+                <RefreshCw className="w-6 h-6 animate-spin text-primary" />
+                <p className="text-sm text-muted-foreground">Checking authentication session...</p>
               </div>
-              <Button
-                type="submit"
-                className="w-full bg-gradient-primary hover:opacity-90 text-white font-semibold h-11 rounded-lg"
-              >
-                Unlock Control Center
-              </Button>
-            </form>
-            <div className="text-center pt-2">
-              <Link to="/">
-                <Button variant="ghost" className="text-xs text-muted-foreground hover:text-foreground">
-                  ← Return to Portfolio Home
-                </Button>
-              </Link>
-            </div>
+            ) : (
+              <div className="space-y-4">
+                <p className="text-xs text-muted-foreground text-center leading-relaxed">
+                  Authentication is managed securely via GitHub OAuth. You must have write access to the host repository to save changes.
+                </p>
+                <a href="/api/admin/auth/login" className="block">
+                  <Button className="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold h-11 rounded-lg gap-2">
+                    <Github className="w-5 h-5" />
+                    Sign in with GitHub
+                  </Button>
+                </a>
+                <div className="text-center pt-2">
+                  <Link to="/">
+                    <Button variant="ghost" className="text-xs text-muted-foreground hover:text-foreground">
+                      ← Return to Portfolio Home
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
@@ -512,9 +525,14 @@ const Admin = () => {
                 Portfolio <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">Control Center</span>
                 <Badge variant="outline" className="text-xs font-mono font-normal">Serverless CMS</Badge>
               </h1>
-              <p className="text-muted-foreground text-sm mt-1">
-                AI-powered content management system running entirely in your browser.
-              </p>
+              {gitUser && (
+                <div className="flex items-center gap-2 mt-2 text-xs text-muted-foreground">
+                  <img src={gitUser.avatar_url} alt={gitUser.login} className="w-5 h-5 rounded-full border border-border" />
+                  <span>Logged in as <strong>@{gitUser.login}</strong></span>
+                  <span className="text-muted-foreground/30">|</span>
+                  <span>Repository: <strong className="font-mono">{gitUser.targetRepo || "GabuGravin41/dalton-lab-forge"}</strong></span>
+                </div>
+              )}
             </div>
 
             {/* Global Actions */}
@@ -522,7 +540,7 @@ const Admin = () => {
               <Button
                 variant="outline"
                 onClick={syncWithGitHub}
-                disabled={isSyncing || !isGitHubConfigured()}
+                disabled={isSyncing}
                 className="gap-2 text-sm h-10"
               >
                 <RefreshCw className={`w-4 h-4 ${isSyncing ? "animate-spin" : ""}`} />
@@ -530,27 +548,19 @@ const Admin = () => {
               </Button>
               <Button
                 onClick={publishToGitHub}
-                disabled={isPublishing || !isGitHubConfigured()}
+                disabled={isPublishing}
                 className="bg-primary text-primary-foreground hover:bg-primary/90 gap-2 text-sm h-10"
               >
                 <Github className="w-4 h-4" />
                 {isPublishing ? "Publishing..." : "Publish Changes"}
               </Button>
+              <a href="/api/admin/auth/logout">
+                <Button variant="ghost" className="hover:bg-destructive/10 hover:text-destructive text-sm h-10 gap-2">
+                  Sign Out
+                </Button>
+              </a>
             </div>
           </div>
-
-          {!isGitHubConfigured() && (
-            <div className="p-4 rounded-xl bg-orange-500/10 border border-orange-500/20 text-orange-600 flex items-start gap-3">
-              <AlertCircle className="w-5 h-5 mt-0.5 flex-shrink-0" />
-              <div>
-                <h4 className="font-semibold text-sm">GitHub Repository Not Connected</h4>
-                <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">
-                  Your API credentials are not set. You can still make edits using the AI Editor locally and download the files,
-                  but configure your credentials in the <strong>Settings</strong> tab to enable automated cloud publishing.
-                </p>
-              </div>
-            </div>
-          )}
 
           <Tabs defaultValue="dashboard" className="space-y-6">
             <TabsList className="bg-card border border-border p-1 gap-1 h-auto flex flex-wrap sm:grid sm:grid-cols-4">
@@ -921,10 +931,10 @@ const Admin = () => {
                 {/* Form configuration */}
                 <Card className="bg-card/50 backdrop-blur-sm border-border">
                   <CardHeader>
-                    <CardTitle className="text-lg">API Settings</CardTitle>
-                    <CardDescription className="text-xs">Configure your API access tokens. These values are saved locally in your browser and never sent to any third party.</CardDescription>
+                    <CardTitle className="text-lg">API & AI Settings</CardTitle>
+                    <CardDescription className="text-xs">Configure your API access tokens for AI features. These values are saved locally in your browser and never sent to any third party.</CardDescription>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="space-y-4">
                     <form onSubmit={saveSettings} className="space-y-4">
                       
                       <div className="space-y-1.5">
@@ -974,59 +984,34 @@ const Admin = () => {
                         </>
                       )}
 
-                      <div className="space-y-1.5 border-t border-border pt-4">
-                        <label className="text-xs font-semibold text-muted-foreground uppercase">GitHub Personal Access Token (PAT)</label>
-                        <Input
-                          type="password"
-                          placeholder="ghp_..."
-                          value={gitToken}
-                          onChange={(e) => setGitToken(e.target.value)}
-                        />
-                        <p className="text-[10px] text-muted-foreground leading-relaxed">Required to write files and upload PDFs directly to your repository.</p>
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-1.5">
-                          <label className="text-xs font-semibold text-muted-foreground uppercase">GitHub Owner (Username)</label>
-                          <Input
-                            placeholder="GabuGravin41"
-                            value={gitOwner}
-                            onChange={(e) => setGitOwner(e.target.value)}
-                          />
-                        </div>
-
-                        <div className="space-y-1.5">
-                          <label className="text-xs font-semibold text-muted-foreground uppercase">GitHub Repository Name</label>
-                          <Input
-                            placeholder="dalton-lab-forge"
-                            value={gitRepo}
-                            onChange={(e) => setGitRepo(e.target.value)}
-                          />
-                        </div>
-                      </div>
-
-                      <div className="space-y-1.5">
-                        <label className="text-xs font-semibold text-muted-foreground uppercase">Target Commit Branch</label>
-                        <Input
-                          placeholder="main"
-                          value={gitBranch}
-                          onChange={(e) => setGitBranch(e.target.value)}
-                        />
-                      </div>
-
-                      <div className="space-y-1.5 border-t border-border pt-4">
-                        <label className="text-xs font-semibold text-muted-foreground uppercase">Control Center Passcode</label>
-                        <Input
-                          type="password"
-                          placeholder="daltonadmin"
-                          value={adminPasscode}
-                          onChange={(e) => setAdminPasscode(e.target.value)}
-                        />
-                        <p className="text-[10px] text-muted-foreground leading-relaxed">Passcode required to open this Admin Dashboard. Default: daltonadmin</p>
-                      </div>
-
-                      <Button type="submit" className="w-full mt-4">Save Configuration</Button>
+                      <Button type="submit" className="w-full mt-4 bg-primary text-primary-foreground hover:bg-primary/90">Save AI Settings</Button>
                     </form>
+
+                    <div className="border-t border-border pt-4 space-y-3">
+                      <h4 className="text-xs font-semibold text-muted-foreground uppercase">GitHub Connection Details</h4>
+                      {gitUser ? (
+                        <div className="p-3.5 rounded-lg bg-background/50 border border-border space-y-2.5 text-xs">
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">Connected User:</span>
+                            <span className="font-semibold text-foreground">@{gitUser.login}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">Target Repository:</span>
+                            <span className="font-mono text-foreground">{gitUser.targetRepo || "GabuGravin41/dalton-lab-forge"}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">Branch:</span>
+                            <span className="font-semibold text-foreground">main</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">OAuth Scope:</span>
+                            <span className="font-semibold text-green-500">repo (Write Access Enabled)</span>
+                          </div>
+                        </div>
+                      ) : (
+                        <p className="text-xs text-destructive">Not connected to GitHub OAuth.</p>
+                      )}
+                    </div>
                   </CardContent>
                 </Card>
 
@@ -1086,13 +1071,13 @@ const Admin = () => {
                       This portfolio operates on a Decoupled Serverless Git-CMS model:
                     </p>
                     <ul className="list-disc pl-4 space-y-2">
-                      <li>Your tokens are stored in your browser's <code className="bg-background px-1 py-0.5 rounded">localStorage</code>, keeping them secure and fully client-side.</li>
-                      <li>Edits are compiled into clean configuration files and committed directly to your repository using standard secure GitHub APIs.</li>
-                      <li>Any hosting service (like Vercel, Netlify, or GitHub Pages) automatically detects the commit, rebuilds the static files, and updates the site in 30 seconds.</li>
+                      <li>Your GitHub credentials are managed securely server-side via OAuth and signed HTTP-only cookies, preventing token exposure in the browser.</li>
+                      <li>Edits are compiled into configuration files and committed directly to your repository using server-side GitHub APIs.</li>
+                      <li>Any hosting service (like Vercel) automatically detects the commit, rebuilds the static files, and redeploys the site in 1-2 minutes.</li>
                     </ul>
                     <div className="p-3 bg-primary/10 border border-primary/20 rounded-lg text-primary text-[10px] mt-4 leading-normal flex items-start gap-2">
                       <AlertCircle className="w-4 h-4 flex-shrink-0" />
-                      <span>Note: Make sure your GitHub token has write permissions (repo scopes) to your repository.</span>
+                      <span>Note: Make sure your logged-in GitHub account has write access (collaborator or owner) to the repository.</span>
                     </div>
                   </CardContent>
                 </Card>

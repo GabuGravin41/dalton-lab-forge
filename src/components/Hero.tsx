@@ -1,8 +1,12 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Download } from "lucide-react";
-import profileData from "@/data/profile.json";
+import { usePortfolio } from "@/context/PortfolioContext";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 
 const Hero = () => {
+  const { profile, updateProfile, isEditMode } = usePortfolio();
+
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id);
     if (element) {
@@ -10,8 +14,8 @@ const Hero = () => {
     }
   };
 
-  const nameParts = profileData.name.split(" ");
-  const firstName = nameParts[0];
+  const nameParts = (profile.name || "").split(" ");
+  const firstName = nameParts[0] || "";
   const lastName = nameParts.slice(1).join(" ");
 
   return (
@@ -37,23 +41,59 @@ const Hero = () => {
           <div className="space-y-6 md:space-y-8 animate-fade-in lg:pr-16 lg:max-w-2xl">
 
             <div className="space-y-3 md:space-y-4">
-              <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold leading-[0.9] tracking-tight">
-                <span className="block text-foreground">{firstName}</span>
-                <span className="block bg-gradient-to-r from-[hsl(245,58%,51%)] to-[hsl(260,60%,45%)] bg-clip-text text-transparent">{lastName}</span>
-              </h1>
+              {isEditMode ? (
+                <div className="space-y-2 max-w-md">
+                  <label className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">Edit Full Name</label>
+                  <Input
+                    value={profile.name || ""}
+                    onChange={(e) => updateProfile("name", e.target.value)}
+                    className="text-2xl font-bold bg-background/50 border-primary/30"
+                    placeholder="Enter full name"
+                  />
+                </div>
+              ) : (
+                <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold leading-[0.9] tracking-tight">
+                  <span className="block text-foreground">{firstName}</span>
+                  <span className="block bg-gradient-to-r from-[hsl(245,58%,51%)] to-[hsl(260,60%,45%)] bg-clip-text text-transparent">{lastName}</span>
+                </h1>
+              )}
               
-              <div className="flex flex-wrap gap-2 pt-2">
-                {profileData.roles.map((role) => (
-                  <span key={role} className="px-3 py-1 text-xs font-medium bg-primary/20 text-primary rounded-full border border-primary/30">
-                    {role}
-                  </span>
-                ))}
-              </div>
+              {isEditMode ? (
+                <div className="space-y-2 max-w-md pt-2">
+                  <label className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">Edit Roles (comma separated)</label>
+                  <Input
+                    value={(profile.roles || []).join(", ")}
+                    onChange={(e) => updateProfile("roles", e.target.value.split(",").map((r: string) => r.trim()))}
+                    className="bg-background/50 border-primary/30 text-xs"
+                    placeholder="e.g. ML Engineer, Hardware Designer"
+                  />
+                </div>
+              ) : (
+                <div className="flex flex-wrap gap-2 pt-2">
+                  {(profile.roles || []).map((role) => (
+                    <span key={role} className="px-3 py-1 text-xs font-medium bg-primary/20 text-primary rounded-full border border-primary/30">
+                      {role}
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
 
-            <p className="text-base md:text-lg text-muted-foreground leading-relaxed max-w-lg">
-              {profileData.bio}
-            </p>
+            {isEditMode ? (
+              <div className="space-y-2 max-w-lg">
+                <label className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">Edit Introduction Bio</label>
+                <Textarea
+                  value={profile.bio || ""}
+                  onChange={(e) => updateProfile("bio", e.target.value)}
+                  className="min-h-[80px] bg-background/50 border-primary/30 text-xs leading-relaxed"
+                  placeholder="Short intro bio..."
+                />
+              </div>
+            ) : (
+              <p className="text-base md:text-lg text-muted-foreground leading-relaxed max-w-lg">
+                {profile.bio}
+              </p>
+            )}
 
             <div className="flex flex-wrap gap-3 md:gap-4 pt-2 md:pt-4">
               <Button

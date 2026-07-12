@@ -1,0 +1,39 @@
+import { useParams } from "react-router-dom";
+import { useEffect } from "react";
+import { usePortfolio } from "@/context/PortfolioContext";
+import Index from "./Index";
+import { Loader2 } from "lucide-react";
+
+export const UserPortfolio = () => {
+  const { username } = useParams<{ username: string }>();
+  const { loadUserPortfolio, loading, error } = usePortfolio();
+
+  useEffect(() => {
+    if (username) {
+      loadUserPortfolio(username);
+    }
+  }, [username]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex flex-col items-center justify-center gap-4 text-foreground">
+        <Loader2 className="w-8 h-8 text-primary animate-spin" />
+        <p className="text-sm font-mono tracking-widest text-muted-foreground uppercase">Loading live portfolio...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-background flex flex-col items-center justify-center gap-4 text-foreground text-center px-6">
+        <div className="text-3xl font-bold bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent">Portfolio Not Found</div>
+        <p className="text-sm text-muted-foreground max-w-md">The portfolio page for @{username} does not exist or failed to load. Check the spelling or create your own portfolio now!</p>
+        <a href="/forge" className="mt-4 px-5 py-2.5 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-all font-semibold shadow-md">Create Your Portfolio Now</a>
+      </div>
+    );
+  }
+
+  return <Index />;
+};
+
+export default UserPortfolio;

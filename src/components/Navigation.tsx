@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, Sparkles, FileText, Settings, Palette, LayoutGrid } from "lucide-react";
+import { Menu, X, Sparkles, FileText, Settings, Palette, LayoutGrid, Copy } from "lucide-react";
 import { useTheme } from "next-themes";
 import {
   Dialog,
@@ -144,6 +144,8 @@ const Navigation = () => {
   const isPlayground = location.pathname === '/playground';
   const isResume = location.pathname === '/resume';
   const isAdmin = location.pathname === '/admin';
+  const isUserPortfolio = location.pathname.startsWith('/u/');
+  const portfolioUsername = isUserPortfolio ? location.pathname.replace('/u/', '').split('/')[0] : null;
 
   useEffect(() => {
     const handleScroll = () => {
@@ -300,13 +302,18 @@ const Navigation = () => {
               handleFocusChange={handleFocusChange}
             />
             
-            {!isPlayground && !isResume && !isAdmin && (
-              <Button
-                onClick={() => scrollToSection("contact")}
-                className="bg-gradient-accent text-accent-foreground hover:opacity-90 shadow-lg shadow-accent/20 hover:shadow-accent/30 transition-all hover:scale-105"
-              >
-                Let's Connect
-              </Button>
+            {isUserPortfolio ? (
+              <Link to={`/forge?clone=${portfolioUsername}`}>
+                <Button className="bg-gradient-to-r from-primary to-accent text-primary-foreground hover:opacity-90 shadow-lg hover:scale-105 transition-all gap-1.5">
+                  <Copy className="w-3.5 h-3.5" /> Clone This Site
+                </Button>
+              </Link>
+            ) : !isPlayground && !isResume && !isAdmin && (
+              <Link to="/forge">
+                <Button className="bg-gradient-accent text-accent-foreground hover:opacity-90 shadow-lg shadow-accent/20 hover:shadow-accent/30 transition-all hover:scale-105 gap-1.5">
+                  <Sparkles className="w-3.5 h-3.5" /> Forge Yours
+                </Button>
+              </Link>
             )}
           </div>
 
@@ -370,13 +377,18 @@ const Navigation = () => {
                 </button>
               </Link>
               
-              {!isPlayground && !isResume && !isAdmin && (
-                <Button
-                  onClick={() => scrollToSection("contact")}
-                  className="w-full bg-gradient-accent text-accent-foreground hover:opacity-90 shadow-lg"
-                >
-                  Let's Connect
-                </Button>
+              {isUserPortfolio ? (
+                <Link to={`/forge?clone=${portfolioUsername}`} onClick={() => setMobileMenuOpen(false)}>
+                  <Button className="w-full bg-gradient-to-r from-primary to-accent text-primary-foreground hover:opacity-90 gap-2">
+                    <Copy className="w-4 h-4" /> Clone This Site
+                  </Button>
+                </Link>
+              ) : !isPlayground && !isResume && !isAdmin && (
+                <Link to="/forge" onClick={() => setMobileMenuOpen(false)}>
+                  <Button className="w-full bg-gradient-accent text-accent-foreground hover:opacity-90 shadow-lg gap-2">
+                    <Sparkles className="w-4 h-4" /> Forge Yours
+                  </Button>
+                </Link>
               )}
             </div>
           </div>

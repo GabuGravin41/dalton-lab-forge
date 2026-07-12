@@ -17,9 +17,7 @@ import {
   Sparkles,
   Award,
 } from "lucide-react";
-import profileData from "@/data/profile.json";
-import projectsData from "@/data/projects.json";
-import papersData from "@/data/papers.json";
+import { usePortfolio } from "@/context/PortfolioContext";
 import Navigation from "@/components/Navigation";
 import { toast } from "sonner";
 
@@ -53,21 +51,9 @@ const Resume = () => {
     window.dispatchEvent(new CustomEvent("portfolio-focus-change"));
   };
 
-  // Load from local storage (or fallback to static data files)
-  const [profile] = useState<any>(() => {
-    const saved = localStorage.getItem("portfolio_profile");
-    return saved ? JSON.parse(saved) : profileData;
-  });
-  const [projects] = useState<any[]>(() => {
-    const saved = localStorage.getItem("portfolio_projects");
-    return saved ? JSON.parse(saved) : projectsData;
-  });
-  const [papers] = useState<any[]>(() => {
-    const saved = localStorage.getItem("portfolio_papers");
-    return saved ? JSON.parse(saved) : papersData;
-  });
+  const { profile, projects, papers } = usePortfolio();
 
-  const socials = profile.socials || profileData.socials;
+  const socials = profile.socials || { github: "", linkedin: "", email: "", twitter: "", instagram: "" };
 
   const handlePrint = () => {
     toast.info("Opening system print dialog... Select 'Save as PDF' to export.");
