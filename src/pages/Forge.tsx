@@ -12,8 +12,13 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 
-type CreationMode = "ai" | "clone" | "blank";
-type ForgeTab = "forge" | "login";
+const themeClasses: Record<string, { primary: string; text: string; bgGlow: string; border: string; badge: string }> = {
+  indigo:   { primary: "text-indigo-500", text: "text-indigo-400", bgGlow: "bg-indigo-500/10", border: "border-indigo-500/30", badge: "bg-indigo-500/10 text-indigo-400" },
+  emerald:  { primary: "text-emerald-500", text: "text-emerald-400", bgGlow: "bg-emerald-500/10", border: "border-emerald-500/30", badge: "bg-emerald-500/10 text-emerald-400" },
+  rose:     { primary: "text-rose-500", text: "text-rose-400", bgGlow: "bg-rose-500/10", border: "border-rose-500/30", badge: "bg-rose-500/10 text-rose-400" },
+  cyberpunk:{ primary: "text-fuchsia-500", text: "text-fuchsia-400", bgGlow: "bg-fuchsia-500/10", border: "border-fuchsia-500/30", badge: "bg-fuchsia-500/10 text-fuchsia-400" },
+  steel:    { primary: "text-slate-400", text: "text-slate-400", bgGlow: "bg-slate-500/10", border: "border-slate-500/30", badge: "bg-slate-500/10 text-slate-400" },
+};
 
 const Forge = () => {
   const navigate = useNavigate();
@@ -105,19 +110,24 @@ const Forge = () => {
         }
         const aiSuccess = await generatePortfolioFromAI(careerText);
         if (!aiSuccess) throw new Error("AI generation failed");
-        // Context state is now updated; login will use backend defaults
-        // since the profile/projects/papers were set in context state
-        // We pass no seedData — the AI-generated state is in-memory and will be saved after login
       } else if (creationMode === "clone") {
-        // Clone path: use pre-loaded snapshot as seed
-        if (!cloneSnapshot) {
+        let snapshot = cloneSnapshot;
+        if (!snapshot && !cloneSource.trim()) {
+          // If blank, automatically load dalton's profile as the default template
+          setIsLoadingClone(true);
+          const defaultSnapshot = await fetchUserSnapshot("dalton");
+          setIsLoadingClone(false);
+          if (!defaultSnapshot) {
+            throw new Error("Could not fetch default template. Enter a template user manually.");
+          }
+          snapshot = defaultSnapshot;
+        } else if (!snapshot) {
           toast.error("Please load a template to clone first.");
           setIsProcessing(false);
           return;
         }
-        seedData = cloneSnapshot;
+        seedData = snapshot;
       }
-      // Blank path: no seedData, no AI — backend uses own defaults
 
       const loginSuccess = await login(username.trim().toLowerCase(), passcode, seedData);
       if (!loginSuccess) throw new Error("Failed to register account");
@@ -125,6 +135,7 @@ const Forge = () => {
       setStep(3);
     } catch (err: any) {
       console.error(err);
+      toast.error(err.message || "Failed to generate portfolio");
     } finally {
       setIsProcessing(false);
     }
@@ -145,16 +156,18 @@ const Forge = () => {
     }
   };
 
-  return (
-    <div className="min-h-screen bg-background text-foreground flex items-center justify-center p-6 relative overflow-hidden">
-      {/* Background decorations */}
-      <div className="absolute top-0 left-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
-      <div className="absolute bottom-0 right-0 w-96 h-96 bg-accent/5 rounded-full blur-3xl" />
+  const activeTheme = themeClasses[theme] || themeClasses.indigo;
 
-      <Card className="w-full max-w-xl bg-card/40 backdrop-blur-xl border-border shadow-2xl relative z-10">
+  return (
+    <div className="min-h-screen bg-background text-foreground flex items-center justify-center p-6 relative overflow-hidden transition-all duration-500">
+      {/* Background decorations */}
+      <div className={`absolute top-0 left-0 w-96 h-96 rounded-full blur-3xl transition-all duration-700 ${activeTheme.bgGlow}`} />
+      <div className={`absolute bottom-0 right-0 w-96 h-96 rounded-full blur-3xl transition-all duration-700 ${activeTheme.bgGlow}`} />
+
+      <Card className={`w-full max-w-xl bg-card/40 backdrop-blur-xl shadow-2xl relative z-10 transition-all duration-500 border ${activeTheme.border}`}>
         <CardHeader className="text-center pb-2">
-          <div className="mx-auto w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center border border-primary/20 mb-4">
-            <Sparkles className="w-6 h-6 text-primary animate-pulse" />
+          <div className={`mx-auto w-12 h-12 rounded-2xl flex items-center justify-center border mb-4 transition-all duration-500 ${activeTheme.border} ${activeTheme.bgGlow}`}>
+            <Sparkles className={`w-6 h-6 animate-pulse transition-colors duration-500 ${activeTheme.text}`} />
           </div>
           <CardTitle className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
             LabForge Portfolio Builder

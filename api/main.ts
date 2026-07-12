@@ -31,6 +31,13 @@ export default async function handler(req: any, res: any) {
   const pathParam = url.searchParams.get('path');
   const pathname = pathParam ? `/api/${pathParam}`.replace(/\/$/, '') : url.pathname.replace(/\/$/, '');
 
+  // Manually populate req.query from URL search parameters to guarantee compatibility across Vercel environments
+  const queryObj: Record<string, string> = {};
+  url.searchParams.forEach((value, key) => {
+    queryObj[key] = value;
+  });
+  req.query = { ...req.query, ...queryObj };
+
   try {
     switch (pathname) {
       case '/api/auth':
