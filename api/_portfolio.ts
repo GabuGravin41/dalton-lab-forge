@@ -1,5 +1,5 @@
-import { getDbPool } from './db.js';
-import { profileData, projectsData, papersData } from './defaults.js';
+import { getDbPool } from './_db.js';
+import { profileData, projectsData, papersData } from './_defaults.js';
 
 export default async function handler(req: any, res: any) {
   // Set CORS headers

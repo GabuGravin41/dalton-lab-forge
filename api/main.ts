@@ -1,20 +1,20 @@
-import authHandler from './auth.js';
-import portfolioHandler from './portfolio.js';
-import saveHandler from './save.js';
-import sessionHandler from './session.js';
-import generateHandler from './generate.js';
-import exploreHandler from './explore.js';
-import uploadAvatarHandler from './upload-avatar.js';
-import uploadProjectImageHandler from './upload-project-image.js';
-import contactHandler from './contact.js';
+import authHandler from './_auth.js';
+import portfolioHandler from './_portfolio.js';
+import saveHandler from './_save.js';
+import sessionHandler from './_session.js';
+import generateHandler from './_generate.js';
+import exploreHandler from './_explore.js';
+import uploadAvatarHandler from './_upload-avatar.js';
+import uploadProjectImageHandler from './_upload-project-image.js';
+import contactHandler from './_contact.js';
 
 // Admin handlers
-import adminContentHandler from './admin/content.js';
-import adminMeHandler from './admin/me.js';
-import adminUploadHandler from './admin/upload.js';
-import adminLoginHandler from './admin/auth/login.js';
-import adminCallbackHandler from './admin/auth/callback.js';
-import adminLogoutHandler from './admin/auth/logout.js';
+import adminContentHandler from './_admin/content.js';
+import adminMeHandler from './_admin/me.js';
+import adminUploadHandler from './_admin/upload.js';
+import adminLoginHandler from './_admin/auth/login.js';
+import adminCallbackHandler from './_admin/auth/callback.js';
+import adminLogoutHandler from './_admin/auth/logout.js';
 
 export default async function handler(req: any, res: any) {
   // Parse the URL pathname

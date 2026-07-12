@@ -1,5 +1,5 @@
 import { verifyAndDecodeToken, parseCookies } from '../session.js';
-import { readContentFile, writeContentFile, CONTENT_FILES, type ContentFileKey } from '../github-api.js';
+import { readContentFile, writeContentFile, CONTENT_FILES, type ContentFileKey } from '../_github-api.js';
 
 export default async function handler(req: any, res: any) {
   // Set CORS headers
