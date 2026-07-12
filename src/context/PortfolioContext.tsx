@@ -281,7 +281,7 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         token,
         loading,
         error,
-        setEditMode,
+        setEditMode: setIsEditMode,
         updateProfile,
         updateProjects,
         updatePapers,
