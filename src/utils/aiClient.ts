@@ -173,54 +173,34 @@ const callOpenRouter = async (
 };
 
 /**
- * Unifed helper to request text generation from active provider with fallback chains
+ * Unified helper to request text generation from secure backend proxy endpoint
  */
 export const generateAIResponse = async (
   userPrompt: string,
   systemPrompt = "",
   jsonMode = false
 ): Promise<string> => {
-  const userConfig = getActiveAIConfig();
-  
-  // Build dynamic attempt execution list
-  const attemptList: Array<{ provider: "gemini" | "openrouter"; apiKey: string; model: string }> = [];
+  try {
+    const response = await fetch("/api/chat", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        userPrompt,
+        systemPrompt,
+        jsonMode
+      })
+    });
 
-  const hasUserConfig = localStorage.getItem("admin_openrouter_key") || localStorage.getItem("admin_gemini_key");
-
-  // If user has custom configuration, place it first in the list
-  if (hasUserConfig && userConfig.apiKey) {
-    attemptList.push(userConfig);
-  }
-
-  // Load fallback configs
-  const fallbacks = getFallbackChain();
-  for (const f of fallbacks) {
-    // Avoid duplicating if the user key is identical to a fallback key
-    if (!attemptList.some(a => a.apiKey === f.apiKey)) {
-      attemptList.push(f);
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.error || "Failed to generate AI response");
     }
+
+    return data.text;
+  } catch (err: any) {
+    console.error("[AI Client] secure chat proxy failed:", err);
+    throw new Error(err.message || "I apologize, but I ran into an issue connecting to my brain. Please try again or check Dalton's sections directly! 🛠️");
   }
-
-  if (attemptList.length === 0) {
-    throw new Error("No API keys are configured, and no fallback keys are available.");
-  }
-
-  const errors: string[] = [];
-
-  for (const attempt of attemptList) {
-    try {
-      console.log(`[AI Client] Request attempt with provider: ${attempt.provider}, model: ${attempt.model}...`);
-      if (attempt.provider === "gemini") {
-        return await callGeminiDirect(attempt.apiKey, attempt.model, systemPrompt, userPrompt, jsonMode);
-      } else {
-        return await callOpenRouter(attempt.apiKey, attempt.model, systemPrompt, userPrompt, jsonMode);
-      }
-    } catch (err) {
-      const errMsg = err instanceof Error ? err.message : String(err);
-      console.warn(`[AI Client] Attempt failed with ${attempt.provider} model (${attempt.model}):`, errMsg);
-      errors.push(`${attempt.provider} (${attempt.model}): ${errMsg}`);
-    }
-  }
-
-  throw new Error(`All AI provider attempts failed:\n${errors.map((e, i) => `${i + 1}. ${e}`).join("\n")}`);
 };
