@@ -1,4 +1,4 @@
-import { verifyAndDecodeToken, parseCookies } from '../session.js';
+import { verifyAndDecodeToken, parseCookies } from '../_session.js';
 import { uploadBinaryFile } from '../_github-api.js';
 
 export default async function handler(req: any, res: any) {

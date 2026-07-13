@@ -1,4 +1,4 @@
-import { signToken, parseCookies } from '../../session.js';
+import { signToken, parseCookies } from '../../_session.js';
 
 export default async function handler(req: any, res: any) {
   if (req.method !== 'GET') {
