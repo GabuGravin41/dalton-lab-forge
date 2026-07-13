@@ -4,7 +4,6 @@ import { getDbPool } from './_db.js';
 import { profileData, projectsData, papersData } from './_defaults.js';
 
 const JWT_SECRET = process.env.JWT_SECRET;
-if (!JWT_SECRET) throw new Error('FATAL: JWT_SECRET environment variable is not set.');
 
 export default async function handler(req: any, res: any) {
   // Set CORS headers
@@ -29,6 +28,11 @@ export default async function handler(req: any, res: any) {
   const cleanUsername = username.trim().toLowerCase();
   if (cleanUsername.length < 3 || cleanUsername.length > 20 || !/^[a-z0-9_-]+$/.test(cleanUsername)) {
     return res.status(400).json({ error: 'Username must be 3-20 characters and contain only alphanumeric characters, underscores, or dashes.' });
+  }
+
+  if (!JWT_SECRET) {
+    console.error('FATAL: JWT_SECRET environment variable is not set.');
+    return res.status(500).json({ error: 'Server misconfiguration: JWT_SECRET is not set. Please add it in Vercel project settings.' });
   }
 
   try {
