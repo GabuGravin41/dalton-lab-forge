@@ -35,3 +35,32 @@ export function parseCookies(cookieHeader: string | undefined): Record<string, s
   });
   return list;
 }
+
+export default async function handler(req: any, res: any) {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+
+  const session_secret = process.env.SESSION_SECRET;
+  if (!session_secret) {
+    return res.status(500).json({ error: 'SESSION_SECRET environment variable is missing on the server.' });
+  }
+
+  const cookies = parseCookies(req.headers.cookie);
+  const session = cookies.kio_session;
+
+  if (!session) {
+    return res.status(200).json({ authenticated: false });
+  }
+
+  const token = verifyAndDecodeToken(session, session_secret);
+  if (!token) {
+    return res.status(401).json({ authenticated: false, error: 'Invalid or expired session' });
+  }
+
+  return res.status(200).json({ authenticated: true });
+}
