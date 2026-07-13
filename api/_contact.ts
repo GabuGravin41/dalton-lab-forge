@@ -1,5 +1,4 @@
 import { getDbPool } from './_db.js';
-import { Resend } from 'resend';
 
 // IP rate limiter for contact form submissions (3 per minute per IP)
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
@@ -58,6 +57,7 @@ export default async function handler(req: any, res: any) {
     // Attempt to send email via Resend if API key is provided
     const resendApiKey = process.env.RESEND_API_KEY;
     if (resendApiKey) {
+      const { Resend } = await import('resend');
       const resend = new Resend(resendApiKey);
       await resend.emails.send({
         from: 'LabForge Portfolios <onboarding@resend.dev>',
