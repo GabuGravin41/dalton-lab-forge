@@ -1,4 +1,7 @@
 import { useState, useEffect } from "react";
+import profileDefault from "@/data/profile.json";
+import projectsDefault from "@/data/projects.json";
+import papersDefault from "@/data/papers.json";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -113,14 +116,13 @@ const Forge = () => {
       } else if (creationMode === "clone") {
         let snapshot = cloneSnapshot;
         if (!snapshot && !cloneSource.trim()) {
-          // If blank, automatically load dalton's profile as the default template
-          setIsLoadingClone(true);
-          const defaultSnapshot = await fetchUserSnapshot("dalton");
-          setIsLoadingClone(false);
-          if (!defaultSnapshot) {
-            throw new Error("Could not fetch default template. Enter a template user manually.");
-          }
-          snapshot = defaultSnapshot;
+          // If blank, use the bundled local defaults as the "dalton" template —
+          // avoids a network call that fails in local dev (Vite doesn't serve /api/*).
+          snapshot = {
+            profile: profileDefault,
+            projects: projectsDefault as any[],
+            papers: papersDefault as any[],
+          };
         } else if (!snapshot) {
           toast.error("Please load a template to clone first.");
           setIsProcessing(false);
