@@ -2,7 +2,6 @@ import jwt from 'jsonwebtoken';
 import { getDbPool } from './_db.js';
 
 const JWT_SECRET = process.env.JWT_SECRET;
-if (!JWT_SECRET) throw new Error('FATAL: JWT_SECRET environment variable is not set.');
 
 export default async function handler(req: any, res: any) {
   // Set CORS headers
@@ -16,6 +15,10 @@ export default async function handler(req: any, res: any) {
 
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  if (!JWT_SECRET) {
+    return res.status(500).json({ error: 'Server misconfiguration: JWT_SECRET is not set.' });
   }
 
   // Extract JWT token from headers

@@ -2,7 +2,6 @@ import { getDbPool } from './_db.js';
 import jwt from 'jsonwebtoken';
 
 const JWT_SECRET = process.env.JWT_SECRET;
-if (!JWT_SECRET) throw new Error('FATAL: JWT_SECRET environment variable is not set.');
 
 // Max 2MB avatar upload (base64 encoded, so ~2.7MB raw string)
 const MAX_SIZE_BYTES = 2.8 * 1024 * 1024;
@@ -15,6 +14,10 @@ export default async function handler(req: any, res: any) {
 
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+
+  if (!JWT_SECRET) {
+    return res.status(500).json({ error: 'Server misconfiguration: JWT_SECRET is not set.' });
+  }
 
   // Authenticate
   const authHeader = req.headers['authorization'];
