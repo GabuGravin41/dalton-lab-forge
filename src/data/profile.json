@@ -1,87 +1,128 @@
 {
-  "name": "Dalton Omondi",
+  "name": "Dalton Omondi Opondo",
   "theme": "indigo",
-  "engineeringObjective": "Lead Machine Learning & Hardware Systems Engineer focused on translating complex neural network architectures into efficient physical silicon designs and edge hardware systems.",
-  "researchStatement": "Researcher at the intersection of analytic number theory, machine learning, and silicon photonics. Investigating mathematical priors for structured sparsity (ZPSN) and optical neural computing.",
+  "engineeringObjective": "Electrical & Electronics Engineering student at Kenyatta University building AI assessment infrastructure, embedded hardware systems, and scalable education technologies across Africa.",
+  "researchStatement": "AI engineer & Olympiad trainer investigating neural architecture co-design, reasoning benchmarks (ARC Prize, AIMO), structured sparsity (ZPSN), and silicon photonics for next-generation intelligent systems.",
   "roles": [
-    "ML Engineer",
-    "Hardware Designer",
-    "Researcher",
-    "Kaggle Expert"
+    "AI Engineer & Founder (Proctor AI)",
+    "IEEEXtreme 18.0 Rank #1 in Kenya",
+    "IEEE Hackathon 1st Runner-Up",
+    "Kaggle Expert (Top 1%)",
+    "IMO Participant & Chief Trainer"
   ],
-  "bio": "Engineering at the intersection of artificial intelligence and physical systems. From neural networks to circuit boards, I create technology that thinks and works.",
+  "bio": "Building intelligent systems at the intersection of AI, embedded engineering, and education. Founder of Proctor AI, IEEEXtreme 18.0 Rank #1 team in Kenya, IEEE Tech Ignite 1st Runner-Up, International Mathematical Olympiad (IMO) participant, and Chief Trainer for the Kenya Mathematical Olympiad.",
   "about": {
-    "approach": "Whether I'm optimizing a machine learning pipeline, laying out a multi-layer PCB, or prototyping an IoT sensor node, I'm driven by the same question: 'How can we make technology more intelligent, more capable, and more meaningful?' I believe the most groundbreaking innovations emerge when we refuse to stay in our lane — when we bring the precision of hardware design to AI systems, or the adaptability of machine learning to embedded devices.",
-    "lookingFor": "Currently seeking opportunities in hardware engineering, embedded AI, and research positions where I can contribute to projects that push boundaries and create meaningful impact.",
+    "approach": "My work is driven by a simple philosophy: building systems over performing personal branding. Whether I am architecting Proctor AI to assess tens of thousands of Olympiad candidates across East Africa, competing in high-stakes programming contests like IEEEXtreme (Ranked #1 in Kenya) or IEEE Tech Ignite Hackathon (1st Runners Up at Strathmore), training deep vision models, or designing custom embedded hardware, I combine mathematical rigor with practical engineering to solve high-impact infrastructure challenges in Africa.",
+    "lookingFor": "Currently scaling Proctor AI for the MEST AI Startup Program. Open to technical collaborations, AI research partnerships, and investment opportunities in educational infrastructure, automated assessment tools, and AI/hardware co-design.",
     "lookingForTags": [
-      "Hardware Engineering",
-      "Embedded AI",
-      "Research"
+      "Proctor AI Startup",
+      "MEST AI Program",
+      "IEEEXtreme Rank 1",
+      "IEEE Hackathon Runner-Up",
+      "AI Assessment Tools",
+      "Competitive Programming",
+      "Embedded AI & Hardware"
     ],
-    "beyond": "When I'm not designing circuits or training models, I explore philosophy, listen to diverse music, and reflect on the meaning we assign to what we create. Good engineering, I believe, demands both technical precision and human insight."
+    "beyond": "International Mathematical Olympiad (IMO) Participant representing Kenya at Alliance High School and IEEE Kenya Section Paper Writing Contest Runner-Up. Beyond engineering and training Olympiad teams, I explore classical music (Mozart's Requiem, piano, violin composition), pencil drawing, analytic number theory (Riemann hypothesis, prime gaps), and philosophy."
   },
   "skills": [
     {
       "icon": "Cpu",
-      "title": "Machine Learning",
-      "description": "Computer vision, neural networks, and AI model deployment"
-    },
-    {
-      "icon": "Zap",
-      "title": "Hardware Engineering",
-      "description": "PCB design, fabrication, and embedded systems development"
+      "title": "Artificial Intelligence & ML",
+      "description": "PyTorch, Vision Transformers, ResNet, ConvNeXt, Swin, LLMs, Reasoning (ARC Prize, Kaggle Top 1%)"
     },
     {
       "icon": "Code2",
-      "title": "Chip Design",
-      "description": "VLSI design, simulation, and digital circuit architecture"
+      "title": "Full-Stack & Systems Dev",
+      "description": "Python, C++, C, TypeScript, React, Django, Flask, Express, Vite, Tailwind, Docker, SQL"
+    },
+    {
+      "icon": "Zap",
+      "title": "Embedded Systems & Hardware",
+      "description": "STM32L0, ESP32, SIM800L GSM, LoRa, PCB Layout, Sensors, Motor Maintenance & Rewinding"
     },
     {
       "icon": "Lightbulb",
-      "title": "IoT & Research",
-      "description": "Connected devices, sensor networks, and academic exploration"
+      "title": "Olympiad Assessment & EdTech",
+      "description": "Chief Trainer KMO (35k+ students), Founding Trainer KIO (10k+ students), Founder of Proctor AI"
     }
   ],
   "researchInterests": [
-    "Hardware-Software Co-Design for AI",
-    "Neuromorphic Computing",
-    "Efficient Neural Network Architectures",
-    "Low-Power Embedded Systems",
-    "Photonic Chip Design",
-    "Autonomous Systems"
+    "AI-Powered Remote Proctoring & Automated Grading Infrastructure",
+    "Mathematical Reasoning & AGI (ARC Prize, AIMO Progress Prize 2)",
+    "Category Theory & Neural Architecture Co-Design",
+    "Silicon Photonics & Optical Neural Processors",
+    "Number-Theoretic Neural Network Sparsity (ZPSN)",
+    "Low-Cost Educational Hardware (Axon Tablet Architecture)"
   ],
   "socials": {
     "github": "https://github.com/GabuGravin41",
     "linkedin": "https://www.linkedin.com/in/dalton-opondo/",
     "email": "daltonomondi588@gmail.com",
+    "kaggle": "https://www.kaggle.com/daltongabrielomondi",
     "instagram": "https://www.instagram.com/daltongabrielomondi/",
     "twitter": "https://x.com/dalton_omo86356"
   },
   "experience": [
     {
-      "role": "Machine Learning & Hardware Systems Engineer",
-      "company": "Freelance & Research Collaborations",
-      "period": "2023 - Present",
-      "description": "Designing custom multi-layer PCBs for drone controllers and IoT systems. Training and deploying custom YOLOv8 object detection pipelines on edge hardware (Raspberry Pi/ESP32). Writing and collaborating on peer-reviewed research exploring numeric-theoretic sparse neural networks (ZPSN) and silicon photonics models."
+      "role": "Founder & Lead Developer",
+      "company": "Proctor AI",
+      "period": "2025 - Present",
+      "description": "Built and launched an AI-powered competition and assessment platform across East Africa. Integrated automated grading and remote AI proctoring, successfully deployed for the Kenya Informatics Olympiad (KIO, 10,000+ students) and scaling for the Kenya Mathematical Olympiad (KMO, 35,000+ preliminary candidates)."
     },
     {
-      "role": "Embedded Systems Developer",
-      "company": "Lab Forge Projects",
-      "period": "2021 - 2023",
-      "description": "Developed firmware in Verilog for 5-stage pipelined RISC-V processors. Fabricated low-power IoT weather stations utilizing LoRa modules for long-range sensor telemetry. Created MQTT smart hubs with integrated Android app controls."
+      "role": "Chief Trainer (KMO) & Founding Trainer (KIO)",
+      "company": "Kenya Mathematical & Informatics Olympiads (UoN / CEMASTEA / Waterloo)",
+      "period": "Sept 2023 - Present",
+      "description": "Official national trainer awarded by University of Nairobi, CEMASTEA, and University of Waterloo CEMC for conducting national Olympiad training camps. International Mathematical Olympiad (IMO) contestant."
+    },
+    {
+      "role": "Co-founder & CEO",
+      "company": "EduReach",
+      "period": "April 2026 - Present",
+      "description": "Building an edtech initiative leveraging AI and digital platforms to expand access to high-quality learning resources and personalized study tools for African students."
+    },
+    {
+      "role": "Vice Chair (ESA) & IEEE Student Chapter Chair",
+      "company": "Kenyatta University",
+      "period": "Oct 2025 - Present",
+      "description": "Vice Chair of the Engineering Students Association (ESA) and Chair of the IEEE Photonics Student Branch Chapter; 1st Runners Up at IEEE Tech Ignite Hackathon 2025 (Strathmore University); Event Ambassador for ESA-KU Women in Engineering Summit 1.0."
+    },
+    {
+      "role": "Machine Learning & Backend Developer",
+      "company": "Rastuc (KNH MedTech Ecosystem)",
+      "period": "Nov 2023 - Sept 2024",
+      "description": "Engineered backend services with Django/Flask and implemented healthcare ML applications within the Kenyatta National Hospital MedTech ecosystem."
+    },
+    {
+      "role": "IoT Engineer & Electrical Machinery Maintenance",
+      "company": "Atlantis Telecoms & Industrial Engineering",
+      "period": "March - Sept 2025",
+      "description": "Designed IoT solutions and embedded hardware integration at Atlantis Telecoms; acquired practical industrial experience in electrical machinery maintenance and motor rewinding."
     }
   ],
   "education": [
     {
       "degree": "Bachelor of Science in Electrical and Electronics Engineering",
-      "school": "Technical University / Research Institution",
-      "period": "2019 - 2023",
-      "description": "Specialized in VLSI circuit design, embedded computing, and hardware description languages. Graduated with honors."
+      "school": "Kenyatta University",
+      "period": "2023 - 2028 (Expected July 2028)",
+      "description": "Third-year engineering student exploring artificial intelligence, embedded systems, robotics, photonics, electronics design, and computer architecture."
+    },
+    {
+      "degree": "Kenya National Secondary School Education",
+      "school": "Alliance High School",
+      "period": "Alumni",
+      "description": "Top academic national high school education. Competed in the International Mathematical Olympiad (IMO) representing Kenya."
     }
   ],
   "certifications": [
-    "Kaggle Competition Expert",
-    "Altium Certified PCB Designer",
-    "TensorFlow Certified Developer"
+    "International Mathematical Olympiad (IMO) Participant — Representing Kenya (Alliance High School)",
+    "IEEEXtreme 18.0 Programming Competition — Ranked #1 Team in Kenya (Gold Medal & Certificate out of 19,000+ global participants)",
+    "IEEE Tech Ignite Hackathon 2025 (Strathmore University) — 1st Runners Up Award",
+    "IEEE Kenya Section Paper Writing Contest — Runners Up Award (Smart Living 2024)",
+    "Kenya Mathematical Olympiad (KMO) — National Trainer Recognition (UoN, CEMASTEA & University of Waterloo CEMC)",
+    "Kenyatta University / DARA Big Data / Hack4dev — Data Science Regional Hackathon Certificate",
+    "Kaggle Competition Expert (Ranked ~Top 1% Globally)",
+    "ESA-KU Women in Engineering Summit 1.0 — Event Ambassador Certificate"
   ]
 }

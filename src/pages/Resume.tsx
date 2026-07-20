@@ -676,13 +676,19 @@ const Resume = () => {
       {/* Print Specific CSS Styles injected globally */}
       <style>{`
         @media print {
-          body {
+          @page {
+            size: A4 portrait;
+            margin: 10mm;
+          }
+          html, body {
             background-color: white !important;
             color: black !important;
+            height: 100% !important;
+            overflow: hidden !important;
           }
           main {
-            padding-top: 0 !important;
-            padding-bottom: 0 !important;
+            padding: 0 !important;
+            margin: 0 !important;
           }
           #resume-canvas {
             border: none !important;
