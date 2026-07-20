@@ -1,8 +1,8 @@
 {
   "name": "Dalton Omondi Opondo",
   "theme": "indigo",
-  "engineeringObjective": "Electrical & Electronics Engineering student at Kenyatta University building AI assessment infrastructure, embedded hardware systems, and scalable education technologies across Africa.",
-  "researchStatement": "AI engineer & Olympiad trainer investigating neural architecture co-design, reasoning benchmarks (ARC Prize, AIMO), structured sparsity (ZPSN), and silicon photonics for next-generation intelligent systems.",
+  "engineeringObjective": "Electrical and Electronics Engineering student at Kenyatta University building automated competition systems, embedded hardware networks, and scalable educational technology.",
+  "researchStatement": "Investigating neural network optimization, structured sparsity, and hardware-software co-design for deep learning applications. Passionate about machine learning reasoning benchmarks and neuromorphic computing.",
   "roles": [
     "AI Engineer & Founder (Proctor AI)",
     "IEEEXtreme 18.0 Rank #1 in Kenya",
@@ -10,10 +10,10 @@
     "Kaggle Expert (Top 1%)",
     "IMO Participant & Chief Trainer"
   ],
-  "bio": "Building intelligent systems at the intersection of AI, embedded engineering, and education. Founder of Proctor AI, IEEEXtreme 18.0 Rank #1 team in Kenya, IEEE Tech Ignite 1st Runner-Up, International Mathematical Olympiad (IMO) participant, and Chief Trainer for the Kenya Mathematical Olympiad.",
+  "bio": "Electrical and Electronics Engineering student focused on building automated assessment systems and embedded hardware. Founder of Proctor AI, Kaggle Expert (Top 1%), and Chief Trainer for the Kenya Mathematical Olympiad.",
   "about": {
-    "approach": "Where software intelligence meets physical reality — that's where I build. My work is driven by a simple core idea: building functional systems over performing. Whether I'm training a computer vision model, architecting a backend API, laying out a circuit board, or prototyping an embedded node, I bring the same focus to technical precision and real-world utility. I believe the most compelling work happens when you bridge disciplines — bringing the rigor of hardware engineering to AI systems, and the adaptability of machine learning to physical devices.",
-    "lookingFor": "Currently scaling Proctor AI as part of the MEST AI Startup Program. I'm open to technical collaborations, AI research partnerships, and opportunities centered around educational infrastructure, automated assessment tools, and AI/hardware co-design.",
+    "approach": "My approach to engineering is centered on practical utility and technical rigor. I enjoy bridging the gap between hardware and software, whether that involves designing PCBs, developing embedded firmware, or training deep learning models. I prioritize building reliable, functional systems that address real-world constraints over theoretical complexity.",
+    "lookingFor": "Currently developing Proctor AI and open to technical collaborations, machine learning research partnerships, and opportunities in embedded systems, educational tools, and hardware-software co-design.",
     "lookingForTags": [
       "Proctor AI Startup",
       "MEST AI Program",
@@ -66,37 +66,37 @@
       "role": "Founder & Lead Developer",
       "company": "Proctor AI",
       "period": "2025 - Present",
-      "description": "Built and launched an AI-powered competition and assessment platform across East Africa. Integrated automated grading and remote AI proctoring, successfully deployed for the Kenya Informatics Olympiad (KIO, 10,000+ students) and scaling for the Kenya Mathematical Olympiad (KMO, 35,000+ preliminary candidates)."
+      "description": "Developed and launched an automated grading and remote proctoring platform for competitions in East Africa. Deployed the system for 10,000+ students in the Kenya Informatics Olympiad and scaled it to support 35,000+ candidates for the Kenya Mathematical Olympiad."
     },
     {
       "role": "Chief Trainer (KMO) & Founding Trainer (KIO)",
       "company": "Kenya Mathematical & Informatics Olympiads (UoN / CEMASTEA / Waterloo)",
       "period": "Sept 2023 - Present",
-      "description": "Official national trainer awarded by University of Nairobi, CEMASTEA, and University of Waterloo CEMC for conducting national Olympiad training camps. International Mathematical Olympiad (IMO) contestant."
+      "description": "Design curriculum and conduct training camps for the national Olympiad teams. Recognized as a national trainer by the University of Nairobi, CEMASTEA, and the University of Waterloo CEMC."
     },
     {
       "role": "Co-founder & CEO",
       "company": "EduReach",
       "period": "April 2026 - Present",
-      "description": "Building an edtech initiative leveraging AI and digital platforms to expand access to high-quality learning resources and personalized study tools for African students."
+      "description": "Co-founded an educational technology platform developing adaptive learning systems, personalized study resources, and digital tutoring tools for STEM students."
     },
     {
       "role": "Vice Chair (ESA) & IEEE Student Chapter Chair",
       "company": "Kenyatta University",
       "period": "Oct 2025 - Present",
-      "description": "Vice Chair of the Engineering Students Association (ESA) and Chair of the IEEE Photonics Student Branch Chapter; 1st Runners Up at IEEE Tech Ignite Hackathon 2025 (Strathmore University); Event Ambassador for ESA-KU Women in Engineering Summit 1.0."
+      "description": "Served as Vice Chair of the Engineering Students Association and Chair of the IEEE Photonics Student Branch Chapter. Led student initiatives, organized technical hackathons, and represented the association at engineering summits."
     },
     {
       "role": "Machine Learning & Backend Developer",
       "company": "Rastuc (KNH MedTech Ecosystem)",
       "period": "Nov 2023 - Sept 2024",
-      "description": "Engineered backend services with Django/Flask and implemented healthcare ML applications within the Kenyatta National Hospital MedTech ecosystem."
+      "description": "Developed backend APIs and services using Django and Flask. Implemented machine learning models for medical image classification and data analysis within the Kenyatta Hospital MedTech ecosystem."
     },
     {
       "role": "IoT Engineer & Electrical Machinery Maintenance",
       "company": "Atlantis Telecoms & Industrial Engineering",
       "period": "March - Sept 2025",
-      "description": "Designed IoT solutions and embedded hardware integration at Atlantis Telecoms; acquired practical industrial experience in electrical machinery maintenance and motor rewinding."
+      "description": "Designed and integrated IoT telemetry solutions and embedded hardware nodes. Maintained industrial electrical machinery and performed hands-on motor rewinding."
     }
   ],
   "education": [

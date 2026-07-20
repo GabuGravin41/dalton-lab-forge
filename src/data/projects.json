@@ -1,7 +1,7 @@
 [
   {
     "title": "Proctor AI — Remote AI Proctoring & Automated Grading Platform",
-    "description": "Flagship AI assessment platform designed for East Africa. Enables trainers and organizations to host competitions and practice sessions remotely with automated AI proctoring and instant grading. Deployed for 10,000+ students in the Kenya Informatics Olympiad (KIO) and scaling for 35,000+ students in the Kenya Mathematical Olympiad (KMO).",
+    "description": "An automated grading and remote proctoring platform for hosting STEM competitions. Deployed for 10,000+ students in the Kenya Informatics Olympiad and scaled for 35,000+ candidates in the Kenya Mathematical Olympiad.",
     "tags": ["AI Infrastructure", "Computer Vision", "Django", "React", "Automated Grading", "EdTech"],
     "github": "https://github.com/GabuGravin41/dalton-lab-forge",
     "demo": "https://dalton-omondi.vercel.app/",
@@ -10,7 +10,7 @@
   },
   {
     "title": "EduReach — Personalized EdTech Platform",
-    "description": "Co-founded EdTech initiative leveraging AI models and digital platforms to expand access to high-quality learning resources, adaptive practice tools, and personalized STEM tutoring across Africa.",
+    "description": "An educational technology platform developing adaptive learning systems, digital study resources, and personalized tutoring tools for students in Kenya.",
     "tags": ["EdTech", "Django", "React", "AI Tutoring", "Databases"],
     "github": "https://github.com/GabuGravin41/dalton-lab-forge",
     "category": "ml",
@@ -18,7 +18,7 @@
   },
   {
     "title": "AI Facial Deepfake Detection System",
-    "description": "Advanced deep learning media verification pipeline utilizing face embeddings and deep neural networks to detect facial manipulations. Features InceptionResNetV1 (pretrained on VGGFace2), ResNet architectures, and a ConvNeXt + Swin Transformer fusion model.",
+    "description": "A deep learning media verification pipeline utilizing facial landmark extraction, face alignment, and custom classifiers (ResNet, InceptionResNetV1 pretrained on VGGFace2) to detect video manipulations and prevent spoofing.",
     "tags": ["Computer Vision", "Deep Learning", "PyTorch", "ConvNeXt", "Swin Transformer", "Face Embeddings"],
     "github": "https://github.com/GabuGravin41/dalton-lab-forge",
     "category": "ml",
@@ -26,7 +26,7 @@
   },
   {
     "title": "Kaggle Competitive AI & ARC Prize Benchmark Suite",
-    "description": "Ranked ~Top 1% globally on Kaggle (Expert level). Competed in ARC AGI / ARC Prize, March Machine Learning Mania 2025, AIMO Progress Prize 2, Stanford RNA 3D Folding, and SWE-bench challenges.",
+    "description": "Developed models for Kaggle competitions (Kaggle Expert, Top 1% globally), focusing on reasoning benchmarks such as the ARC AGI Prize, AIMO Progress Prize, and Stanford RNA 3D Folding.",
     "tags": ["Kaggle Expert", "ARC AGI Prize", "AIMO", "PyTorch", "Ensembling", "Reasoning AI"],
     "github": "https://github.com/GabuGravin41/dalton-lab-forge",
     "demo": "https://www.kaggle.com/daltongabrielomondi",

@@ -1,137 +1,209 @@
 export const profileData = {
-  "name": "Dalton Omondi",
+  "name": "Dalton Omondi Opondo",
   "theme": "indigo",
-  "engineeringObjective": "Lead Machine Learning & Hardware Systems Engineer focused on translating complex neural network architectures into efficient physical silicon designs and edge hardware systems.",
-  "researchStatement": "Researcher at the intersection of analytic number theory, machine learning, and silicon photonics. Investigating mathematical priors for structured sparsity (ZPSN) and optical neural computing.",
+  "engineeringObjective": "Electrical and Electronics Engineering student at Kenyatta University building automated competition systems, embedded hardware networks, and scalable educational technology.",
+  "researchStatement": "Investigating neural network optimization, structured sparsity, and hardware-software co-design for deep learning applications. Passionate about machine learning reasoning benchmarks and neuromorphic computing.",
   "roles": [
-    "ML Engineer",
-    "Hardware Designer",
-    "Researcher",
-    "Kaggle Expert"
+    "AI Engineer & Founder (Proctor AI)",
+    "IEEEXtreme 18.0 Rank #1 in Kenya",
+    "IEEE Hackathon 1st Runner-Up",
+    "Kaggle Expert (Top 1%)",
+    "IMO Participant & Chief Trainer"
   ],
-  "bio": "Engineering at the intersection of artificial intelligence and physical systems. From neural networks to circuit boards, I create technology that thinks and works.",
+  "bio": "Electrical and Electronics Engineering student focused on building automated assessment systems and embedded hardware. Founder of Proctor AI, Kaggle Expert (Top 1%), and Chief Trainer for the Kenya Mathematical Olympiad.",
   "about": {
-    "approach": "Whether I'm optimizing a machine learning pipeline, laying out a multi-layer PCB, or prototyping an IoT sensor node, I'm driven by the same question: 'How can we make technology more intelligent, more capable, and more meaningful?' I believe the most groundbreaking innovations emerge when we refuse to stay in our lane — when we bring the precision of hardware design to AI systems, or the adaptability of machine learning to embedded devices.",
-    "lookingFor": "Currently seeking opportunities in hardware engineering, embedded AI, and research positions where I can contribute to projects that push boundaries and create meaningful impact.",
+    "approach": "My approach to engineering is centered on practical utility and technical rigor. I enjoy bridging the gap between hardware and software, whether that involves designing PCBs, developing embedded firmware, or training deep learning models. I prioritize building reliable, functional systems that address real-world constraints over theoretical complexity.",
+    "lookingFor": "Currently developing Proctor AI and open to technical collaborations, machine learning research partnerships, and opportunities in embedded systems, educational tools, and hardware-software co-design.",
     "lookingForTags": [
-      "Hardware Engineering",
-      "Embedded AI",
-      "Research"
+      "Proctor AI Startup",
+      "MEST AI Program",
+      "AI Assessment Tools",
+      "Hardware/AI Co-Design",
+      "Competitive Programming"
     ],
-    "beyond": "When I'm not designing circuits or training models, I explore philosophy, listen to diverse music, and reflect on the meaning we assign to what we create. Good engineering, I believe, demands both technical precision and human insight."
+    "beyond": "When I'm not training models or debugging hardware, I train high school students for national and international mathematics and informatics Olympiads. Outside of tech, I spend time exploring classical music (piano, violin composition, and Mozart's Requiem), pencil drawing, and analytic number theory."
   },
   "skills": [
     {
       "icon": "Cpu",
-      "title": "Machine Learning",
-      "description": "Computer vision, neural networks, and AI model deployment"
-    },
-    {
-      "icon": "Zap",
-      "title": "Hardware Engineering",
-      "description": "PCB design, fabrication, and embedded systems development"
+      "title": "Artificial Intelligence & ML",
+      "description": "PyTorch, Vision Transformers, ResNet, ConvNeXt, Swin, LLMs, Reasoning (ARC Prize, Kaggle Top 1%)"
     },
     {
       "icon": "Code2",
-      "title": "Chip Design",
-      "description": "VLSI design, simulation, and digital circuit architecture"
+      "title": "Full-Stack & Systems Dev",
+      "description": "Python, C++, C, TypeScript, React, Django, Flask, Express, Vite, Tailwind, Docker, SQL"
+    },
+    {
+      "icon": "Zap",
+      "title": "Embedded Systems & Hardware",
+      "description": "STM32L0, ESP32, SIM800L GSM, LoRa, PCB Layout, Sensors, Motor Maintenance & Rewinding"
     },
     {
       "icon": "Lightbulb",
-      "title": "IoT & Research",
-      "description": "Connected devices, sensor networks, and academic exploration"
+      "title": "Olympiad Assessment & EdTech",
+      "description": "Chief Trainer KMO (35k+ students), Founding Trainer KIO (10k+ students), Founder of Proctor AI"
     }
   ],
   "researchInterests": [
-    "Hardware-Software Co-Design for AI",
-    "Neuromorphic Computing",
-    "Efficient Neural Network Architectures",
-    "Low-Power Embedded Systems",
-    "Photonic Chip Design",
-    "Autonomous Systems"
+    "AI-Powered Remote Proctoring & Automated Grading Infrastructure",
+    "Mathematical Reasoning & AGI (ARC Prize, AIMO Progress Prize 2)",
+    "Category Theory & Neural Architecture Co-Design",
+    "Silicon Photonics & Optical Neural Processors",
+    "Number-Theoretic Neural Network Sparsity (ZPSN)",
+    "Low-Cost Educational Hardware (Axon Tablet Architecture)"
   ],
   "socials": {
     "github": "https://github.com/GabuGravin41",
     "linkedin": "https://www.linkedin.com/in/dalton-opondo/",
     "email": "daltonomondi588@gmail.com",
+    "kaggle": "https://www.kaggle.com/daltongabrielomondi",
     "instagram": "https://www.instagram.com/daltongabrielomondi/",
     "twitter": "https://x.com/dalton_omo86356"
   },
   "experience": [
     {
-      "role": "Machine Learning & Hardware Systems Engineer",
-      "company": "Freelance & Research Collaborations",
-      "period": "2023 - Present",
-      "description": "Designing custom multi-layer PCBs for drone controllers and IoT systems. Training and deploying custom YOLOv8 object detection pipelines on edge hardware (Raspberry Pi/ESP32). Writing and collaborating on peer-reviewed research exploring numeric-theoretic sparse neural networks (ZPSN) and silicon photonics models."
+      "role": "Founder & Lead Developer",
+      "company": "Proctor AI",
+      "period": "2025 - Present",
+      "description": "Developed and launched an automated grading and remote proctoring platform for competitions in East Africa. Deployed the system for 10,000+ students in the Kenya Informatics Olympiad and scaled it to support 35,000+ candidates for the Kenya Mathematical Olympiad."
     },
     {
-      "role": "Embedded Systems Developer",
-      "company": "Lab Forge Projects",
-      "period": "2021 - 2023",
-      "description": "Developed firmware in Verilog for 5-stage pipelined RISC-V processors. Fabricated low-power IoT weather stations utilizing LoRa modules for long-range sensor telemetry. Created MQTT smart hubs with integrated Android app controls."
+      "role": "Chief Trainer (KMO) & Founding Trainer (KIO)",
+      "company": "Kenya Mathematical & Informatics Olympiads (UoN / CEMASTEA / Waterloo)",
+      "period": "Sept 2023 - Present",
+      "description": "Design curriculum and conduct training camps for the national Olympiad teams. Recognized as a national trainer by the University of Nairobi, CEMASTEA, and the University of Waterloo CEMC."
+    },
+    {
+      "role": "Co-founder & CEO",
+      "company": "EduReach",
+      "period": "April 2026 - Present",
+      "description": "Co-founded an educational technology platform developing adaptive learning systems, personalized study resources, and digital tutoring tools for STEM students."
+    },
+    {
+      "role": "Vice Chair (ESA) & IEEE Student Chapter Chair",
+      "company": "Kenyatta University",
+      "period": "Oct 2025 - Present",
+      "description": "Served as Vice Chair of the Engineering Students Association and Chair of the IEEE Photonics Student Branch Chapter. Led student initiatives, organized technical hackathons, and represented the association at engineering summits."
+    },
+    {
+      "role": "Machine Learning & Backend Developer",
+      "company": "Rastuc (KNH MedTech Ecosystem)",
+      "period": "Nov 2023 - Sept 2024",
+      "description": "Developed backend APIs and services using Django and Flask. Implemented machine learning models for medical image classification and data analysis within the Kenyatta Hospital MedTech ecosystem."
+    },
+    {
+      "role": "IoT Engineer & Electrical Machinery Maintenance",
+      "company": "Atlantis Telecoms & Industrial Engineering",
+      "period": "March - Sept 2025",
+      "description": "Designed and integrated IoT telemetry solutions and embedded hardware nodes. Maintained industrial electrical machinery and performed hands-on motor rewinding."
     }
   ],
   "education": [
     {
       "degree": "Bachelor of Science in Electrical and Electronics Engineering",
-      "school": "Technical University / Research Institution",
-      "period": "2019 - 2023",
-      "description": "Specialized in VLSI circuit design, embedded computing, and hardware description languages. Graduated with honors."
+      "school": "Kenyatta University",
+      "period": "2023 - 2028 (Expected July 2028)",
+      "description": "Third-year engineering student exploring artificial intelligence, embedded systems, robotics, photonics, electronics design, and computer architecture."
+    },
+    {
+      "degree": "Kenya National Secondary School Education",
+      "school": "Alliance High School",
+      "period": "Alumni",
+      "description": "Top academic national high school education. Competed in the International Mathematical Olympiad (IMO) representing Kenya."
     }
   ],
   "certifications": [
-    "Kaggle Competition Expert",
-    "Altium Certified PCB Designer",
-    "TensorFlow Certified Developer"
+    "International Mathematical Olympiad (IMO) Participant — Representing Kenya (Alliance High School)",
+    "IEEEXtreme 18.0 Programming Competition — Ranked #1 Team in Kenya (Gold Medal & Certificate out of 19,000+ global participants)",
+    "IEEE Tech Ignite Hackathon 2025 (Strathmore University) — 1st Runners Up Award",
+    "IEEE Kenya Section Paper Writing Contest — Runners Up Award (Smart Living 2024)",
+    "Kenya Mathematical Olympiad (KMO) — National Trainer Recognition (UoN, CEMASTEA & University of Waterloo CEMC)",
+    "Kenyatta University / DARA Big Data / Hack4dev — Data Science Regional Hackathon Certificate",
+    "Kaggle Competition Expert (Ranked ~Top 1% Globally)",
+    "ESA-KU Women in Engineering Summit 1.0 — Event Ambassador Certificate"
   ]
 };
 
 export const projectsData = [
   {
-    "title": "Real-Time Object Detection System",
-    "description": "Built a computer vision system using YOLOv8 for real-time object detection with edge deployment on Raspberry Pi. Achieved 30+ FPS performance.",
-    "tags": ["Machine Learning", "Computer Vision", "Python", "Edge AI"],
+    "title": "Proctor AI — Remote AI Proctoring & Automated Grading Platform",
+    "description": "An automated grading and remote proctoring platform for hosting STEM competitions. Deployed for 10,000+ students in the Kenya Informatics Olympiad and scaled for 35,000+ candidates in the Kenya Mathematical Olympiad.",
+    "tags": ["AI Infrastructure", "Computer Vision", "Django", "React", "Automated Grading", "EdTech"],
     "github": "https://github.com/GabuGravin41/dalton-lab-forge",
-    "demo": "/playground",
+    "demo": "https://dalton-omondi.vercel.app/",
     "category": "ml",
     "priority": 5
   },
   {
-    "title": "IoT Weather Station with LoRa",
-    "description": "Designed and fabricated a custom PCB for a low-power IoT weather station using LoRa for long-range data transmission. Integrated multiple environmental sensors.",
-    "tags": ["IoT", "PCB Design", "LoRa", "Embedded C"],
+    "title": "EduReach — Personalized EdTech Platform",
+    "description": "An educational technology platform developing adaptive learning systems, digital study resources, and personalized tutoring tools for students in Kenya.",
+    "tags": ["EdTech", "Django", "React", "AI Tutoring", "Databases"],
+    "github": "https://github.com/GabuGravin41/dalton-lab-forge",
+    "category": "ml",
+    "priority": 5
+  },
+  {
+    "title": "AI Facial Deepfake Detection System",
+    "description": "A deep learning media verification pipeline utilizing facial landmark extraction, face alignment, and custom classifiers (ResNet, InceptionResNetV1 pretrained on VGGFace2) to detect video manipulations and prevent spoofing.",
+    "tags": ["Computer Vision", "Deep Learning", "PyTorch", "ConvNeXt", "Swin Transformer", "Face Embeddings"],
+    "github": "https://github.com/GabuGravin41/dalton-lab-forge",
+    "category": "ml",
+    "priority": 5
+  },
+  {
+    "title": "Kaggle Competitive AI & ARC Prize Benchmark Suite",
+    "description": "Developed models for Kaggle competitions (Kaggle Expert, Top 1% globally), focusing on reasoning benchmarks such as the ARC AGI Prize, AIMO Progress Prize, and Stanford RNA 3D Folding.",
+    "tags": ["Kaggle Expert", "ARC AGI Prize", "AIMO", "PyTorch", "Ensembling", "Reasoning AI"],
+    "github": "https://github.com/GabuGravin41/dalton-lab-forge",
+    "demo": "https://www.kaggle.com/daltongabrielomondi",
+    "category": "ml",
+    "priority": 5
+  },
+  {
+    "title": "Smart Prepaid Water Meter (IoT & Cellular)",
+    "description": "Embedded infrastructure hardware system using STM32L0 and ESP32 microcontrollers paired with a SIM800L GSM module, pulse flow sensors, and battery management circuit for automated prepaid utility metering.",
+    "tags": ["Embedded C", "STM32L0", "ESP32", "SIM800L GSM", "IoT", "Sensors"],
+    "github": "https://github.com/GabuGravin41/dalton-lab-forge",
+    "category": "iot",
+    "priority": 4
+  },
+  {
+    "title": "Axon Tablet Project — Affordable Educational Hardware",
+    "description": "Long-term hardware and OS vision to build a locally designed, low-cost educational tablet tailored for African classrooms with an optimized learning software ecosystem.",
+    "tags": ["Hardware Design", "Custom OS Vision", "EdTech Hardware", "Embedded Systems"],
     "github": "https://github.com/GabuGravin41/dalton-lab-forge",
     "category": "hardware",
     "priority": 4
   },
   {
-    "title": "RISC-V CPU Design",
-    "description": "Implemented a 5-stage pipelined RISC-V processor in Verilog with hazard detection and forwarding. Simulated and synthesized for FPGA deployment.",
+    "title": "iGrow — AI Agricultural Assistant for Farmers",
+    "description": "AI-powered mobile agricultural decision support platform providing crop yield recommendations, disease identification via computer vision, and real-time farmer advice.",
+    "tags": ["AgriTech", "Computer Vision", "Mobile AI", "Python"],
+    "github": "https://github.com/GabuGravin41/dalton-lab-forge",
+    "category": "ml",
+    "priority": 4
+  },
+  {
+    "title": "ChapChap — AI Social Media Management Agent",
+    "description": "Intelligent automated social media agent for content generation, scheduling, audience engagement, and performance analytics.",
+    "tags": ["LLM Agent", "Content Automation", "Python", "API Integration"],
+    "github": "https://github.com/GabuGravin41/dalton-lab-forge",
+    "category": "ml",
+    "priority": 3
+  },
+  {
+    "title": "RISC-V 5-Stage CPU Core Design",
+    "description": "Implemented a 5-stage pipelined RISC-V processor in Verilog with hazard detection, forwarding units, and branch prediction. Simulated and synthesized for FPGA hardware.",
     "tags": ["VLSI", "Verilog", "Computer Architecture", "FPGA"],
     "github": "https://github.com/GabuGravin41/dalton-lab-forge",
     "category": "chip",
     "priority": 5
   },
   {
-    "title": "Smart Home Automation Hub",
-    "description": "Developed a centralized smart home system with ESP32 microcontrollers, MQTT protocol, and a custom Android app. Supports voice control integration.",
-    "tags": ["IoT", "ESP32", "MQTT", "Mobile Dev"],
-    "github": "https://github.com/GabuGravin41/dalton-lab-forge",
-    "category": "iot",
-    "priority": 3
-  },
-  {
-    "title": "Music Generation with AI",
-    "description": "Trained a transformer-based model to generate original music compositions. Explored attention mechanisms and sequence modeling for creative applications.",
-    "tags": ["Deep Learning", "Transformers", "Audio ML", "PyTorch"],
-    "github": "https://github.com/GabuGravin41/dalton-lab-forge",
-    "category": "ml",
-    "priority": 3
-  },
-  {
-    "title": "Multi-Layer PCB for Drone Controller",
-    "description": "Designed a 4-layer PCB for a custom drone flight controller with IMU integration, motor drivers, and telemetry modules. Optimized for signal integrity.",
-    "tags": ["PCB Design", "Embedded Systems", "Altium", "Hardware"],
+    "title": "IoT Weather Station with LoRa Telemetry",
+    "description": "Fabricated custom PCB for a low-power outdoor weather station utilizing LoRa transceivers for long-range sensor telemetry and battery management.",
+    "tags": ["IoT", "PCB Design", "LoRa", "Embedded C"],
     "github": "https://github.com/GabuGravin41/dalton-lab-forge",
     "category": "hardware",
     "priority": 4

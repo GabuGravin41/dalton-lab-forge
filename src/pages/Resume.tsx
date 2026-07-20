@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Printer,
   ArrowLeft,
@@ -51,7 +53,7 @@ const Resume = () => {
     window.dispatchEvent(new CustomEvent("portfolio-focus-change"));
   };
 
-  const { profile, projects, papers } = usePortfolio();
+  const { profile, projects, papers, updateProfile, updateProjects, updatePapers, isEditMode } = usePortfolio();
 
   const socials = profile.socials || { github: "", linkedin: "", email: "", twitter: "", instagram: "" };
 
@@ -76,8 +78,52 @@ const Resume = () => {
     ? (profile.engineeringObjective || profile.bio)
     : (profile.researchStatement || profile.bio);
 
+  const EditHeader = () => {
+    const { publishChanges, logout, username, loading, hasUnsavedChanges } = usePortfolio();
+
+    return (
+      <div className="bg-background/95 backdrop-blur-md border-b border-primary/30 py-2.5 px-6 flex items-center justify-between sticky top-0 z-[100] text-xs text-foreground select-none print:hidden shadow-lg shadow-primary/5">
+        <div className="flex items-center gap-3">
+          <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+          <span className="text-muted-foreground">Editing as <strong className="text-foreground">@{username}</strong></span>
+          {hasUnsavedChanges ? (
+            <span className="flex items-center gap-1.5 px-2 py-0.5 bg-amber-500/15 border border-amber-500/30 rounded-full text-amber-500 text-[10px] font-semibold">
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+              Unsaved changes
+            </span>
+          ) : (
+            <span className="flex items-center gap-1.5 px-2 py-0.5 bg-green-500/10 border border-green-500/20 rounded-full text-green-500 text-[10px] font-semibold">
+              <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
+              All published
+            </span>
+          )}
+        </div>
+        <div className="flex items-center gap-2">
+          <Button
+            variant={hasUnsavedChanges ? "default" : "outline"}
+            size="sm"
+            onClick={publishChanges}
+            disabled={loading || !hasUnsavedChanges}
+            className={`h-7 text-[11px] transition-all ${hasUnsavedChanges ? "bg-primary text-primary-foreground shadow-md shadow-primary/30 hover:bg-primary/90" : "border-border/50 text-muted-foreground"}`}
+          >
+            {loading ? "Publishing..." : hasUnsavedChanges ? "⬆ Publish Live" : "Published"}
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={logout}
+            className="h-7 hover:bg-destructive/10 hover:text-destructive text-[11px] text-muted-foreground"
+          >
+            Log Out
+          </Button>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-background">
+      {isEditMode && <EditHeader />}
       {/* Hide on Print */}
       <div className="print:hidden">
         <Navigation />
@@ -138,7 +184,16 @@ const Resume = () => {
                 {/* Header Section */}
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-border pb-6">
                   <div className="space-y-2">
-                    <h2 className="text-4xl font-extrabold tracking-tight text-foreground">{profile.name}</h2>
+                    {isEditMode ? (
+                      <Input
+                        value={profile.name || ""}
+                        onChange={(e) => updateProfile("name", e.target.value)}
+                        className="text-3xl font-extrabold bg-background/50 border-primary/30 h-auto py-1"
+                        placeholder="Enter full name"
+                      />
+                    ) : (
+                      <h2 className="text-4xl font-extrabold tracking-tight text-foreground">{profile.name}</h2>
+                    )}
                     <div className="flex flex-wrap gap-1.5">
                       {profile.roles?.map((role: string) => (
                         <Badge key={role} variant="outline" className="text-xs border-primary/30 text-primary font-medium">{role}</Badge>
@@ -167,7 +222,16 @@ const Resume = () => {
                   <h3 className="text-xs uppercase font-mono tracking-widest text-primary font-bold">
                     {focus === "engineering" ? "Professional Objective" : "Research Statement"}
                   </h3>
-                  <p className="text-muted-foreground leading-relaxed">{activeBio}</p>
+                  {isEditMode ? (
+                    <Textarea
+                      value={focus === "engineering" ? (profile.engineeringObjective || "") : (profile.researchStatement || "")}
+                      onChange={(e) => updateProfile(focus === "engineering" ? "engineeringObjective" : "researchStatement", e.target.value)}
+                      className="min-h-[65px] bg-background/50 border-primary/30 text-xs leading-relaxed"
+                      placeholder="Enter objective..."
+                    />
+                  ) : (
+                    <p className="text-muted-foreground leading-relaxed">{activeBio}</p>
+                  )}
                 </div>
 
                 {/* Main Two-Column Layout */}
@@ -184,23 +248,53 @@ const Resume = () => {
                             Featured Projects
                           </h3>
                           <div className="space-y-4">
-                            {displayProjects.map((proj) => (
-                              <div key={proj.title} className="space-y-1">
-                                <div className="flex justify-between items-start gap-2">
-                                  <h4 className="font-bold text-foreground text-sm flex items-center gap-1">
-                                    {proj.title}
-                                    {proj.github && <a href={proj.github} className="text-primary hover:text-primary/75"><ExternalLink className="w-3 h-3" /></a>}
-                                  </h4>
-                                  <span className="text-[10px] bg-secondary px-2 py-0.5 rounded text-muted-foreground capitalize">{proj.category}</span>
+                            {displayProjects.map((proj) => {
+                              const globalIdx = projects.findIndex(p => p.title === proj.title);
+                              return (
+                                <div key={proj.title} className="space-y-1">
+                                  {isEditMode && globalIdx > -1 ? (
+                                    <div className="space-y-1.5 border border-primary/20 p-2 rounded bg-background/30">
+                                      <Input
+                                        value={proj.title || ""}
+                                        onChange={(e) => {
+                                          const newProjects = [...projects];
+                                          newProjects[globalIdx] = { ...proj, title: e.target.value };
+                                          updateProjects(newProjects);
+                                        }}
+                                        className="text-xs h-7 font-bold bg-background/50 border-primary/30"
+                                        placeholder="Project Title"
+                                      />
+                                      <Textarea
+                                        value={proj.description || ""}
+                                        onChange={(e) => {
+                                          const newProjects = [...projects];
+                                          newProjects[globalIdx] = { ...proj, description: e.target.value };
+                                          updateProjects(newProjects);
+                                        }}
+                                        className="text-xs min-h-[50px] bg-background/50 border-primary/30 leading-relaxed"
+                                        placeholder="Project Description"
+                                      />
+                                    </div>
+                                  ) : (
+                                    <>
+                                      <div className="flex justify-between items-start gap-2">
+                                        <h4 className="font-bold text-foreground text-sm flex items-center gap-1">
+                                          {proj.title}
+                                          {proj.github && <a href={proj.github} className="text-primary hover:text-primary/75"><ExternalLink className="w-3 h-3" /></a>}
+                                        </h4>
+                                        <span className="text-[10px] bg-secondary px-2 py-0.5 rounded text-muted-foreground capitalize">{proj.category}</span>
+                                      </div>
+                                      <p className="text-xs text-muted-foreground leading-relaxed">{proj.description}</p>
+                                      <div className="flex flex-wrap gap-1 pt-1">
+                                        {proj.tags.slice(0, 4).map((tag: string) => (
+                                          <span key={tag} className="text-[9px] bg-secondary/50 px-1.5 py-0.5 rounded text-muted-foreground">{tag}</span>
+                                        ))}
+                                      </div>
+                                    </>
+                                  )}
                                 </div>
-                                <p className="text-xs text-muted-foreground leading-relaxed">{proj.description}</p>
-                                <div className="flex flex-wrap gap-1 pt-1">
-                                  {proj.tags.slice(0, 4).map((tag: string) => (
-                                    <span key={tag} className="text-[9px] bg-secondary/50 px-1.5 py-0.5 rounded text-muted-foreground">{tag}</span>
-                                  ))}
-                                </div>
-                              </div>
-                            ))}
+                              );
+                            })}
                           </div>
                         </div>
 
@@ -211,14 +305,53 @@ const Resume = () => {
                             Experience
                           </h3>
                           <div className="space-y-4">
-                            {profile.experience?.map((exp: any) => (
-                              <div key={exp.role} className="space-y-1">
-                                <div className="flex justify-between items-start gap-2">
-                                  <h4 className="font-bold text-foreground text-sm">{exp.role}</h4>
-                                  <span className="text-xs text-muted-foreground font-mono flex-shrink-0">{exp.period}</span>
-                                </div>
-                                <div className="text-xs font-semibold text-primary/80">{exp.company}</div>
-                                <p className="text-xs text-muted-foreground leading-relaxed mt-1">{exp.description}</p>
+                            {profile.experience?.map((exp: any, idx: number) => (
+                              <div key={idx} className="space-y-1">
+                                {isEditMode ? (
+                                  <div className="space-y-1.5 border border-primary/20 p-2 rounded bg-background/30">
+                                    <div className="grid grid-cols-2 gap-2">
+                                      <Input
+                                        value={exp.role || ""}
+                                        onChange={(e) => {
+                                          const newExp = [...profile.experience];
+                                          newExp[idx] = { ...exp, role: e.target.value };
+                                          updateProfile("experience", newExp);
+                                        }}
+                                        className="text-xs h-7 bg-background/50 border-primary/30"
+                                        placeholder="Role"
+                                      />
+                                      <Input
+                                        value={exp.company || ""}
+                                        onChange={(e) => {
+                                          const newExp = [...profile.experience];
+                                          newExp[idx] = { ...exp, company: e.target.value };
+                                          updateProfile("experience", newExp);
+                                        }}
+                                        className="text-xs h-7 bg-background/50 border-primary/30"
+                                        placeholder="Company"
+                                      />
+                                    </div>
+                                    <Textarea
+                                      value={exp.description || ""}
+                                      onChange={(e) => {
+                                        const newExp = [...profile.experience];
+                                        newExp[idx] = { ...exp, description: e.target.value };
+                                        updateProfile("experience", newExp);
+                                      }}
+                                      className="text-xs min-h-[50px] bg-background/50 border-primary/30 leading-relaxed"
+                                      placeholder="Description"
+                                    />
+                                  </div>
+                                ) : (
+                                  <>
+                                    <div className="flex justify-between items-start gap-2">
+                                      <h4 className="font-bold text-foreground text-sm">{exp.role}</h4>
+                                      <span className="text-xs text-muted-foreground font-mono flex-shrink-0">{exp.period}</span>
+                                    </div>
+                                    <div className="text-xs font-semibold text-primary/80">{exp.company}</div>
+                                    <p className="text-xs text-muted-foreground leading-relaxed mt-1">{exp.description}</p>
+                                  </>
+                                )}
                               </div>
                             ))}
                           </div>
@@ -233,14 +366,53 @@ const Resume = () => {
                             Research Experience
                           </h3>
                           <div className="space-y-4">
-                            {profile.experience?.map((exp: any) => (
-                              <div key={exp.role} className="space-y-1">
-                                <div className="flex justify-between items-start gap-2">
-                                  <h4 className="font-bold text-foreground text-sm">{exp.role}</h4>
-                                  <span className="text-xs text-muted-foreground font-mono flex-shrink-0">{exp.period}</span>
-                                </div>
-                                <div className="text-xs font-semibold text-primary/80">{exp.company}</div>
-                                <p className="text-xs text-muted-foreground leading-relaxed mt-1">{exp.description}</p>
+                            {profile.experience?.map((exp: any, idx: number) => (
+                              <div key={idx} className="space-y-1">
+                                {isEditMode ? (
+                                  <div className="space-y-1.5 border border-primary/20 p-2 rounded bg-background/30">
+                                    <div className="grid grid-cols-2 gap-2">
+                                      <Input
+                                        value={exp.role || ""}
+                                        onChange={(e) => {
+                                          const newExp = [...profile.experience];
+                                          newExp[idx] = { ...exp, role: e.target.value };
+                                          updateProfile("experience", newExp);
+                                        }}
+                                        className="text-xs h-7 bg-background/50 border-primary/30"
+                                        placeholder="Role"
+                                      />
+                                      <Input
+                                        value={exp.company || ""}
+                                        onChange={(e) => {
+                                          const newExp = [...profile.experience];
+                                          newExp[idx] = { ...exp, company: e.target.value };
+                                          updateProfile("experience", newExp);
+                                        }}
+                                        className="text-xs h-7 bg-background/50 border-primary/30"
+                                        placeholder="Company"
+                                      />
+                                    </div>
+                                    <Textarea
+                                      value={exp.description || ""}
+                                      onChange={(e) => {
+                                        const newExp = [...profile.experience];
+                                        newExp[idx] = { ...exp, description: e.target.value };
+                                        updateProfile("experience", newExp);
+                                      }}
+                                      className="text-xs min-h-[50px] bg-background/50 border-primary/30 leading-relaxed"
+                                      placeholder="Description"
+                                    />
+                                  </div>
+                                ) : (
+                                  <>
+                                    <div className="flex justify-between items-start gap-2">
+                                      <h4 className="font-bold text-foreground text-sm">{exp.role}</h4>
+                                      <span className="text-xs text-muted-foreground font-mono flex-shrink-0">{exp.period}</span>
+                                    </div>
+                                    <div className="text-xs font-semibold text-primary/80">{exp.company}</div>
+                                    <p className="text-xs text-muted-foreground leading-relaxed mt-1">{exp.description}</p>
+                                  </>
+                                )}
                               </div>
                             ))}
                           </div>
@@ -253,18 +425,48 @@ const Resume = () => {
                             Selected Technical Projects
                           </h3>
                           <div className="space-y-4">
-                            {displayProjects.map((proj) => (
-                              <div key={proj.title} className="space-y-1">
-                                <div className="flex justify-between items-start gap-2">
-                                  <h4 className="font-bold text-foreground text-sm flex items-center gap-1">
-                                    {proj.title}
-                                    {proj.github && <a href={proj.github} className="text-primary hover:text-primary/75"><ExternalLink className="w-3 h-3" /></a>}
-                                  </h4>
-                                  <span className="text-[10px] bg-secondary px-2 py-0.5 rounded text-muted-foreground capitalize">{proj.category}</span>
+                            {displayProjects.map((proj) => {
+                              const globalIdx = projects.findIndex(p => p.title === proj.title);
+                              return (
+                                <div key={proj.title} className="space-y-1">
+                                  {isEditMode && globalIdx > -1 ? (
+                                    <div className="space-y-1.5 border border-primary/20 p-2 rounded bg-background/30">
+                                      <Input
+                                        value={proj.title || ""}
+                                        onChange={(e) => {
+                                          const newProjects = [...projects];
+                                          newProjects[globalIdx] = { ...proj, title: e.target.value };
+                                          updateProjects(newProjects);
+                                        }}
+                                        className="text-xs h-7 font-bold bg-background/50 border-primary/30"
+                                        placeholder="Project Title"
+                                      />
+                                      <Textarea
+                                        value={proj.description || ""}
+                                        onChange={(e) => {
+                                          const newProjects = [...projects];
+                                          newProjects[globalIdx] = { ...proj, description: e.target.value };
+                                          updateProjects(newProjects);
+                                        }}
+                                        className="text-xs min-h-[50px] bg-background/50 border-primary/30 leading-relaxed"
+                                        placeholder="Project Description"
+                                      />
+                                    </div>
+                                  ) : (
+                                    <>
+                                      <div className="flex justify-between items-start gap-2">
+                                        <h4 className="font-bold text-foreground text-sm flex items-center gap-1">
+                                          {proj.title}
+                                          {proj.github && <a href={proj.github} className="text-primary hover:text-primary/75"><ExternalLink className="w-3 h-3" /></a>}
+                                        </h4>
+                                        <span className="text-[10px] bg-secondary px-2 py-0.5 rounded text-muted-foreground capitalize">{proj.category}</span>
+                                      </div>
+                                      <p className="text-xs text-muted-foreground leading-relaxed">{proj.description}</p>
+                                    </>
+                                  )}
                                 </div>
-                                <p className="text-xs text-muted-foreground leading-relaxed">{proj.description}</p>
-                              </div>
-                            ))}
+                              );
+                            })}
                           </div>
                         </div>
                       </>
