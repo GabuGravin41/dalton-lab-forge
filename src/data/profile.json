@@ -12,18 +12,16 @@
   ],
   "bio": "Building intelligent systems at the intersection of AI, embedded engineering, and education. Founder of Proctor AI, IEEEXtreme 18.0 Rank #1 team in Kenya, IEEE Tech Ignite 1st Runner-Up, International Mathematical Olympiad (IMO) participant, and Chief Trainer for the Kenya Mathematical Olympiad.",
   "about": {
-    "approach": "My work is driven by a simple philosophy: building systems over performing personal branding. Whether I am architecting Proctor AI to assess tens of thousands of Olympiad candidates across East Africa, competing in high-stakes programming contests like IEEEXtreme (Ranked #1 in Kenya) or IEEE Tech Ignite Hackathon (1st Runners Up at Strathmore), training deep vision models, or designing custom embedded hardware, I combine mathematical rigor with practical engineering to solve high-impact infrastructure challenges in Africa.",
-    "lookingFor": "Currently scaling Proctor AI for the MEST AI Startup Program. Open to technical collaborations, AI research partnerships, and investment opportunities in educational infrastructure, automated assessment tools, and AI/hardware co-design.",
+    "approach": "Where software intelligence meets physical reality — that's where I build. My work is driven by a simple core idea: building functional systems over performing. Whether I'm training a computer vision model, architecting a backend API, laying out a circuit board, or prototyping an embedded node, I bring the same focus to technical precision and real-world utility. I believe the most compelling work happens when you bridge disciplines — bringing the rigor of hardware engineering to AI systems, and the adaptability of machine learning to physical devices.",
+    "lookingFor": "Currently scaling Proctor AI as part of the MEST AI Startup Program. I'm open to technical collaborations, AI research partnerships, and opportunities centered around educational infrastructure, automated assessment tools, and AI/hardware co-design.",
     "lookingForTags": [
       "Proctor AI Startup",
       "MEST AI Program",
-      "IEEEXtreme Rank 1",
-      "IEEE Hackathon Runner-Up",
       "AI Assessment Tools",
-      "Competitive Programming",
-      "Embedded AI & Hardware"
+      "Hardware/AI Co-Design",
+      "Competitive Programming"
     ],
-    "beyond": "International Mathematical Olympiad (IMO) Participant representing Kenya at Alliance High School and IEEE Kenya Section Paper Writing Contest Runner-Up. Beyond engineering and training Olympiad teams, I explore classical music (Mozart's Requiem, piano, violin composition), pencil drawing, analytic number theory (Riemann hypothesis, prime gaps), and philosophy."
+    "beyond": "When I'm not training models or debugging hardware, I train high school students for national and international mathematics and informatics Olympiads. Outside of tech, I spend time exploring classical music (piano, violin composition, and Mozart's Requiem), pencil drawing, and analytic number theory."
   },
   "skills": [
     {
