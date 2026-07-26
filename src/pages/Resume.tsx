@@ -72,7 +72,9 @@ const Resume = () => {
 
   // Slice arrays based on active focus to guarantee fit on single page
   const displayProjects = focus === "engineering" ? sortedProjects.slice(0, 4) : sortedProjects.slice(0, 2);
-  const displayPapers = focus === "engineering" ? sortedPapers.slice(0, 2) : sortedPapers.slice(0, 4);
+  const displayPapers = profile.hideResearch
+    ? []
+    : focus === "engineering" ? sortedPapers.slice(0, 2) : sortedPapers.slice(0, 4);
 
   const activeBio = focus === "engineering"
     ? (profile.engineeringObjective || profile.bio)

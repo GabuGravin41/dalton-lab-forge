@@ -17,8 +17,8 @@ export const getPortfolioUpdatesFromAI = async (
   currentPapers: any[]
 ): Promise<UpdateAssistantResult> => {
   const systemPrompt = `
-You are Dalton Omondi's Portfolio Content Update Assistant.
-Your task is to analyze Dalton's current portfolio data and the user's natural language request (which describes changes, new accomplishments, projects, or research papers).
+You are the Portfolio Content Update Assistant.
+Your task is to analyze the current portfolio data and the user's natural language request (which describes changes, new accomplishments, projects, or research papers).
 You must determine which parts of the portfolio data need to be added, modified, or deleted, and return the updated structures.
 
 Each project and paper object must include a "priority" field (integer 1 to 5, where 5 is the highest priority).
@@ -54,8 +54,8 @@ ${JSON.stringify(currentPapers, null, 2)}
 1. Review the User Update Request.
 2. Determine which data configurations need to change:
    - If the request is to add a project, append it to the Projects array. Ensure it has: title, description, tags (array of strings), github link (default to empty string or user provided), demo link (default to empty string or user provided), category (must be one of: 'ml', 'hardware', 'chip', 'iot'), and priority (integer 1 to 5, default to 5 unless specified).
-   - If the request is to add a research paper, append it to the Papers array. Ensure it has: title, authors (default to "Dalton Omondi" if not specified), year, abstract, tags (array of strings), pdfPath (e.g. "/papers/filename.pdf" where filename is a URL-safe version of the title), status (must be one of: 'published', 'submitted', 'draft', 'preprint'), and priority (integer 1 to 5, default to 5 unless specified).
-   - If the request is to update his general profile (bio, roles, theme, engineeringObjective, researchStatement, social links, work experience, education, certifications), modify the Profile configuration accordingly.
+   - If the request is to add a research paper, append it to the Papers array. Ensure it has: title, authors (default to the profile name if not specified), year, abstract, tags (array of strings), pdfPath (e.g. "/papers/filename.pdf" where filename is a URL-safe version of the title), status (must be one of: 'published', 'submitted', 'draft', 'preprint'), and priority (integer 1 to 5, default to 5 unless specified).
+   - If the request is to update the general profile (bio, roles, theme, engineeringObjective, researchStatement, social links, work experience, education, certifications), modify the Profile configuration accordingly.
 3. Keep all other fields intact unless explicitly asked to modify them. Ensure existing priorities are preserved.
 4. Return a valid JSON matching the schema.
 `;

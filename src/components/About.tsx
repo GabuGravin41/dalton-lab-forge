@@ -50,14 +50,35 @@ const About = () => {
             </div>
             
             <div className="lg:col-span-3 space-y-4 md:space-y-6">
-              <p className="text-lg md:text-xl text-muted-foreground leading-relaxed">
-                Where <span className="font-bold text-primary">software intelligence</span> meets{" "}
-                <span className="font-bold text-accent">physical reality</span> — that's where I build.
-              </p>
-              <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
-                I'm an engineer who finds beauty in both abstraction and tangibility. My work spans from training 
-                neural networks that see and understand, to designing circuit boards that bring those models into the real world.
-              </p>
+              {isEditMode ? (
+                <div className="space-y-4">
+                  <div className="space-y-1">
+                    <span className="text-[10px] font-bold text-muted-foreground uppercase">Intersection Headline</span>
+                    <Input
+                      value={profile.about?.intersectionHeadline ?? "Where software intelligence meets physical reality — that's where I build."}
+                      onChange={(e) => updateProfile("about", { ...profile.about, intersectionHeadline: e.target.value })}
+                      className="bg-background/50 border-primary/30 text-sm font-semibold"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <span className="text-[10px] font-bold text-muted-foreground uppercase">Intersection Body</span>
+                    <Textarea
+                      value={profile.about?.intersectionBody ?? "I'm an engineer who finds beauty in both abstraction and tangibility. My work spans from training neural networks that see and understand, to designing circuit boards that bring those models into the real world."}
+                      onChange={(e) => updateProfile("about", { ...profile.about, intersectionBody: e.target.value })}
+                      className="min-h-[100px] bg-background/50 border-primary/30 text-xs leading-relaxed"
+                    />
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <p className="text-lg md:text-xl text-muted-foreground leading-relaxed">
+                    {profile.about?.intersectionHeadline ?? "Where software intelligence meets physical reality — that's where I build."}
+                  </p>
+                  <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
+                    {profile.about?.intersectionBody ?? "I'm an engineer who finds beauty in both abstraction and tangibility. My work spans from training neural networks that see and understand, to designing circuit boards that bring those models into the real world."}
+                  </p>
+                </>
+              )}
             </div>
           </div>
 
@@ -145,10 +166,12 @@ const About = () => {
               </div>
 
               {/* Live GitHub & Kaggle Metrics */}
-              <div className="space-y-4 pt-2">
-                <h3 className="text-xs md:text-sm font-mono text-muted-foreground uppercase tracking-wider">Live Analytics & Standings</h3>
-                <GitHubStats />
-              </div>
+              {!profile.hideGitHubStats && (
+                <div className="space-y-4 pt-2">
+                  <h3 className="text-xs md:text-sm font-mono text-muted-foreground uppercase tracking-wider">Live Analytics & Standings</h3>
+                  <GitHubStats />
+                </div>
+              )}
             </div>
 
             {/* Skills sidebar */}

@@ -2,10 +2,12 @@ import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Send, Mic, MicOff, Volume2, VolumeX, Bot, User, X, MessageCircle } from "lucide-react";
+import { Send, Mic, MicOff, Volume2, VolumeX, Bot, User, X, MessageCircle, Sparkles, CheckCircle2 } from "lucide-react";
 
 import { usePortfolio } from "@/context/PortfolioContext";
 import { generateAIResponse } from "@/utils/aiClient";
+import { getPortfolioUpdatesFromAI, UpdateAssistantResult } from "@/utils/adminGemini";
+import { toast } from "sonner";
 
 interface Message {
   id: string;
@@ -15,7 +17,10 @@ interface Message {
 }
 
 const FloatingChatbot = () => {
-  const { profile, projects, papers } = usePortfolio();
+  const { isEditMode, profile, projects, papers, updateProfile, updateProjects, updatePapers } = usePortfolio();
+  const [botMode, setBotMode] = useState<"chat" | "editor">("chat");
+  const [proposedEdits, setProposedEdits] = useState<UpdateAssistantResult | null>(null);
+  const [isAiLoading, setIsAiLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState("");
@@ -186,9 +191,39 @@ Assistant response:
     }
   };
 
+  const handleSendAIRequest = async () => {
+    if (!inputValue.trim() || isAiLoading) return;
+    const promptText = inputValue;
+    setInputValue("");
+    setIsAiLoading(true);
+    setProposedEdits(null);
+    try {
+      const result = await getPortfolioUpdatesFromAI(promptText, profile, projects, papers);
+      setProposedEdits(result);
+    } catch (err: any) {
+      console.error("AI edit error:", err);
+      toast.error(err.message || "Failed to generate AI edits");
+    } finally {
+      setIsAiLoading(false);
+    }
+  };
+
+  const applyProposedEdits = () => {
+    if (!proposedEdits) return;
+    updateProfile("_all", proposedEdits.updatedProfile);
+    updateProjects(proposedEdits.updatedProjects);
+    updatePapers(proposedEdits.updatedPapers);
+    setProposedEdits(null);
+    toast.success("AI edits applied locally! Click 'Publish Live' at the top of the page to save.");
+  };
+
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
-      handleSendMessage();
+      if (botMode === "editor") {
+        handleSendAIRequest();
+      } else {
+        handleSendMessage();
+      }
     }
   };
 
@@ -249,87 +284,180 @@ Assistant response:
             </CardTitle>
           </CardHeader>
           
-          <CardContent className="p-0 flex-1 flex flex-col min-h-0">
-            {/* Messages Area */}
-            <div className="flex-1 overflow-y-auto p-3 md:p-4 space-y-2 md:space-y-3">
-              {messages.map((message) => (
-                <div
-                  key={message.id}
-                  className={`flex gap-1.5 md:gap-2 ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+          <CardContent className="p-0 flex-1 flex flex-col min-h-0 bg-card">
+            {/* Tab bar if isEditMode is true */}
+            {isEditMode && (
+              <div className="flex border-b border-border/50 bg-muted/30 p-1.5 flex-shrink-0">
+                <button
+                  type="button"
+                  onClick={() => { setBotMode("chat"); setProposedEdits(null); }}
+                  className={`flex-1 flex items-center justify-center gap-1.5 py-1 text-xs font-medium rounded-md transition-all ${botMode === "chat" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
                 >
-                  {message.sender === 'bot' && (
-                    <div className="w-5 h-5 md:w-6 md:h-6 rounded-full bg-gradient-primary flex items-center justify-center flex-shrink-0">
-                      <Bot className="w-2.5 h-2.5 md:w-3 md:h-3 text-white" />
-                    </div>
-                  )}
-                  
-                  <div
-                    className={`max-w-[80%] px-2.5 py-1.5 md:px-3 md:py-2 rounded-2xl ${
-                      message.sender === 'user'
-                        ? 'bg-gradient-primary text-white shadow-sm'
-                        : 'bg-muted border border-border/50 text-foreground'
-                    }`}
-                  >
-                    <p className="text-xs md:text-sm leading-relaxed whitespace-pre-wrap">{message.text}</p>
-                    <span className="text-[10px] md:text-xs opacity-70 mt-0.5 md:mt-1 block">
-                      {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                    </span>
-                  </div>
-                  
-                  {message.sender === 'user' && (
-                    <div className="w-5 h-5 md:w-6 md:h-6 rounded-full bg-gradient-accent flex items-center justify-center flex-shrink-0">
-                      <User className="w-2.5 h-2.5 md:w-3 md:h-3 text-white" />
-                    </div>
-                  )}
-                </div>
-              ))}
-              
-              {isLoading && (
-                <div className="flex gap-1.5 md:gap-2 justify-start items-center">
-                  <div className="w-5 h-5 md:w-6 md:h-6 rounded-full bg-gradient-primary flex items-center justify-center flex-shrink-0">
-                    <Bot className="w-2.5 h-2.5 md:w-3 md:h-3 text-white" />
-                  </div>
-                  <div className="bg-muted px-3 py-2 rounded-2xl max-w-[80%] flex items-center gap-1 border border-border/50">
-                    <span className="w-1.5 h-1.5 bg-foreground/50 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                    <span className="w-1.5 h-1.5 bg-foreground/50 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                    <span className="w-1.5 h-1.5 bg-foreground/50 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
-                  </div>
-                </div>
-              )}
-              <div ref={messagesEndRef} />
-            </div>
-
-            {/* Input Area */}
-            <div className="border-t border-border p-2.5 md:p-3 flex-shrink-0 bg-background/50">
-              <div className="flex gap-1.5 md:gap-2">
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={toggleRecording}
-                  className={`h-8 w-8 md:h-9 md:w-9 p-0 rounded-full ${isRecording ? 'bg-destructive/20 text-destructive border border-destructive/30 animate-pulse' : 'text-muted-foreground hover:bg-muted'}`}
-                  title={isRecording ? "Stop Recording" : "Voice Input"}
+                  <Bot className="w-3.5 h-3.5" /> Test Chatbot
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { setBotMode("editor"); }}
+                  className={`flex-1 flex items-center justify-center gap-1.5 py-1 text-xs font-medium rounded-md transition-all ${botMode === "editor" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
                 >
-                  {isRecording ? <MicOff className="w-3.5 h-3.5 md:w-4 md:h-4" /> : <Mic className="w-3.5 h-3.5 md:w-4 md:h-4" />}
-                </Button>
-                
-                <Input
-                  placeholder="Ask me anything..."
-                  value={inputValue}
-                  onChange={(e) => setInputValue(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                  className="flex-1 h-8 md:h-9 text-xs md:text-sm bg-muted/30 border-border/70 focus-visible:ring-primary rounded-full px-4"
-                  disabled={isLoading}
-                />
-                
-                <Button
-                  onClick={handleSendMessage}
-                  className="h-8 w-8 md:h-9 md:w-9 p-0 bg-gradient-primary hover:opacity-90 text-white rounded-full shadow-sm"
-                  disabled={!inputValue.trim() || isLoading}
-                >
-                  <Send className="w-3.5 h-3.5 md:w-4 md:h-4" />
-                </Button>
+                  <Sparkles className="w-3.5 h-3.5 text-primary" /> AI Co-pilot
+                </button>
               </div>
-            </div>
+            )}
+
+            {botMode === "editor" ? (
+              /* AI Editor Panel */
+              <div className="flex-1 flex flex-col min-h-0">
+                <div className="flex-1 overflow-y-auto p-4 space-y-4">
+                  <div className="bg-primary/5 border border-primary/20 rounded-xl p-3 text-xs leading-relaxed text-muted-foreground space-y-2">
+                    <div className="font-semibold text-foreground flex items-center gap-1">
+                      <Sparkles className="w-3.5 h-3.5 text-primary animate-pulse" />
+                      AI Co-pilot Editor
+                    </div>
+                    <p>
+                      Tell me what changes you'd like to make to your portfolio (e.g. <em>"Change my theme to rose"</em>, <em>"Add a project about satellite systems"</em>, or <em>"Rewrite my bio to focus on physics"</em>) and I will update your sections instantly!
+                    </p>
+                  </div>
+
+                  {isAiLoading && (
+                    <div className="flex flex-col items-center justify-center py-8 gap-3 text-muted-foreground">
+                      <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                      <p className="text-xs font-mono">Formulating portfolio updates...</p>
+                    </div>
+                  )}
+
+                  {proposedEdits && (
+                    <div className="bg-card border border-border/80 rounded-xl p-3.5 shadow-sm space-y-3.5 animate-fade-in">
+                      <div className="flex items-center gap-1.5 text-xs font-bold text-green-500">
+                        <CheckCircle2 className="w-4 h-4" /> Proposed Changes
+                      </div>
+                      <p className="text-xs leading-relaxed text-muted-foreground whitespace-pre-wrap">{proposedEdits.explanation}</p>
+                      
+                      <div className="flex gap-2">
+                        <Button
+                          onClick={applyProposedEdits}
+                          className="flex-1 h-8 bg-green-600 hover:bg-green-700 text-white text-xs gap-1.5 shadow-md shadow-green-500/10 rounded-lg"
+                        >
+                          Apply Updates
+                        </Button>
+                        <Button
+                          variant="outline"
+                          onClick={() => setProposedEdits(null)}
+                          className="h-8 text-xs border-border/60 hover:bg-muted rounded-lg"
+                        >
+                          Cancel
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Input Area */}
+                <div className="border-t border-border p-2.5 md:p-3 flex-shrink-0 bg-background/50">
+                  <div className="flex gap-1.5 md:gap-2">
+                    <Input
+                      placeholder="Instruct AI Co-pilot..."
+                      value={inputValue}
+                      onChange={(e) => setInputValue(e.target.value)}
+                      onKeyPress={handleKeyPress}
+                      className="flex-1 h-8 md:h-9 text-xs md:text-sm bg-muted/30 border-border/70 focus-visible:ring-primary rounded-full px-4"
+                      disabled={isAiLoading}
+                    />
+                    <Button
+                      onClick={handleSendAIRequest}
+                      className="h-8 w-8 md:h-9 md:w-9 p-0 bg-gradient-primary hover:opacity-90 text-white rounded-full shadow-sm"
+                      disabled={!inputValue.trim() || isAiLoading}
+                    >
+                      <Send className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              /* Visitor Chat Panel (default) */
+              <>
+                {/* Messages Area */}
+                <div className="flex-1 overflow-y-auto p-3 md:p-4 space-y-2 md:space-y-3">
+                  {messages.map((message) => (
+                    <div
+                      key={message.id}
+                      className={`flex gap-1.5 md:gap-2 ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+                    >
+                      {message.sender === 'bot' && (
+                        <div className="w-5 h-5 md:w-6 md:h-6 rounded-full bg-gradient-primary flex items-center justify-center flex-shrink-0">
+                          <Bot className="w-2.5 h-2.5 md:w-3 md:h-3 text-white" />
+                        </div>
+                      )}
+                      
+                      <div
+                        className={`max-w-[80%] px-2.5 py-1.5 md:px-3 md:py-2 rounded-2xl ${
+                          message.sender === 'user'
+                            ? 'bg-gradient-primary text-white shadow-sm'
+                            : 'bg-muted border border-border/50 text-foreground'
+                        }`}
+                      >
+                        <p className="text-xs md:text-sm leading-relaxed whitespace-pre-wrap">{message.text}</p>
+                        <span className="text-[10px] md:text-xs opacity-70 mt-0.5 md:mt-1 block">
+                          {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </span>
+                      </div>
+                      
+                      {message.sender === 'user' && (
+                        <div className="w-5 h-5 md:w-6 md:h-6 rounded-full bg-gradient-accent flex items-center justify-center flex-shrink-0">
+                          <User className="w-2.5 h-2.5 md:w-3 md:h-3 text-white" />
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                  
+                  {isLoading && (
+                    <div className="flex gap-1.5 md:gap-2 justify-start items-center">
+                      <div className="w-5 h-5 md:w-6 md:h-6 rounded-full bg-gradient-primary flex items-center justify-center flex-shrink-0">
+                        <Bot className="w-2.5 h-2.5 md:w-3 md:h-3 text-white" />
+                      </div>
+                      <div className="bg-muted px-3 py-2 rounded-2xl max-w-[80%] flex items-center gap-1 border border-border/50">
+                        <span className="w-1.5 h-1.5 bg-foreground/50 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                        <span className="w-1.5 h-1.5 bg-foreground/50 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                        <span className="w-1.5 h-1.5 bg-foreground/50 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                      </div>
+                    </div>
+                  )}
+                  <div ref={messagesEndRef} />
+                </div>
+
+                {/* Input Area */}
+                <div className="border-t border-border p-2.5 md:p-3 flex-shrink-0 bg-background/50">
+                  <div className="flex gap-1.5 md:gap-2">
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={toggleRecording}
+                      className={`h-8 w-8 md:h-9 md:w-9 p-0 rounded-full ${isRecording ? 'bg-destructive/20 text-destructive border border-destructive/30 animate-pulse' : 'text-muted-foreground hover:bg-muted'}`}
+                      title={isRecording ? "Stop Recording" : "Voice Input"}
+                    >
+                      {isRecording ? <MicOff className="w-3.5 h-3.5 md:w-4 md:h-4" /> : <Mic className="w-3.5 h-3.5 md:w-4 md:h-4" />}
+                    </Button>
+                    
+                    <Input
+                      placeholder="Ask me anything..."
+                      value={inputValue}
+                      onChange={(e) => setInputValue(e.target.value)}
+                      onKeyPress={handleKeyPress}
+                      className="flex-1 h-8 md:h-9 text-xs md:text-sm bg-muted/30 border-border/70 focus-visible:ring-primary rounded-full px-4"
+                      disabled={isLoading}
+                    />
+                    
+                    <Button
+                      onClick={handleSendMessage}
+                      className="h-8 w-8 md:h-9 md:w-9 p-0 bg-gradient-primary hover:opacity-90 text-white rounded-full shadow-sm"
+                      disabled={!inputValue.trim() || isLoading}
+                    >
+                      <Send className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                    </Button>
+                  </div>
+                </div>
+              </>
+            )}
           </CardContent>
         </Card>
       )}

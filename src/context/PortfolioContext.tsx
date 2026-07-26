@@ -139,6 +139,14 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   };
 
   const updateProfile = (key: string, value: any) => {
+    if (key === "_all") {
+      setProfile(value);
+      if (value.theme) {
+        localStorage.setItem("portfolio_theme", value.theme);
+        window.dispatchEvent(new CustomEvent("portfolio-theme-change"));
+      }
+      return;
+    }
     setProfile((prev: any) => {
       const updated = { ...prev, [key]: value };
       

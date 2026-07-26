@@ -54,7 +54,7 @@ const EditHeader = () => {
 
 
 const Index = () => {
-  const { isEditMode } = usePortfolio();
+  const { isEditMode, profile } = usePortfolio();
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -64,7 +64,7 @@ const Index = () => {
         <Hero />
         <About />
         <Projects />
-        <Research />
+        {!profile?.hideResearch && <Research />}
         <Contact />
       </main>
       <Footer />

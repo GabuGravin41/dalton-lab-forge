@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, Sparkles, FileText, Settings, Palette, LayoutGrid, Copy, Users, Globe } from "lucide-react";
+import { Menu, X, Sparkles, FileText, Settings, Palette, LayoutGrid, Copy, Users, Globe, User } from "lucide-react";
 import { useTheme } from "next-themes";
 import { usePortfolio } from "@/context/PortfolioContext";
 import {
@@ -133,24 +133,53 @@ const SettingsButton = ({ activeTheme, activeFocus, handleThemeChange, handleFoc
 
           {/* Custom Domain Settings */}
           {isEditMode && (
-            <div className="space-y-3 border-t border-border/50 pt-5">
-              <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
-                <Globe className="w-3.5 h-3.5 text-primary" />
-                Custom Domain
-              </h4>
-              <div className="space-y-2">
-                <Input
-                  type="text"
-                  placeholder="e.g. myportfolio.com"
-                  value={profile?.customDomain || ""}
-                  onChange={(e) => updateProfile("customDomain", e.target.value.trim().toLowerCase())}
-                  className="bg-card/40 border-border/50 focus:border-primary text-sm h-10"
-                />
-                <p className="text-[10px] text-muted-foreground leading-normal">
-                  Point your domain's CNAME record to <strong>cname.vercel-dns.com</strong> (or A record to <strong>76.76.21.21</strong>), add it to Vercel, and save here to link your portfolio.
-                </p>
+            <>
+              <div className="space-y-3 border-t border-border/50 pt-5">
+                <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
+                  <Globe className="w-3.5 h-3.5 text-primary" />
+                  Custom Domain
+                </h4>
+                <div className="space-y-2">
+                  <Input
+                    type="text"
+                    placeholder="e.g. myportfolio.com"
+                    value={profile?.customDomain || ""}
+                    onChange={(e) => updateProfile("customDomain", e.target.value.trim().toLowerCase())}
+                    className="bg-card/40 border-border/50 focus:border-primary text-sm h-10"
+                  />
+                  <p className="text-[10px] text-muted-foreground leading-normal">
+                    Point your domain's CNAME record to <strong>cname.vercel-dns.com</strong> (or A record to <strong>76.76.21.21</strong>), add it to Vercel, and save here to link your portfolio.
+                  </p>
+                </div>
               </div>
-            </div>
+
+              <div className="space-y-3 border-t border-border/50 pt-5">
+                <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
+                  <LayoutGrid className="w-3.5 h-3.5 text-primary" />
+                  Active Sections
+                </h4>
+                <div className="space-y-3 bg-card/20 p-3 rounded-lg border border-border/50">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-medium text-foreground">Publications & Research</span>
+                    <input
+                      type="checkbox"
+                      checked={!profile?.hideResearch}
+                      onChange={(e) => updateProfile("hideResearch", !e.target.checked)}
+                      className="w-4 h-4 text-primary bg-background border-border rounded focus:ring-primary cursor-pointer"
+                    />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-medium text-foreground">GitHub & Kaggle Stats</span>
+                    <input
+                      type="checkbox"
+                      checked={!profile?.hideGitHubStats}
+                      onChange={(e) => updateProfile("hideGitHubStats", !e.target.checked)}
+                      className="w-4 h-4 text-primary bg-background border-border rounded focus:ring-primary cursor-pointer"
+                    />
+                  </div>
+                </div>
+              </div>
+            </>
           )}
         </div>
       </DialogContent>
@@ -160,6 +189,7 @@ const SettingsButton = ({ activeTheme, activeFocus, handleThemeChange, handleFoc
 
 const Navigation = () => {
   const { theme: nextTheme, setTheme: setNextTheme } = useTheme();
+  const { username: loggedInUser } = usePortfolio();
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("");
@@ -334,7 +364,13 @@ const Navigation = () => {
               handleFocusChange={handleFocusChange}
             />
             
-            {isUserPortfolio ? (
+            {loggedInUser ? (
+              <Link to={`/u/${loggedInUser}`}>
+                <Button className="bg-gradient-to-r from-primary to-accent text-primary-foreground hover:opacity-90 shadow-lg hover:scale-105 transition-all gap-1.5">
+                  <User className="w-3.5 h-3.5" /> My Portfolio
+                </Button>
+              </Link>
+            ) : isUserPortfolio ? (
               <Link to={`/forge?clone=${portfolioUsername}`}>
                 <Button className="bg-gradient-to-r from-primary to-accent text-primary-foreground hover:opacity-90 shadow-lg hover:scale-105 transition-all gap-1.5">
                   <Copy className="w-3.5 h-3.5" /> Clone This Site
@@ -343,7 +379,7 @@ const Navigation = () => {
             ) : !isPlayground && !isResume && !isAdmin && (
               <Link to="/forge">
                 <Button className="bg-gradient-accent text-accent-foreground hover:opacity-90 shadow-lg shadow-accent/20 hover:shadow-accent/30 transition-all hover:scale-105 gap-1.5">
-                  <Sparkles className="w-3.5 h-3.5" /> Forge Yours
+                  <Sparkles className="w-3.5 h-3.5" /> Forge / Log In
                 </Button>
               </Link>
             )}
@@ -409,7 +445,13 @@ const Navigation = () => {
                 </button>
               </Link>
               
-              {isUserPortfolio ? (
+              {loggedInUser ? (
+                <Link to={`/u/${loggedInUser}`} onClick={() => setMobileMenuOpen(false)}>
+                  <Button className="w-full bg-gradient-to-r from-primary to-accent text-primary-foreground hover:opacity-90 gap-2">
+                    <User className="w-4 h-4" /> My Portfolio
+                  </Button>
+                </Link>
+              ) : isUserPortfolio ? (
                 <Link to={`/forge?clone=${portfolioUsername}`} onClick={() => setMobileMenuOpen(false)}>
                   <Button className="w-full bg-gradient-to-r from-primary to-accent text-primary-foreground hover:opacity-90 gap-2">
                     <Copy className="w-4 h-4" /> Clone This Site
@@ -418,7 +460,7 @@ const Navigation = () => {
               ) : !isPlayground && !isResume && !isAdmin && (
                 <Link to="/forge" onClick={() => setMobileMenuOpen(false)}>
                   <Button className="w-full bg-gradient-accent text-accent-foreground hover:opacity-90 shadow-lg gap-2">
-                    <Sparkles className="w-4 h-4" /> Forge Yours
+                    <Sparkles className="w-4 h-4" /> Forge / Log In
                   </Button>
                 </Link>
               )}
