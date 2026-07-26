@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import Navigation from "@/components/Navigation";
 import Hero from "@/components/Hero";
 import About from "@/components/About";
@@ -57,7 +58,23 @@ const EditHeader = () => {
 
 const Index = () => {
   const { isEditMode, profile } = usePortfolio();
-  const activeLayout = profile?.layoutTemplate || "standard";
+  const [activeLayout, setActiveLayout] = useState(() => {
+    return localStorage.getItem("portfolio_layout") || profile?.layoutTemplate || "standard";
+  });
+
+  useEffect(() => {
+    if (isEditMode && profile?.layoutTemplate) {
+      setActiveLayout(profile.layoutTemplate);
+    }
+  }, [profile?.layoutTemplate, isEditMode]);
+
+  useEffect(() => {
+    const syncLayout = () => {
+      setActiveLayout(localStorage.getItem("portfolio_layout") || profile?.layoutTemplate || "standard");
+    };
+    window.addEventListener("portfolio-layout-change", syncLayout);
+    return () => window.removeEventListener("portfolio-layout-change", syncLayout);
+  }, [profile?.layoutTemplate]);
 
   const renderLayoutContent = () => {
     switch (activeLayout) {

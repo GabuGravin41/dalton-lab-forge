@@ -85,25 +85,36 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       const savedDraftProjects = localStorage.getItem(`draft_projects_${user}`);
       const savedDraftPapers = localStorage.getItem(`draft_papers_${user}`);
 
+      let activeProfile;
       if (user === username) {
         setIsEditMode(true);
         if (savedDraftProfile) {
-          setProfile(JSON.parse(savedDraftProfile));
+          activeProfile = JSON.parse(savedDraftProfile);
+          setProfile(activeProfile);
           setProjects(JSON.parse(savedDraftProjects || "[]"));
           setPapers(JSON.parse(savedDraftPapers || "[]"));
           setHasUnsavedChanges(true);
         } else {
-          setProfile(data.profile);
+          activeProfile = data.profile;
+          setProfile(activeProfile);
           setProjects(data.projects);
           setPapers(data.papers);
           setHasUnsavedChanges(false);
         }
       } else {
-        setProfile(data.profile);
+        activeProfile = data.profile;
+        setProfile(activeProfile);
         setProjects(data.projects);
         setPapers(data.papers);
         setIsEditMode(false);
         setHasUnsavedChanges(false);
+      }
+
+      if (activeProfile) {
+        localStorage.setItem("portfolio_theme", activeProfile.theme || "indigo");
+        localStorage.setItem("portfolio_layout", activeProfile.layoutTemplate || "standard");
+        window.dispatchEvent(new CustomEvent("portfolio-theme-change"));
+        window.dispatchEvent(new CustomEvent("portfolio-layout-change"));
       }
     } catch (err: any) {
       console.error(err);
@@ -154,25 +165,36 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       const savedDraftProjects = localStorage.getItem(`draft_projects_${user}`);
       const savedDraftPapers = localStorage.getItem(`draft_papers_${user}`);
 
+      let activeProfile;
       if (user === username) {
         setIsEditMode(true);
         if (savedDraftProfile) {
-          setProfile(JSON.parse(savedDraftProfile));
+          activeProfile = JSON.parse(savedDraftProfile);
+          setProfile(activeProfile);
           setProjects(JSON.parse(savedDraftProjects || "[]"));
           setPapers(JSON.parse(savedDraftPapers || "[]"));
           setHasUnsavedChanges(true);
         } else {
-          setProfile(data.profile);
+          activeProfile = data.profile;
+          setProfile(activeProfile);
           setProjects(data.projects);
           setPapers(data.papers);
           setHasUnsavedChanges(false);
         }
       } else {
-        setProfile(data.profile);
+        activeProfile = data.profile;
+        setProfile(activeProfile);
         setProjects(data.projects);
         setPapers(data.papers);
         setIsEditMode(false);
         setHasUnsavedChanges(false);
+      }
+
+      if (activeProfile) {
+        localStorage.setItem("portfolio_theme", activeProfile.theme || "indigo");
+        localStorage.setItem("portfolio_layout", activeProfile.layoutTemplate || "standard");
+        window.dispatchEvent(new CustomEvent("portfolio-theme-change"));
+        window.dispatchEvent(new CustomEvent("portfolio-layout-change"));
       }
     } catch (err: any) {
       console.error(err);

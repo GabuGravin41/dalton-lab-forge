@@ -15,11 +15,20 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 
-const SettingsButton = ({ activeTheme, activeFocus, handleThemeChange, handleFocusChange }: {
+const SettingsButton = ({ 
+  activeTheme, 
+  activeFocus, 
+  activeLayout,
+  handleThemeChange, 
+  handleFocusChange, 
+  handleLayoutChange 
+}: {
   activeTheme: string;
   activeFocus: string;
+  activeLayout: string;
   handleThemeChange: (t: string) => void;
   handleFocusChange: (f: "engineering" | "research") => void;
+  handleLayoutChange: (l: string) => void;
 }) => {
   const { isEditMode, profile, updateProfile } = usePortfolio();
   const themes = [
@@ -103,9 +112,9 @@ const SettingsButton = ({ activeTheme, activeFocus, handleThemeChange, handleFoc
                 <button
                   key={layout.id}
                   type="button"
-                  onClick={() => updateProfile("layoutTemplate", layout.id)}
+                  onClick={() => handleLayoutChange(layout.id)}
                   className={`flex items-center justify-between p-3 rounded-lg border text-left transition-all ${
-                    (profile?.layoutTemplate || "standard") === layout.id
+                    activeLayout === layout.id
                       ? "bg-primary/10 border-primary shadow-sm shadow-primary/5"
                       : "bg-card/40 border-border/50 hover:bg-card/70 hover:border-border"
                   }`}
@@ -114,7 +123,7 @@ const SettingsButton = ({ activeTheme, activeFocus, handleThemeChange, handleFoc
                     <div className="text-sm font-semibold">{layout.name}</div>
                     <div className="text-[10px] text-muted-foreground">{layout.desc}</div>
                   </div>
-                  {(profile?.layoutTemplate || "standard") === layout.id && (
+                  {activeLayout === layout.id && (
                     <div className="w-2 h-2 rounded-full bg-primary" />
                   )}
                 </button>
@@ -303,12 +312,13 @@ const SettingsButton = ({ activeTheme, activeFocus, handleThemeChange, handleFoc
 
 const Navigation = () => {
   const { theme: nextTheme, setTheme: setNextTheme } = useTheme();
-  const { username: loggedInUser, profile } = usePortfolio();
+  const { username: loggedInUser, profile, isEditMode, updateProfile } = usePortfolio();
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("");
   const [activeTheme, setActiveTheme] = useState(() => localStorage.getItem("portfolio_theme") || "indigo");
   const [activeFocus, setActiveFocus] = useState(() => localStorage.getItem("portfolio_resume_focus") || "engineering");
+  const [activeLayout, setActiveLayout] = useState(() => localStorage.getItem("portfolio_layout") || "standard");
   const location = useLocation();
   const isPlayground = location.pathname === '/playground';
   const isResume = location.pathname === '/resume';
@@ -337,17 +347,20 @@ const Navigation = () => {
     const syncSettings = () => {
       setActiveTheme(localStorage.getItem("portfolio_theme") || "indigo");
       setActiveFocus(localStorage.getItem("portfolio_resume_focus") || "engineering");
+      setActiveLayout(localStorage.getItem("portfolio_layout") || "standard");
     };
 
     window.addEventListener("scroll", handleScroll);
     window.addEventListener("portfolio-theme-change", syncSettings);
     window.addEventListener("portfolio-focus-change", syncSettings);
+    window.addEventListener("portfolio-layout-change", syncSettings);
     window.addEventListener("storage", syncSettings);
 
     return () => {
       window.removeEventListener("scroll", handleScroll);
       window.removeEventListener("portfolio-theme-change", syncSettings);
       window.removeEventListener("portfolio-focus-change", syncSettings);
+      window.removeEventListener("portfolio-layout-change", syncSettings);
       window.removeEventListener("storage", syncSettings);
     };
   }, []);
@@ -361,6 +374,10 @@ const Navigation = () => {
       setNextTheme("dark");
     }
     
+    if (isEditMode) {
+      updateProfile("theme", theme);
+    }
+    
     const savedProfile = localStorage.getItem("portfolio_profile");
     if (savedProfile) {
       try {
@@ -371,6 +388,17 @@ const Navigation = () => {
     }
     
     window.dispatchEvent(new CustomEvent("portfolio-theme-change"));
+  };
+
+  const handleLayoutChange = (layout: string) => {
+    setActiveLayout(layout);
+    localStorage.setItem("portfolio_layout", layout);
+    
+    if (isEditMode) {
+      updateProfile("layoutTemplate", layout);
+    }
+    
+    window.dispatchEvent(new CustomEvent("portfolio-layout-change"));
   };
 
   const handleFocusChange = (focus: "engineering" | "research") => {
@@ -474,8 +502,10 @@ const Navigation = () => {
             <SettingsButton
               activeTheme={activeTheme}
               activeFocus={activeFocus}
+              activeLayout={activeLayout}
               handleThemeChange={handleThemeChange}
               handleFocusChange={handleFocusChange}
+              handleLayoutChange={handleLayoutChange}
             />
             
             {loggedInUser ? (
@@ -505,8 +535,10 @@ const Navigation = () => {
             <SettingsButton
               activeTheme={activeTheme}
               activeFocus={activeFocus}
+              activeLayout={activeLayout}
               handleThemeChange={handleThemeChange}
               handleFocusChange={handleFocusChange}
+              handleLayoutChange={handleLayoutChange}
             />
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
