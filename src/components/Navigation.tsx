@@ -88,6 +88,40 @@ const SettingsButton = ({ activeTheme, activeFocus, handleThemeChange, handleFoc
             </div>
           </div>
 
+          {/* Layout Template selection */}
+          <div className="space-y-3 border-t border-border/50 pt-5">
+            <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
+              <LayoutGrid className="w-3.5 h-3.5 text-primary" />
+              Structural Layout Template
+            </h4>
+            <div className="grid gap-2.5">
+              {[
+                { id: "standard", name: "Standard Dalton", desc: "Interactive tech-nerd layout with full graphics & visualizers" },
+                { id: "minimalist", name: "Minimalist Reader", desc: "Clean typography-focused academic design with sidebar" },
+                { id: "creative", name: "Asymmetrical Creative", desc: "Modern flamboyant layout with bold typography & glowing hover-states" }
+              ].map((layout) => (
+                <button
+                  key={layout.id}
+                  type="button"
+                  onClick={() => updateProfile("layoutTemplate", layout.id)}
+                  className={`flex items-center justify-between p-3 rounded-lg border text-left transition-all ${
+                    (profile?.layoutTemplate || "standard") === layout.id
+                      ? "bg-primary/10 border-primary shadow-sm shadow-primary/5"
+                      : "bg-card/40 border-border/50 hover:bg-card/70 hover:border-border"
+                  }`}
+                >
+                  <div>
+                    <div className="text-sm font-semibold">{layout.name}</div>
+                    <div className="text-[10px] text-muted-foreground">{layout.desc}</div>
+                  </div>
+                  {(profile?.layoutTemplate || "standard") === layout.id && (
+                    <div className="w-2 h-2 rounded-full bg-primary" />
+                  )}
+                </button>
+              ))}
+            </div>
+          </div>
+
           {/* Resume Focus selection */}
           <div className="space-y-3 border-t border-border/50 pt-5">
             <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">

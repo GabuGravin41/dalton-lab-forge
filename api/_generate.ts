@@ -80,6 +80,7 @@ Schema requirements:
 1. "profile":
    - "name": User's full name.
    - "theme": "indigo" (default).
+   - "layoutTemplate": "standard" | "minimalist" | "creative" (default: "standard"). Choose the template style that best matches the user's personality or style preference.
    - "engineeringObjective": A 1-2 sentence professional objective focused on engineering, software, systems, or hands-on technology building.
    - "researchStatement": A 1-2 sentence statement focused on research, academic study, science, math, or theoretical work.
    - "roles": String array of 3-4 professional titles (e.g. ["ML Engineer", "Full Stack Developer"]).

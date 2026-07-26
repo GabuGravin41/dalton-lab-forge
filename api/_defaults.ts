@@ -1,6 +1,7 @@
 export const profileData = {
   "name": "Dalton Omondi Opondo",
   "theme": "indigo",
+  "layoutTemplate": "standard",
   "engineeringObjective": "Electrical and Electronics Engineering student at Kenyatta University building automated competition systems, embedded hardware networks, and scalable educational technology.",
   "researchStatement": "Investigating neural network optimization, structured sparsity, and hardware-software co-design for deep learning applications. Passionate about machine learning reasoning benchmarks and neuromorphic computing.",
   "roles": [

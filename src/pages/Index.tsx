@@ -8,6 +8,8 @@ import Footer from "@/components/Footer";
 import FloatingChatbot from "@/components/FloatingChatbot";
 import { usePortfolio } from "@/context/PortfolioContext";
 import { Button } from "@/components/ui/button";
+import { MinimalistLayout } from "@/components/MinimalistLayout";
+import { CreativeLayout } from "@/components/CreativeLayout";
 
 const EditHeader = () => {
   const { publishChanges, logout, username, loading, hasUnsavedChanges } = usePortfolio();
@@ -55,17 +57,34 @@ const EditHeader = () => {
 
 const Index = () => {
   const { isEditMode, profile } = usePortfolio();
+  const activeLayout = profile?.layoutTemplate || "standard";
+
+  const renderLayoutContent = () => {
+    switch (activeLayout) {
+      case "minimalist":
+        return <MinimalistLayout />;
+      case "creative":
+        return <CreativeLayout />;
+      case "standard":
+      default:
+        return (
+          <>
+            <Hero />
+            <About />
+            <Projects />
+            {!profile?.hideResearch && <Research />}
+            <Contact />
+          </>
+        );
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background text-foreground">
       {isEditMode && <EditHeader />}
       <Navigation />
       <main>
-        <Hero />
-        <About />
-        <Projects />
-        {!profile?.hideResearch && <Research />}
-        <Contact />
+        {renderLayoutContent()}
       </main>
       <Footer />
       <FloatingChatbot />

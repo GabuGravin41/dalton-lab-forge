@@ -1038,6 +1038,18 @@ const Admin = () => {
                       </select>
                     </div>
                     <div className="space-y-1.5">
+                      <label className="text-xs font-semibold text-muted-foreground uppercase">Structural Layout Template</label>
+                      <select
+                        className="w-full bg-background border border-input rounded-md px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                        value={profile.layoutTemplate || "standard"}
+                        onChange={(e) => handleProfileUpdate("layoutTemplate", e.target.value)}
+                      >
+                        <option value="standard">Standard Dalton (Interactive Tech-Nerd)</option>
+                        <option value="minimalist">Minimalist Reader (Clean Typography/Academic)</option>
+                        <option value="creative">Asymmetrical Creative (Modern Flamboyant)</option>
+                      </select>
+                    </div>
+                    <div className="space-y-1.5">
                       <label className="text-xs font-semibold text-muted-foreground uppercase">Engineering Focus Resume Objective</label>
                       <Textarea
                         value={profile.engineeringObjective || ""}
