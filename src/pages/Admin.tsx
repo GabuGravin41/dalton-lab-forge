@@ -1034,6 +1034,7 @@ const Admin = () => {
                         <option value="rose">Cyber-Rose (Crimson & Gold)</option>
                         <option value="cyberpunk">Neon Cyberpunk (Magenta & Cyan)</option>
                         <option value="steel">Minimal Steel (Slate & Silver)</option>
+                        <option value="teal-gold">Teal Gold (Teal & Amber Gold)</option>
                       </select>
                     </div>
                     <div className="space-y-1.5">

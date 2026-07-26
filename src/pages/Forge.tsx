@@ -21,6 +21,7 @@ const themeClasses: Record<string, { primary: string; text: string; bgGlow: stri
   rose:     { primary: "text-rose-500", text: "text-rose-400", bgGlow: "bg-rose-500/10", border: "border-rose-500/30", badge: "bg-rose-500/10 text-rose-400" },
   cyberpunk:{ primary: "text-fuchsia-500", text: "text-fuchsia-400", bgGlow: "bg-fuchsia-500/10", border: "border-fuchsia-500/30", badge: "bg-fuchsia-500/10 text-fuchsia-400" },
   steel:    { primary: "text-slate-400", text: "text-slate-400", bgGlow: "bg-slate-500/10", border: "border-slate-500/30", badge: "bg-slate-500/10 text-slate-400" },
+  "teal-gold": { primary: "text-teal-500", text: "text-teal-400", bgGlow: "bg-teal-500/10", border: "border-teal-500/30", badge: "bg-teal-500/10 text-teal-400" },
 };
 
 const Forge = () => {
@@ -54,6 +55,7 @@ const Forge = () => {
     { id: "rose", name: "Cyber-Rose", color: "bg-rose-600" },
     { id: "cyberpunk", name: "Neon Cyberpunk", color: "bg-fuchsia-600" },
     { id: "steel", name: "Minimal Steel", color: "bg-slate-500" },
+    { id: "teal-gold", name: "Teal Gold", color: "bg-teal-600" },
   ];
 
   // ─── Auto-detect ?clone=username on mount ────────────────────────────────

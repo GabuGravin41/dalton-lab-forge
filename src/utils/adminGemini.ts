@@ -22,7 +22,7 @@ Your task is to analyze the current portfolio data and the user's natural langua
 You must determine which parts of the portfolio data need to be added, modified, or deleted, and return the updated structures.
 
 Each project and paper object must include a "priority" field (integer 1 to 5, where 5 is the highest priority).
-The profile object must include "theme" (one of: 'indigo', 'emerald', 'rose', 'cyberpunk', 'steel'), "engineeringObjective", and "researchStatement".
+The profile object must include "theme" (one of: 'indigo', 'emerald', 'rose', 'cyberpunk', 'steel', 'teal-gold'), "engineeringObjective", and "researchStatement".
 
 Return the updated configurations in a valid JSON object matching this schema:
 {

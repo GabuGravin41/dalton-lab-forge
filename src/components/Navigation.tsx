@@ -28,6 +28,7 @@ const SettingsButton = ({ activeTheme, activeFocus, handleThemeChange, handleFoc
     { id: "rose", name: "Cyber-Rose", color: "bg-rose-600", desc: "Dark Crimson & Gold accents" },
     { id: "cyberpunk", name: "Neon Cyberpunk", color: "bg-fuchsia-600", desc: "Pitch Black & electric Magenta/Cyan" },
     { id: "steel", name: "Minimal Steel", color: "bg-slate-500", desc: "Slate background & Steel/Silver accents" },
+    { id: "teal-gold", name: "Teal Gold", color: "bg-teal-600", desc: "Vintage deep Teal & Amber Gold accents" },
   ];
 
   return (

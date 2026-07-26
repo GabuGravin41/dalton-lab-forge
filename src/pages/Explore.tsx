@@ -21,6 +21,7 @@ const themeAccents: Record<string, { dot: string; glow: string; badge: string }>
   rose:     { dot: "bg-rose-500",    glow: "shadow-rose-500/20",    badge: "bg-rose-500/10 text-rose-400 border-rose-500/20" },
   cyberpunk:{ dot: "bg-fuchsia-500", glow: "shadow-fuchsia-500/20", badge: "bg-fuchsia-500/10 text-fuchsia-400 border-fuchsia-500/20" },
   steel:    { dot: "bg-slate-400",   glow: "shadow-slate-400/20",   badge: "bg-slate-500/10 text-slate-400 border-slate-500/20" },
+  "teal-gold": { dot: "bg-teal-500", glow: "shadow-teal-500/20", badge: "bg-teal-500/10 text-teal-400 border-teal-500/20" },
 };
 
 const Explore = () => {

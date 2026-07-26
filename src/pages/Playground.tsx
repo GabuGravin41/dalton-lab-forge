@@ -419,6 +419,7 @@ Text to analyze: "${textInput}"
             { id: "rose", color: "bg-rose-600", label: "Rose" },
             { id: "cyberpunk", color: "bg-fuchsia-600", label: "Cyberpunk" },
             { id: "steel", color: "bg-slate-500", label: "Steel" },
+            { id: "teal-gold", color: "bg-teal-600", label: "Teal Gold" },
           ].map((t) => (
             <button
               key={t.id}
