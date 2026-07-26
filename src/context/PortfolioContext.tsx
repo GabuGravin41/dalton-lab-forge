@@ -56,12 +56,29 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`/api/portfolio?username=${user}`);
+      const activeToken = token || localStorage.getItem("portfolio_token");
+      const headers: HeadersInit = {};
+      if (activeToken) {
+        headers["Authorization"] = `Bearer ${activeToken}`;
+      }
+      const res = await fetch(`/api/portfolio?username=${user}`, { headers });
       if (!res.ok) {
         throw new Error(res.status === 404 ? "Portfolio not found" : "Failed to load portfolio");
       }
       
       const data = await res.json();
+      
+      // Sync loaded aiSettings to localStorage
+      if (user === username || user === data.username) {
+        const loadedProfile = data.profile;
+        if (loadedProfile?.aiSettings) {
+          const { provider, openrouterKey, openrouterModel, geminiKey } = loadedProfile.aiSettings;
+          if (provider) localStorage.setItem("admin_ai_provider", provider);
+          if (openrouterKey) localStorage.setItem("admin_openrouter_key", openrouterKey);
+          if (openrouterModel) localStorage.setItem("admin_openrouter_model", openrouterModel);
+          if (geminiKey) localStorage.setItem("admin_gemini_key", geminiKey);
+        }
+      }
       
       // Check if user is logged in as this person, load their local drafts if present
       const savedDraftProfile = localStorage.getItem(`draft_profile_${user}`);
@@ -107,7 +124,12 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     setError(null);
     try {
       const cleanDomain = dom.trim().toLowerCase().replace(/^www\./, '');
-      const res = await fetch(`/api/portfolio?domain=${cleanDomain}`);
+      const activeToken = token || localStorage.getItem("portfolio_token");
+      const headers: HeadersInit = {};
+      if (activeToken) {
+        headers["Authorization"] = `Bearer ${activeToken}`;
+      }
+      const res = await fetch(`/api/portfolio?domain=${cleanDomain}`, { headers });
       if (!res.ok) {
         throw new Error(res.status === 404 ? "Portfolio not found" : "Failed to load portfolio");
       }
@@ -115,6 +137,18 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       const data = await res.json();
       const user = data.username;
       
+      // Sync loaded aiSettings to localStorage
+      if (user === username || user === data.username) {
+        const loadedProfile = data.profile;
+        if (loadedProfile?.aiSettings) {
+          const { provider, openrouterKey, openrouterModel, geminiKey } = loadedProfile.aiSettings;
+          if (provider) localStorage.setItem("admin_ai_provider", provider);
+          if (openrouterKey) localStorage.setItem("admin_openrouter_key", openrouterKey);
+          if (openrouterModel) localStorage.setItem("admin_openrouter_model", openrouterModel);
+          if (geminiKey) localStorage.setItem("admin_gemini_key", geminiKey);
+        }
+      }
+
       // Check if user is logged in as this person, load their local drafts if present
       const savedDraftProfile = localStorage.getItem(`draft_profile_${user}`);
       const savedDraftProjects = localStorage.getItem(`draft_projects_${user}`);

@@ -168,7 +168,33 @@ export const generateAIResponse = async (
   systemPrompt = "",
   jsonMode = false
 ): Promise<string> => {
-  // 1. Try serverless backend proxy (/api/chat)
+  // 1. Try User-configured custom key in localStorage (First priority)
+  const activeConfig = getActiveAIConfig();
+  if (activeConfig.apiKey) {
+    try {
+      if (activeConfig.provider === "gemini") {
+        return await callGeminiDirect(activeConfig.apiKey, activeConfig.model, systemPrompt, userPrompt, jsonMode);
+      } else {
+        return await callOpenRouter(activeConfig.apiKey, activeConfig.model, systemPrompt, userPrompt, jsonMode);
+      }
+    } catch (err: any) {
+      console.warn("[AI Client] User custom key failed:", err);
+      // Propagate critical errors (auth, quota, payment) so users are informed about key configuration issues
+      const errMsg = err.message || "";
+      if (
+        errMsg.includes("API key") || 
+        errMsg.includes("credits") || 
+        errMsg.includes("quota") || 
+        errMsg.includes("rate limit") || 
+        errMsg.includes("Unauthorized") || 
+        errMsg.includes("Payment Required")
+      ) {
+        throw err;
+      }
+    }
+  }
+
+  // 2. Try serverless backend proxy (/api/chat)
   try {
     const response = await fetch("/api/chat", {
       method: "POST",
@@ -181,21 +207,7 @@ export const generateAIResponse = async (
       if (data.text) return data.text;
     }
   } catch (err) {
-    // Silent fail over to client-side
-  }
-
-  // 2. Try User-configured custom key in localStorage
-  const activeConfig = getActiveAIConfig();
-  if (activeConfig.apiKey) {
-    try {
-      if (activeConfig.provider === "gemini") {
-        return await callGeminiDirect(activeConfig.apiKey, activeConfig.model, systemPrompt, userPrompt, jsonMode);
-      } else {
-        return await callOpenRouter(activeConfig.apiKey, activeConfig.model, systemPrompt, userPrompt, jsonMode);
-      }
-    } catch (err: any) {
-      console.warn("[AI Client] User custom key failed, falling back to backup chain:", err);
-    }
+    // Silent fail over to backup chain
   }
 
   // 3. Try Owner fallback chain

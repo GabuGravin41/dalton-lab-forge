@@ -179,6 +179,85 @@ const SettingsButton = ({ activeTheme, activeFocus, handleThemeChange, handleFoc
                   </div>
                 </div>
               </div>
+
+              <div className="space-y-3 border-t border-border/50 pt-5">
+                <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
+                  <Sparkles className="w-3.5 h-3.5 text-primary" />
+                  Custom AI Provider Settings
+                </h4>
+                <div className="space-y-3 bg-card/20 p-3 rounded-lg border border-border/50">
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-bold text-muted-foreground uppercase">AI Provider</label>
+                    <select
+                      value={profile?.aiSettings?.provider || "openrouter"}
+                      onChange={(e) => {
+                        const provider = e.target.value as "gemini" | "openrouter";
+                        const currentSettings = profile?.aiSettings || {};
+                        updateProfile("aiSettings", { ...currentSettings, provider });
+                        localStorage.setItem("admin_ai_provider", provider);
+                      }}
+                      className="w-full text-xs bg-background/50 border border-border/50 rounded-md p-1.5 text-foreground focus:border-primary outline-none"
+                    >
+                      <option value="openrouter" className="bg-background">OpenRouter (Any model)</option>
+                      <option value="gemini" className="bg-background">Gemini API (Google)</option>
+                    </select>
+                  </div>
+
+                  {(profile?.aiSettings?.provider || "openrouter") === "openrouter" ? (
+                    <>
+                      <div className="space-y-1">
+                        <label className="text-[10px] font-bold text-muted-foreground uppercase">OpenRouter API Key</label>
+                        <Input
+                          type="password"
+                          placeholder={profile?.aiSettings?.openrouterKey === "configured" ? "••••••••••••" : "sk-or-v1-..."}
+                          value={profile?.aiSettings?.openrouterKey === "configured" ? "" : (profile?.aiSettings?.openrouterKey || "")}
+                          onChange={(e) => {
+                            const openrouterKey = e.target.value;
+                            const currentSettings = profile?.aiSettings || {};
+                            updateProfile("aiSettings", { ...currentSettings, openrouterKey });
+                            localStorage.setItem("admin_openrouter_key", openrouterKey);
+                          }}
+                          className="bg-background/40 border-border/50 text-xs h-8"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[10px] font-bold text-muted-foreground uppercase">OpenRouter Model</label>
+                        <Input
+                          type="text"
+                          placeholder="e.g. google/gemini-2.5-flash"
+                          value={profile?.aiSettings?.openrouterModel || "google/gemini-2.5-flash"}
+                          onChange={(e) => {
+                            const openrouterModel = e.target.value;
+                            const currentSettings = profile?.aiSettings || {};
+                            updateProfile("aiSettings", { ...currentSettings, openrouterModel });
+                            localStorage.setItem("admin_openrouter_model", openrouterModel);
+                          }}
+                          className="bg-background/40 border-border/50 text-xs h-8"
+                        />
+                      </div>
+                    </>
+                  ) : (
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-bold text-muted-foreground uppercase">Gemini API Key</label>
+                      <Input
+                        type="password"
+                        placeholder={profile?.aiSettings?.geminiKey === "configured" ? "••••••••••••" : "AIzaSy..."}
+                        value={profile?.aiSettings?.geminiKey === "configured" ? "" : (profile?.aiSettings?.geminiKey || "")}
+                        onChange={(e) => {
+                          const geminiKey = e.target.value;
+                          const currentSettings = profile?.aiSettings || {};
+                          updateProfile("aiSettings", { ...currentSettings, geminiKey });
+                          localStorage.setItem("admin_gemini_key", geminiKey);
+                        }}
+                        className="bg-background/40 border-border/50 text-xs h-8"
+                      />
+                    </div>
+                  )}
+                  <p className="text-[9px] text-muted-foreground leading-normal mt-1">
+                    Enter your own API key to bypass shared rate limits. Keys are stored securely in your private database row.
+                  </p>
+                </div>
+              </div>
             </>
           )}
         </div>

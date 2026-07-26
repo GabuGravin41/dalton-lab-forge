@@ -1,5 +1,8 @@
 import { getDbPool } from './_db.js';
 import { profileData, projectsData, papersData } from './_defaults.js';
+import jwt from 'jsonwebtoken';
+
+const JWT_SECRET = process.env.JWT_SECRET;
 
 export default async function handler(req: any, res: any) {
   // Set CORS headers
@@ -61,12 +64,38 @@ export default async function handler(req: any, res: any) {
       [cleanUsername]
     ).catch(() => {/* ignore silently */});
 
+    // Validate if the request is from the owner of this portfolio
+    let isOwner = false;
+    const authHeader = req.headers['authorization'];
+    if (authHeader?.startsWith('Bearer ') && JWT_SECRET) {
+      try {
+        const token = authHeader.slice(7);
+        const decoded = jwt.verify(token, JWT_SECRET) as any;
+        if (decoded && decoded.username === cleanUsername) {
+          isOwner = true;
+        }
+      } catch (e) {
+        // Ignored, treated as not owner
+      }
+    }
+
+    const profile = row.profile_data || {};
+    if (!isOwner && profile.aiSettings) {
+      // Strip sensitive API keys from public visitor response
+      profile.aiSettings = {
+        provider: profile.aiSettings.provider,
+        openrouterModel: profile.aiSettings.openrouterModel,
+        openrouterKey: profile.aiSettings.openrouterKey ? "configured" : "",
+        geminiKey: profile.aiSettings.geminiKey ? "configured" : ""
+      };
+    }
+
     // Cache publicly for 60s at the CDN edge, stale-while-revalidate for 30s more
     res.setHeader('Cache-Control', 's-maxage=60, stale-while-revalidate=30');
 
     return res.status(200).json({
       username: cleanUsername,
-      profile: row.profile_data,
+      profile,
       projects: row.projects_data,
       papers: row.papers_data,
       views: (row.view_count || 0) + 1
