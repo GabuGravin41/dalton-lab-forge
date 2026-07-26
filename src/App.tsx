@@ -27,6 +27,15 @@ const PageLoader = () => (
 
 const queryClient = new QueryClient();
 
+const isCustomDomain = () => {
+  const hostname = window.location.hostname;
+  return !(
+    hostname === "localhost" ||
+    hostname === "127.0.0.1" ||
+    hostname.endsWith(".vercel.app")
+  );
+};
+
 const App = () => {
   useEffect(() => {
     const applyActiveTheme = () => {
@@ -94,7 +103,7 @@ const App = () => {
           <BrowserRouter>
             <Suspense fallback={<PageLoader />}>
               <Routes>
-                <Route path="/" element={<Index />} />
+                <Route path="/" element={isCustomDomain() ? <UserPortfolio useDomain={true} /> : <Index />} />
                 <Route path="/playground" element={<Playground />} />
                 <Route path="/admin" element={<Admin />} />
                 <Route path="/resume" element={<Resume />} />

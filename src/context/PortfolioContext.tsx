@@ -24,6 +24,7 @@ interface PortfolioContextType {
   publishChanges: () => Promise<boolean>;
   generatePortfolioFromAI: (text: string) => Promise<boolean>;
   loadUserPortfolio: (username: string) => Promise<void>;
+  loadUserPortfolioByDomain: (domain: string) => Promise<void>;
 }
 
 const PortfolioContext = createContext<PortfolioContextType | undefined>(undefined);
@@ -61,6 +62,50 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       }
       
       const data = await res.json();
+      
+      // Check if user is logged in as this person, load their local drafts if present
+      const savedDraftProfile = localStorage.getItem(`draft_profile_${user}`);
+      const savedDraftProjects = localStorage.getItem(`draft_projects_${user}`);
+      const savedDraftPapers = localStorage.getItem(`draft_papers_${user}`);
+
+      if (user === username && savedDraftProfile) {
+        setProfile(JSON.parse(savedDraftProfile));
+        setProjects(JSON.parse(savedDraftProjects || "[]"));
+        setPapers(JSON.parse(savedDraftPapers || "[]"));
+        setIsEditMode(true);
+        setHasUnsavedChanges(true);
+      } else {
+        setProfile(data.profile);
+        setProjects(data.projects);
+        setPapers(data.papers);
+        setHasUnsavedChanges(false);
+      }
+    } catch (err: any) {
+      console.error(err);
+      setError(err.message);
+      toast.error(err.message);
+      
+      // Reset to defaults on error
+      setProfile(profileDefault);
+      setProjects(projectsDefault);
+      setPapers(papersDefault);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadUserPortfolioByDomain = async (dom: string) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const cleanDomain = dom.trim().toLowerCase().replace(/^www\./, '');
+      const res = await fetch(`/api/portfolio?domain=${cleanDomain}`);
+      if (!res.ok) {
+        throw new Error(res.status === 404 ? "Portfolio not found" : "Failed to load portfolio");
+      }
+      
+      const data = await res.json();
+      const user = data.username;
       
       // Check if user is logged in as this person, load their local drafts if present
       const savedDraftProfile = localStorage.getItem(`draft_profile_${user}`);
@@ -290,6 +335,7 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         publishChanges,
         generatePortfolioFromAI,
         loadUserPortfolio,
+        loadUserPortfolioByDomain,
         fetchUserSnapshot
       }}
     >

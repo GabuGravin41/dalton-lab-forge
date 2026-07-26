@@ -16,12 +16,14 @@ function setMeta(attr: string, value: string, content: string) {
   return el;
 }
 
-export const UserPortfolio = () => {
+export const UserPortfolio = ({ useDomain = false }: { useDomain?: boolean }) => {
   const { username } = useParams<{ username: string }>();
-  const { loadUserPortfolio, profile, loading, error } = usePortfolio();
+  const { loadUserPortfolio, loadUserPortfolioByDomain, profile, loading, error } = usePortfolio();
 
   useEffect(() => {
-    if (username) {
+    if (useDomain) {
+      loadUserPortfolioByDomain(window.location.hostname);
+    } else if (username) {
       loadUserPortfolio(username);
     }
     // Cleanup: restore default meta on unmount
@@ -30,7 +32,7 @@ export const UserPortfolio = () => {
       const tags = document.querySelectorAll("meta[data-user-og]");
       tags.forEach(t => t.remove());
     };
-  }, [username]);
+  }, [username, useDomain]);
 
   // Inject user-specific OG tags once profile is loaded
   useEffect(() => {
@@ -40,7 +42,7 @@ export const UserPortfolio = () => {
     const bio = profile.bio || `${name}'s portfolio — powered by LabForge.`;
     const title = `${name} — ${role}`;
     const origin = window.location.origin;
-    const url = `${origin}/u/${username}`;
+    const url = username ? `${origin}/u/${username}` : `${origin}/`;
 
     document.title = title;
     const metas = [

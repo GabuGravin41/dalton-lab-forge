@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, Sparkles, FileText, Settings, Palette, LayoutGrid, Copy, Users } from "lucide-react";
+import { Menu, X, Sparkles, FileText, Settings, Palette, LayoutGrid, Copy, Users, Globe } from "lucide-react";
 import { useTheme } from "next-themes";
+import { usePortfolio } from "@/context/PortfolioContext";
 import {
   Dialog,
   DialogContent,
@@ -19,6 +21,7 @@ const SettingsButton = ({ activeTheme, activeFocus, handleThemeChange, handleFoc
   handleThemeChange: (t: string) => void;
   handleFocusChange: (f: "engineering" | "research") => void;
 }) => {
+  const { isEditMode, profile, updateProfile } = usePortfolio();
   const themes = [
     { id: "indigo", name: "Midnight Indigo", color: "bg-indigo-600", desc: "Deep Indigo & Amber accents" },
     { id: "emerald", name: "Emerald Aurora", color: "bg-emerald-600", desc: "Forest background & Cyan highlights" },
@@ -127,6 +130,28 @@ const SettingsButton = ({ activeTheme, activeFocus, handleThemeChange, handleFoc
               </button>
             </div>
           </div>
+
+          {/* Custom Domain Settings */}
+          {isEditMode && (
+            <div className="space-y-3 border-t border-border/50 pt-5">
+              <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
+                <Globe className="w-3.5 h-3.5 text-primary" />
+                Custom Domain
+              </h4>
+              <div className="space-y-2">
+                <Input
+                  type="text"
+                  placeholder="e.g. myportfolio.com"
+                  value={profile?.customDomain || ""}
+                  onChange={(e) => updateProfile("customDomain", e.target.value.trim().toLowerCase())}
+                  className="bg-card/40 border-border/50 focus:border-primary text-sm h-10"
+                />
+                <p className="text-[10px] text-muted-foreground leading-normal">
+                  Point your domain's CNAME record to <strong>cname.vercel-dns.com</strong> (or A record to <strong>76.76.21.21</strong>), add it to Vercel, and save here to link your portfolio.
+                </p>
+              </div>
+            </div>
+          )}
         </div>
       </DialogContent>
     </Dialog>

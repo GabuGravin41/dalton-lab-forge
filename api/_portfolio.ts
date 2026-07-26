@@ -15,10 +15,10 @@ export default async function handler(req: any, res: any) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { username } = req.query;
+  const { username, domain } = req.query;
 
-  // Fallback to Dalton's profile if no user is specified
-  if (!username || username === 'dalton') {
+  // Fallback to Dalton's profile if no user is specified and no domain is specified
+  if ((!username && !domain) || username === 'dalton') {
     return res.status(200).json({
       username: 'dalton',
       profile: profileData,
@@ -27,17 +27,30 @@ export default async function handler(req: any, res: any) {
     });
   }
 
-  const cleanUsername = username.trim().toLowerCase();
-
   try {
     const pool = getDbPool();
-    const result = await pool.query(
-      'SELECT profile_data, projects_data, papers_data, view_count FROM users_portfolios WHERE username = $1',
-      [cleanUsername]
-    );
+    let result;
+    let cleanUsername = '';
 
-    if (result.rows.length === 0) {
-      return res.status(404).json({ error: `Portfolio for user '${cleanUsername}' not found` });
+    if (domain) {
+      const cleanDomain = domain.trim().toLowerCase().replace(/^www\./, '');
+      result = await pool.query(
+        "SELECT username, profile_data, projects_data, papers_data, view_count FROM users_portfolios WHERE profile_data->>'customDomain' = $1 OR profile_data->>'customDomain' = $2",
+        [cleanDomain, `www.${cleanDomain}`]
+      );
+      if (result.rows.length === 0) {
+        return res.status(404).json({ error: `Portfolio for domain '${cleanDomain}' not found` });
+      }
+      cleanUsername = result.rows[0].username;
+    } else {
+      cleanUsername = username.trim().toLowerCase();
+      result = await pool.query(
+        'SELECT profile_data, projects_data, papers_data, view_count FROM users_portfolios WHERE username = $1',
+        [cleanUsername]
+      );
+      if (result.rows.length === 0) {
+        return res.status(404).json({ error: `Portfolio for user '${cleanUsername}' not found` });
+      }
     }
 
     const row = result.rows[0];

@@ -1,5 +1,6 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { FileText, ExternalLink, BookOpen, Award, TrendingUp, Eye, Star, Trash2, Plus } from "lucide-react";
 import { useState } from "react";
 import PaperModal from "./PaperModal";
