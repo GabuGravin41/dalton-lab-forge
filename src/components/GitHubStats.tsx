@@ -63,9 +63,9 @@ const GitHubStats = () => {
           public_repos: 14,
           followers: 28,
           following: 19,
-          name: "Dalton Omondi",
+          name: profile.name || "Dalton Omondi",
           avatar_url: `https://github.com/${username}.png`,
-          bio: "Machine Learning & Hardware Systems Engineer"
+          bio: profile.bio || "AI & Software Systems Engineer"
         });
         setRepos([
           {

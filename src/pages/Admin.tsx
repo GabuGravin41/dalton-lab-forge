@@ -97,6 +97,9 @@ const Admin = () => {
             if (profileRes.data) {
               setProfile(profileRes.data);
               setShas(prev => ({ ...prev, profile: profileRes.sha }));
+              if (profileRes.data.name) {
+                setPaperAuthors(profileRes.data.name);
+              }
             }
             if (projectsRes.data) {
               setProjects(projectsRes.data);
@@ -470,7 +473,7 @@ const Admin = () => {
             </div>
             <CardTitle className="text-2xl font-bold">Admin Control Center</CardTitle>
             <CardDescription>
-              Sign in with GitHub to access Dalton's portfolio dashboard
+              Sign in with GitHub to access your portfolio dashboard
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">

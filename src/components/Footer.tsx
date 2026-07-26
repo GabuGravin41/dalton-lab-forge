@@ -140,7 +140,7 @@ const Footer = () => {
           <div className="pt-6 md:pt-8 border-t border-border">
             <div className="flex flex-col md:flex-row items-center justify-between gap-3 md:gap-4">
               <div className="flex flex-col sm:flex-row items-center gap-1.5 sm:gap-2 text-xs md:text-sm text-muted-foreground text-center">
-                <span>© {currentYear} Dalton Omondi.</span>
+                <span>© {currentYear} {profile?.name || "Dalton Omondi"}.</span>
                 <span className="hidden sm:inline">•</span>
                 <span className="flex items-center gap-1">
                   Built with <Heart className="w-3 h-3 text-destructive fill-destructive animate-pulse" /> and <Code2 className="w-3 h-3 text-primary" />

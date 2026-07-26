@@ -28,7 +28,7 @@ export const UserPortfolio = ({ useDomain = false }: { useDomain?: boolean }) =>
     }
     // Cleanup: restore default meta on unmount
     return () => {
-      document.title = "Dalton Omondi - Machine Learning + Hardware Engineer";
+      document.title = "LabForge Portfolio";
       const tags = document.querySelectorAll("meta[data-user-og]");
       tags.forEach(t => t.remove());
     };

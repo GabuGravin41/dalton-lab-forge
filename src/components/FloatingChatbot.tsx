@@ -131,7 +131,7 @@ Assistant response:
       console.error("Chatbot error:", error);
       const botResponse: Message = {
         id: Date.now().toString(),
-        text: "I apologize, but I ran into an issue connecting to my brain. Please try again or feel free to check Dalton's sections directly! 🛠️",
+        text: "I apologize, but I ran into an issue connecting to my brain. Please try again or feel free to check the portfolio sections directly! 🛠️",
         sender: 'bot',
         timestamp: new Date()
       };

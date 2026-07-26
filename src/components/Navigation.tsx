@@ -303,7 +303,7 @@ const SettingsButton = ({ activeTheme, activeFocus, handleThemeChange, handleFoc
 
 const Navigation = () => {
   const { theme: nextTheme, setTheme: setNextTheme } = useTheme();
-  const { username: loggedInUser } = usePortfolio();
+  const { username: loggedInUser, profile } = usePortfolio();
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("");
@@ -410,7 +410,7 @@ const Navigation = () => {
               <div className="relative">
                 <div className="absolute inset-0 bg-gradient-to-r from-[hsl(245,58%,51%)] to-[hsl(260,60%,45%)] rounded-lg blur-md opacity-0 group-hover:opacity-50 transition-opacity" />
                 <span className="relative text-xl font-bold bg-gradient-to-r from-[hsl(245,58%,51%)] to-[hsl(260,60%,45%)] bg-clip-text text-transparent group-hover:scale-105 transition-transform inline-block">
-                  Dalton Omondi
+                  {profile?.name || "Dalton Omondi"}
                 </span>
               </div>
               {scrolled && (
