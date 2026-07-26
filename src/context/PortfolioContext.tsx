@@ -68,16 +68,24 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       const savedDraftProjects = localStorage.getItem(`draft_projects_${user}`);
       const savedDraftPapers = localStorage.getItem(`draft_papers_${user}`);
 
-      if (user === username && savedDraftProfile) {
-        setProfile(JSON.parse(savedDraftProfile));
-        setProjects(JSON.parse(savedDraftProjects || "[]"));
-        setPapers(JSON.parse(savedDraftPapers || "[]"));
+      if (user === username) {
         setIsEditMode(true);
-        setHasUnsavedChanges(true);
+        if (savedDraftProfile) {
+          setProfile(JSON.parse(savedDraftProfile));
+          setProjects(JSON.parse(savedDraftProjects || "[]"));
+          setPapers(JSON.parse(savedDraftPapers || "[]"));
+          setHasUnsavedChanges(true);
+        } else {
+          setProfile(data.profile);
+          setProjects(data.projects);
+          setPapers(data.papers);
+          setHasUnsavedChanges(false);
+        }
       } else {
         setProfile(data.profile);
         setProjects(data.projects);
         setPapers(data.papers);
+        setIsEditMode(false);
         setHasUnsavedChanges(false);
       }
     } catch (err: any) {
@@ -112,16 +120,24 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       const savedDraftProjects = localStorage.getItem(`draft_projects_${user}`);
       const savedDraftPapers = localStorage.getItem(`draft_papers_${user}`);
 
-      if (user === username && savedDraftProfile) {
-        setProfile(JSON.parse(savedDraftProfile));
-        setProjects(JSON.parse(savedDraftProjects || "[]"));
-        setPapers(JSON.parse(savedDraftPapers || "[]"));
+      if (user === username) {
         setIsEditMode(true);
-        setHasUnsavedChanges(true);
+        if (savedDraftProfile) {
+          setProfile(JSON.parse(savedDraftProfile));
+          setProjects(JSON.parse(savedDraftProjects || "[]"));
+          setPapers(JSON.parse(savedDraftPapers || "[]"));
+          setHasUnsavedChanges(true);
+        } else {
+          setProfile(data.profile);
+          setProjects(data.projects);
+          setPapers(data.papers);
+          setHasUnsavedChanges(false);
+        }
       } else {
         setProfile(data.profile);
         setProjects(data.projects);
         setPapers(data.papers);
+        setIsEditMode(false);
         setHasUnsavedChanges(false);
       }
     } catch (err: any) {

@@ -93,52 +93,73 @@ const Projects = () => {
                   )}
 
                   {isEditMode && (
-                    <label className="absolute inset-0 bg-black/75 opacity-0 group-hover/projphoto:opacity-100 transition-opacity flex flex-col items-center justify-center cursor-pointer text-white text-[10px] gap-1 font-semibold">
-                      <span>📸 Set Project Image</span>
-                      <span className="text-[8px] text-muted-foreground">(Max 2MB)</span>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        className="hidden"
-                        onChange={async (e) => {
-                          const file = e.target.files?.[0];
-                          if (!file) return;
-                          if (file.size > 2 * 1024 * 1024) {
-                            alert("Image too large. Maximum size is 2MB.");
-                            return;
-                          }
-                          const reader = new FileReader();
-                          reader.onloadend = async () => {
-                            const dataUrl = reader.result as string;
-                            try {
-                              const token = localStorage.getItem("portfolio_token");
-                              const res = await fetch("/api/upload-project-image", {
-                                method: "POST",
-                                headers: {
-                                  "Content-Type": "application/json",
-                                  "Authorization": `Bearer ${token}`,
-                                },
-                                body: JSON.stringify({ dataUrl, mimeType: file.type }),
-                              });
-                              if (!res.ok) {
-                                const err = await res.json();
-                                throw new Error(err.error || "Failed to upload");
-                              }
-                              const updated = [...projects];
-                              const projIndex = projects.findIndex(p => p.title === project.title);
-                              if (projIndex !== -1) {
-                                updated[projIndex] = { ...updated[projIndex], imageUrl: dataUrl };
-                                updateProjects(updated);
-                                toast.success("Project image uploaded!");
-                              }
-                            } catch (err: any) {
-                              alert(err.message || "Failed to upload image");
+                    <div className="absolute inset-0 bg-black/75 opacity-0 group-hover/projphoto:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 text-white font-semibold">
+                      <label className="flex flex-col items-center justify-center cursor-pointer text-[10px] gap-1">
+                        <span>📸 Set Project Image</span>
+                        <span className="text-[8px] text-muted-foreground">(Max 2MB)</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={async (e) => {
+                            const file = e.target.files?.[0];
+                            if (!file) return;
+                            if (file.size > 2 * 1024 * 1024) {
+                              alert("Image too large. Maximum size is 2MB.");
+                              return;
                             }
-                          };
-                          reader.readAsDataURL(file);
-                        }}
-                      />
-                    </label>
+                            const reader = new FileReader();
+                            reader.onloadend = async () => {
+                              const dataUrl = reader.result as string;
+                              try {
+                                const token = localStorage.getItem("portfolio_token");
+                                const res = await fetch("/api/upload-project-image", {
+                                  method: "POST",
+                                  headers: {
+                                    "Content-Type": "application/json",
+                                    "Authorization": `Bearer ${token}`,
+                                  },
+                                  body: JSON.stringify({ dataUrl, mimeType: file.type }),
+                                });
+                                if (!res.ok) {
+                                  const err = await res.json();
+                                  throw new Error(err.error || "Failed to upload");
+                                }
+                                const updated = [...projects];
+                                const projIndex = projects.findIndex(p => p.title === project.title);
+                                if (projIndex !== -1) {
+                                  updated[projIndex] = { ...updated[projIndex], imageUrl: dataUrl };
+                                  updateProjects(updated);
+                                  toast.success("Project image uploaded!");
+                                }
+                              } catch (err: any) {
+                                alert(err.message || "Failed to upload image");
+                              }
+                            };
+                            reader.readAsDataURL(file);
+                          }}
+                        />
+                      </label>
+                      {project.imageUrl && (
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          className="h-6 text-[9px] font-medium px-2 bg-red-600 hover:bg-red-700 text-white rounded-md border-0"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            const updated = [...projects];
+                            const projIndex = projects.findIndex(p => p.title === project.title);
+                            if (projIndex !== -1) {
+                              updated[projIndex] = { ...updated[projIndex], imageUrl: "" };
+                              updateProjects(updated);
+                              toast.success("Project image removed!");
+                            }
+                          }}
+                        >
+                          Remove Image
+                        </Button>
+                      )}
+                    </div>
                   )}
                 </div>
 

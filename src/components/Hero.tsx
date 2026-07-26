@@ -4,6 +4,16 @@ import { usePortfolio } from "@/context/PortfolioContext";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 
+const getInitials = (name: string) => {
+  if (!name) return "U";
+  return name.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2);
+};
+
+const getPlaceholderSvg = (name: string) => {
+  const initials = getInitials(name);
+  return `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='800'%3E%3Cdefs%3E%3ClinearGradient id='grad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%231e1b4b'/%3E%3Cstop offset='100%25' stop-color='%234338ca'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='400' height='800' fill='url(%23grad)'/%3E%3Ctext x='50%25' y='50%25' font-size='80' text-anchor='middle' dy='.3em' fill='%23ffffff' font-family='sans-serif' font-weight='bold'%3E${initials}%3C/text%3E%3C/svg%3E`;
+};
+
 const Hero = () => {
   const { profile, updateProfile, isEditMode } = usePortfolio();
 
@@ -299,32 +309,63 @@ const Hero = () => {
                 {/* Profile Photo */}
                 <div className="relative w-full h-full group/photo">
                   <img
-                    src={profile.avatarUrl || "/dalton.jpg"}
+                    src={profile.avatarUrl ? profile.avatarUrl : (profile.name?.toLowerCase().includes("dalton") ? "/dalton.jpg" : getPlaceholderSvg(profile.name || "User"))}
                     alt={`${profile.name} - ML Engineer & Hardware Designer`}
                     className="w-full h-full object-cover object-center transition-transform duration-700 hover:scale-105"
                     onError={(e) => {
                       console.error('Failed to load image');
-                      e.currentTarget.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='800'%3E%3Crect width='400' height='800' fill='%23374151'/%3E%3Ctext x='50%25' y='50%25' font-size='80' text-anchor='middle' dy='.3em' fill='%239CA3AF' font-weight='bold'%3EDO%3C/text%3E%3C/svg%3E";
+                      e.currentTarget.src = getPlaceholderSvg(profile.name || "User");
                     }}
                   />
                   {isEditMode && (
-                    <label className="absolute inset-0 bg-black/60 opacity-0 group-hover/photo:opacity-100 transition-opacity flex flex-col items-center justify-center cursor-pointer text-white text-xs gap-2 font-semibold">
-                      <span>📸 Change Photo</span>
-                      <span className="text-[10px] text-muted-foreground">(Max 2MB, square works best)</span>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        className="hidden"
-                        onChange={async (e) => {
-                          const file = e.target.files?.[0];
-                          if (!file) return;
-                          if (file.size > 2 * 1024 * 1024) {
-                            alert("Image too large. Maximum size is 2MB.");
-                            return;
-                          }
-                          const reader = new FileReader();
-                          reader.onloadend = async () => {
-                            const dataUrl = reader.result as string;
+                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover/photo:opacity-100 transition-opacity flex flex-col items-center justify-center gap-3 text-white text-xs font-semibold">
+                      <label className="flex flex-col items-center justify-center cursor-pointer gap-2">
+                        <span>📸 Change Photo</span>
+                        <span className="text-[10px] text-muted-foreground">(Max 2MB, square works best)</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={async (e) => {
+                            const file = e.target.files?.[0];
+                            if (!file) return;
+                            if (file.size > 2 * 1024 * 1024) {
+                              alert("Image too large. Maximum size is 2MB.");
+                              return;
+                            }
+                            const reader = new FileReader();
+                            reader.onloadend = async () => {
+                              const dataUrl = reader.result as string;
+                              try {
+                                const token = localStorage.getItem("portfolio_token");
+                                const res = await fetch("/api/upload-avatar", {
+                                  method: "POST",
+                                  headers: {
+                                    "Content-Type": "application/json",
+                                    "Authorization": `Bearer ${token}`,
+                                  },
+                                  body: JSON.stringify({ dataUrl, mimeType: file.type }),
+                                });
+                                if (!res.ok) {
+                                  const err = await res.json();
+                                  throw new Error(err.error || "Failed to upload");
+                                }
+                                updateProfile("avatarUrl", dataUrl);
+                              } catch (err: any) {
+                                alert(err.message || "Failed to upload photo");
+                              }
+                            };
+                            reader.readAsDataURL(file);
+                          }}
+                        />
+                      </label>
+                      {profile.avatarUrl && (
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          className="h-8 text-xs font-medium px-3 mt-1 bg-red-600 hover:bg-red-700 text-white rounded-lg border-0"
+                          onClick={async (e) => {
+                            e.preventDefault();
                             try {
                               const token = localStorage.getItem("portfolio_token");
                               const res = await fetch("/api/upload-avatar", {
@@ -333,21 +374,22 @@ const Hero = () => {
                                   "Content-Type": "application/json",
                                   "Authorization": `Bearer ${token}`,
                                 },
-                                body: JSON.stringify({ dataUrl, mimeType: file.type }),
+                                body: JSON.stringify({ dataUrl: "", mimeType: "image/png" }),
                               });
                               if (!res.ok) {
-                                const err = await res.json();
-                                throw new Error(err.error || "Failed to upload");
+                                  const err = await res.json();
+                                  throw new Error(err.error || "Failed to remove");
                               }
-                              updateProfile("avatarUrl", dataUrl);
+                              updateProfile("avatarUrl", "");
                             } catch (err: any) {
-                              alert(err.message || "Failed to upload photo");
+                              alert(err.message || "Failed to remove photo");
                             }
-                          };
-                          reader.readAsDataURL(file);
-                        }}
-                      />
-                    </label>
+                          }}
+                        >
+                          Remove Photo
+                        </Button>
+                      )}
+                    </div>
                   )}
                 </div>
 

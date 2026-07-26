@@ -225,30 +225,93 @@ const Contact = () => {
                     <span className="w-2 h-2 rounded-full bg-accent animate-pulse"></span>
                     Connect With Me
                   </h3>
-                  <p className="text-muted-foreground text-xs md:text-sm mb-4 md:mb-6">Find me across these platforms</p>
-                  <div className="space-y-2 md:space-y-3">
-                    {socialLinks.map((link, idx) => (
-                      <a
-                        key={link.name}
-                        href={link.href}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-3 md:gap-4 p-3 md:p-4 rounded-lg md:rounded-xl bg-background/50 border border-border hover:border-primary/50 transition-all duration-300 group hover:-translate-x-1 hover:shadow-lg hover:shadow-primary/5"
-                        style={{ animationDelay: `${idx * 100}ms` }}
-                      >
-                        <div className="p-2 md:p-3 rounded-lg bg-primary/10 text-primary group-hover:bg-primary/20 group-hover:scale-110 transition-all">
-                          {link.icon}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="font-semibold text-sm md:text-base group-hover:text-primary transition-colors">
-                            {link.name}
+                  <p className="text-muted-foreground text-xs md:text-sm mb-4 md:mb-6">
+                    {isEditMode ? "Manage your social connections & profiles" : "Find me across these platforms"}
+                  </p>
+
+                  {isEditMode ? (
+                    <div className="space-y-3">
+                      <div className="space-y-1">
+                        <label className="text-xs font-semibold text-muted-foreground flex items-center gap-1.5">
+                          <Github className="w-3.5 h-3.5 text-primary" /> GitHub Profile URL
+                        </label>
+                        <Input
+                          value={socials.github || ""}
+                          onChange={(e) => updateProfile("socials", { ...socials, github: e.target.value })}
+                          placeholder="https://github.com/username"
+                          className="bg-background/40 border-border/80 text-xs h-9"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-xs font-semibold text-muted-foreground flex items-center gap-1.5">
+                          <Linkedin className="w-3.5 h-3.5 text-primary" /> LinkedIn Profile URL
+                        </label>
+                        <Input
+                          value={socials.linkedin || ""}
+                          onChange={(e) => updateProfile("socials", { ...socials, linkedin: e.target.value })}
+                          placeholder="https://linkedin.com/in/username"
+                          className="bg-background/40 border-border/80 text-xs h-9"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-xs font-semibold text-muted-foreground flex items-center gap-1.5">
+                          <Mail className="w-3.5 h-3.5 text-primary" /> Contact Email
+                        </label>
+                        <Input
+                          value={socials.email || ""}
+                          onChange={(e) => updateProfile("socials", { ...socials, email: e.target.value })}
+                          placeholder="email@example.com"
+                          className="bg-background/40 border-border/80 text-xs h-9"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-xs font-semibold text-muted-foreground flex items-center gap-1.5">
+                          <Twitter className="w-3.5 h-3.5 text-primary" /> Twitter / X URL
+                        </label>
+                        <Input
+                          value={socials.twitter || ""}
+                          onChange={(e) => updateProfile("socials", { ...socials, twitter: e.target.value })}
+                          placeholder="https://twitter.com/username"
+                          className="bg-background/40 border-border/80 text-xs h-9"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-xs font-semibold text-muted-foreground flex items-center gap-1.5">
+                          <Instagram className="w-3.5 h-3.5 text-primary" /> Instagram URL
+                        </label>
+                        <Input
+                          value={socials.instagram || ""}
+                          onChange={(e) => updateProfile("socials", { ...socials, instagram: e.target.value })}
+                          placeholder="https://instagram.com/username"
+                          className="bg-background/40 border-border/80 text-xs h-9"
+                        />
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="space-y-2 md:space-y-3">
+                      {socialLinks.filter(l => l.href).map((link, idx) => (
+                        <a
+                          key={link.name}
+                          href={link.href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-3 md:gap-4 p-3 md:p-4 rounded-lg md:rounded-xl bg-background/50 border border-border hover:border-primary/50 transition-all duration-300 group hover:-translate-x-1 hover:shadow-lg hover:shadow-primary/5"
+                          style={{ animationDelay: `${idx * 100}ms` }}
+                        >
+                          <div className="p-2 md:p-3 rounded-lg bg-primary/10 text-primary group-hover:bg-primary/20 group-hover:scale-110 transition-all">
+                            {link.icon}
                           </div>
-                          <div className="text-xs md:text-sm text-muted-foreground truncate">{link.label}</div>
-                        </div>
-                        <ExternalLink className="h-3 w-3 md:h-4 md:w-4 text-muted-foreground opacity-0 group-hover:opacity-100 group-hover:translate-x-1 group-hover:-translate-y-1 transition-all flex-shrink-0" />
-                      </a>
-                    ))}
-                  </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="font-semibold text-sm md:text-base group-hover:text-primary transition-colors">
+                              {link.name}
+                            </div>
+                            <div className="text-xs md:text-sm text-muted-foreground truncate">{link.label}</div>
+                          </div>
+                          <ExternalLink className="h-3 w-3 md:h-4 md:w-4 text-muted-foreground opacity-0 group-hover:opacity-100 group-hover:translate-x-1 group-hover:-translate-y-1 transition-all flex-shrink-0" />
+                        </a>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </Card>
 
@@ -258,9 +321,20 @@ const Contact = () => {
                   <h3 className="text-lg md:text-xl font-bold mb-1 md:mb-2 flex items-center gap-2">
                     🔬 Research & Collabs
                   </h3>
-                  <p className="text-muted-foreground text-xs md:text-sm leading-relaxed">
-                    I'm actively seeking research collaborations and academic partnerships in hardware-software co-design, neuromorphic computing, and edge AI.
-                  </p>
+                  {isEditMode ? (
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-bold text-muted-foreground uppercase">Statement</label>
+                      <Textarea
+                        value={profile.researchCollabs || "I'm actively seeking research collaborations and academic partnerships in hardware-software co-design, neuromorphic computing, and edge AI."}
+                        onChange={(e) => updateProfile("researchCollabs", e.target.value)}
+                        className="min-h-[80px] bg-background/50 border-accent/30 text-xs"
+                      />
+                    </div>
+                  ) : (
+                    <p className="text-muted-foreground text-xs md:text-sm leading-relaxed">
+                      {profile.researchCollabs || "I'm actively seeking research collaborations and academic partnerships in hardware-software co-design, neuromorphic computing, and edge AI."}
+                    </p>
+                  )}
                   <div className="flex flex-wrap gap-1.5 md:gap-2 text-[10px] md:text-xs pt-1 md:pt-2">
                     <span className="px-2 md:px-3 py-0.5 md:py-1 bg-primary/20 text-primary rounded-full">Edge AI</span>
                     <span className="px-2 md:px-3 py-0.5 md:py-1 bg-accent/20 text-accent rounded-full">Neuromorphic</span>

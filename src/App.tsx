@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
@@ -34,6 +34,17 @@ const isCustomDomain = () => {
     hostname === "127.0.0.1" ||
     hostname.endsWith(".vercel.app")
   );
+};
+
+const HomeRoute = () => {
+  const loggedInUser = localStorage.getItem("portfolio_user");
+  if (isCustomDomain()) {
+    return <UserPortfolio useDomain={true} />;
+  }
+  if (loggedInUser) {
+    return <Navigate to={`/u/${loggedInUser}`} replace />;
+  }
+  return <Index />;
 };
 
 const App = () => {
@@ -103,7 +114,7 @@ const App = () => {
           <BrowserRouter>
             <Suspense fallback={<PageLoader />}>
               <Routes>
-                <Route path="/" element={isCustomDomain() ? <UserPortfolio useDomain={true} /> : <Index />} />
+                <Route path="/" element={<HomeRoute />} />
                 <Route path="/playground" element={<Playground />} />
                 <Route path="/admin" element={<Admin />} />
                 <Route path="/resume" element={<Resume />} />
