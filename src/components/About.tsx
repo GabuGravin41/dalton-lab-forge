@@ -4,6 +4,7 @@ import { usePortfolio } from "@/context/PortfolioContext";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import GitHubStats from "./GitHubStats";
+import { LiveStatsWidget } from "./LiveStatsWidget";
 
 const About = () => {
   const { profile, updateProfile, isEditMode } = usePortfolio();
@@ -227,6 +228,8 @@ const About = () => {
               </div>
             </div>
           </div>
+
+          <LiveStatsWidget />
         </div>
       </div>
     </section>

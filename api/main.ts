@@ -9,6 +9,7 @@ import uploadProjectImageHandler from './_upload-project-image.js';
 import contactHandler from './_contact.js';
 import chatHandler from './_chat.js';
 import exportHandler from './_export.js';
+import liveStatsHandler from './_live-stats.js';
 
 // Admin handlers
 import adminContentHandler from './_admin/content.js';
@@ -65,6 +66,8 @@ export default async function handler(req: any, res: any) {
         return await chatHandler(req, res);
       case '/api/export':
         return await exportHandler(req, res);
+      case '/api/live-stats':
+        return await liveStatsHandler(req, res);
 
       // GitHub Proxy to avoid rate limits (403 Forbidden)
       case '/api/github-stats': {

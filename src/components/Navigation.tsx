@@ -387,6 +387,44 @@ const SettingsButton = ({
               </div>
             </>
           )}
+          {/* Live Data Connectors */}
+          <div className="space-y-3 border-t border-border/50 pt-5">
+            <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
+              <Globe className="w-3.5 h-3.5 text-primary" />
+              Live Data Connectors
+            </h4>
+            <p className="text-[10px] text-muted-foreground leading-normal">
+              Link your WakaTime coding profile and Google Scholar citations to display live metrics charts.
+            </p>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1">
+                <label className="text-[9px] uppercase tracking-wider text-muted-foreground font-semibold">WakaTime Username</label>
+                <Input
+                  placeholder="e.g. daltonomondi"
+                  value={profile?.socials?.wakatime || ""}
+                  onChange={(e) => {
+                    const wakatime = e.target.value;
+                    const currentSocials = profile?.socials || {};
+                    updateProfile("socials", { ...currentSocials, wakatime });
+                  }}
+                  className="bg-background/40 border-border/50 text-xs h-8"
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="text-[9px] uppercase tracking-wider text-muted-foreground font-semibold">Scholar User ID</label>
+                <Input
+                  placeholder="e.g. user=A1B2C3D"
+                  value={profile?.socials?.googleScholar || ""}
+                  onChange={(e) => {
+                    const googleScholar = e.target.value;
+                    const currentSocials = profile?.socials || {};
+                    updateProfile("socials", { ...currentSocials, googleScholar });
+                  }}
+                  className="bg-background/40 border-border/50 text-xs h-8"
+                />
+              </div>
+            </div>
+          </div>
 
           {/* Static Site Export section */}
           <div className="space-y-3 border-t border-border/50 pt-5">
