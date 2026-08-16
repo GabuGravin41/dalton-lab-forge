@@ -107,7 +107,8 @@ const SettingsButton = ({
               {[
                 { id: "standard", name: "Standard Dalton", desc: "Interactive tech-nerd layout with full graphics & visualizers" },
                 { id: "minimalist", name: "Minimalist Reader", desc: "Clean typography-focused academic design with sidebar" },
-                { id: "creative", name: "Asymmetrical Creative", desc: "Modern flamboyant layout with bold typography & glowing hover-states" }
+                { id: "creative", name: "Asymmetrical Creative", desc: "Modern flamboyant layout with bold typography & glowing hover-states" },
+                { id: "terminal", name: "Monospace CLI Terminal", desc: "Interactive command-line view with custom retro prompts & CRT screen effects" }
               ].map((layout) => (
                 <button
                   key={layout.id}

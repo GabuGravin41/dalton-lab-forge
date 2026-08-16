@@ -11,6 +11,7 @@ import { usePortfolio } from "@/context/PortfolioContext";
 import { Button } from "@/components/ui/button";
 import { MinimalistLayout } from "@/components/MinimalistLayout";
 import { CreativeLayout } from "@/components/CreativeLayout";
+import { TerminalLayout } from "@/components/TerminalLayout";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Mail, Trash2, Calendar, Building, User as UserIcon, Inbox } from "lucide-react";
 import { toast } from "sonner";
@@ -165,6 +166,8 @@ const Index = () => {
         return <MinimalistLayout />;
       case "creative":
         return <CreativeLayout />;
+      case "terminal":
+        return <TerminalLayout />;
       case "standard":
       default:
         return (
