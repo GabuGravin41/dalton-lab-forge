@@ -38,6 +38,7 @@ const SettingsButton = ({
     { id: "cyberpunk", name: "Neon Cyberpunk", color: "bg-fuchsia-600", desc: "Pitch Black & electric Magenta/Cyan" },
     { id: "steel", name: "Minimal Steel", color: "bg-slate-500", desc: "Slate background & Steel/Silver accents" },
     { id: "teal-gold", name: "Teal Gold", color: "bg-teal-600", desc: "Vintage deep Teal & Amber Gold accents" },
+    { id: "custom", name: "Custom Gradient Builder", color: "bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500", desc: "Build your own custom color and gradient theme" },
   ];
 
   return (
@@ -95,6 +96,122 @@ const SettingsButton = ({
                 </button>
               ))}
             </div>
+
+            {/* Custom Theme Color Pickers */}
+            {activeTheme === "custom" && isEditMode && (
+              <div className="p-4 rounded-xl bg-card/40 border border-primary/20 space-y-4 mt-3">
+                <h5 className="text-[11px] font-bold text-primary uppercase tracking-wider">Custom Theme Settings</h5>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] text-muted-foreground font-medium flex items-center gap-1">
+                      <span className="w-2 h-2 rounded-full bg-primary" /> Primary Start
+                    </label>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="color"
+                        value={profile?.customTheme?.primaryStart || "#4F46E5"}
+                        onChange={(e) => {
+                          const current = profile?.customTheme || {};
+                          updateProfile("customTheme", { ...current, primaryStart: e.target.value });
+                        }}
+                        className="w-8 h-8 rounded cursor-pointer bg-transparent border-0"
+                      />
+                      <span className="text-[11px] font-mono uppercase text-xs">{profile?.customTheme?.primaryStart || "#4F46E5"}</span>
+                    </div>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] text-muted-foreground font-medium flex items-center gap-1">
+                      <span className="w-2 h-2 rounded-full bg-primary/70" /> Primary End
+                    </label>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="color"
+                        value={profile?.customTheme?.primaryEnd || "#7C3AED"}
+                        onChange={(e) => {
+                          const current = profile?.customTheme || {};
+                          updateProfile("customTheme", { ...current, primaryEnd: e.target.value });
+                        }}
+                        className="w-8 h-8 rounded cursor-pointer bg-transparent border-0"
+                      />
+                      <span className="text-[11px] font-mono uppercase text-xs">{profile?.customTheme?.primaryEnd || "#7C3AED"}</span>
+                    </div>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] text-muted-foreground font-medium flex items-center gap-1">
+                      <span className="w-2 h-2 rounded-full bg-accent" /> Accent Start
+                    </label>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="color"
+                        value={profile?.customTheme?.accentStart || "#F59E0B"}
+                        onChange={(e) => {
+                          const current = profile?.customTheme || {};
+                          updateProfile("customTheme", { ...current, accentStart: e.target.value });
+                        }}
+                        className="w-8 h-8 rounded cursor-pointer bg-transparent border-0"
+                      />
+                      <span className="text-[11px] font-mono uppercase text-xs">{profile?.customTheme?.accentStart || "#F59E0B"}</span>
+                    </div>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] text-muted-foreground font-medium flex items-center gap-1">
+                      <span className="w-2 h-2 rounded-full bg-accent/70" /> Accent End
+                    </label>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="color"
+                        value={profile?.customTheme?.accentEnd || "#EF4444"}
+                        onChange={(e) => {
+                          const current = profile?.customTheme || {};
+                          updateProfile("customTheme", { ...current, accentEnd: e.target.value });
+                        }}
+                        className="w-8 h-8 rounded cursor-pointer bg-transparent border-0"
+                      />
+                      <span className="text-[11px] font-mono uppercase text-xs">{profile?.customTheme?.accentEnd || "#EF4444"}</span>
+                    </div>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] text-muted-foreground font-medium flex items-center gap-1">
+                      <span className="w-2 h-2 rounded-full bg-muted" /> Background Start
+                    </label>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="color"
+                        value={profile?.customTheme?.bgStart || "#0A0B10"}
+                        onChange={(e) => {
+                          const current = profile?.customTheme || {};
+                          updateProfile("customTheme", { ...current, bgStart: e.target.value });
+                        }}
+                        className="w-8 h-8 rounded cursor-pointer bg-transparent border-0"
+                      />
+                      <span className="text-[11px] font-mono uppercase text-xs">{profile?.customTheme?.bgStart || "#0A0B10"}</span>
+                    </div>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] text-muted-foreground font-medium flex items-center gap-1">
+                      <span className="w-2 h-2 rounded-full bg-muted/70" /> Background End
+                    </label>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="color"
+                        value={profile?.customTheme?.bgEnd || "#11131E"}
+                        onChange={(e) => {
+                          const current = profile?.customTheme || {};
+                          updateProfile("customTheme", { ...current, bgEnd: e.target.value });
+                        }}
+                        className="w-8 h-8 rounded cursor-pointer bg-transparent border-0"
+                      />
+                      <span className="text-[11px] font-mono uppercase text-xs">{profile?.customTheme?.bgEnd || "#11131E"}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Layout Template selection */}
