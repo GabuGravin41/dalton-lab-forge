@@ -47,16 +47,34 @@ export default async function handler(req: any, res: any) {
       return res.status(404).json({ error: 'Recipient portfolio not found.' });
     }
 
-    const profile = result.rows[0].profile_data;
-    const recipientEmail = profile.socials?.email;
-
-    if (!recipientEmail) {
-      return res.status(400).json({ error: 'This portfolio user has not configured a contact email.' });
+    const profile = result.rows[0].profile_data || {};
+    
+    // Auto-save message to profile's leads list
+    if (!profile.leads) {
+      profile.leads = [];
     }
+    
+    const newLead = {
+      id: 'lead_' + Math.random().toString(36).substring(2, 11) + '_' + Date.now(),
+      name: name.trim(),
+      email: email.trim(),
+      message: message.trim(),
+      createdAt: new Date().toISOString()
+    };
+    
+    profile.leads.push(newLead);
+    
+    // Update the database row with the modified profile data
+    await pool.query(
+      'UPDATE users_portfolios SET profile_data = $1 WHERE username = $2',
+      [JSON.stringify(profile), username.trim().toLowerCase()]
+    );
+
+    const recipientEmail = profile.socials?.email;
 
     // Attempt to send email via Resend if API key is provided
     const resendApiKey = process.env.RESEND_API_KEY;
-    if (resendApiKey) {
+    if (resendApiKey && recipientEmail) {
       const { Resend } = await import('resend');
       const resend = new Resend(resendApiKey);
       await resend.emails.send({
@@ -76,12 +94,12 @@ export default async function handler(req: any, res: any) {
           <p style="font-size: 11px; color: #9ca3af;">This email was sent dynamically by Dalton LabForge CMS.</p>
         `
       });
-      return res.status(200).json({ message: 'Message sent successfully via email!' });
+      return res.status(200).json({ message: 'Message sent successfully via email and saved to dashboard!' });
     } else {
-      // Diagnostic success fallback if RESEND_API_KEY is missing
-      console.log(`[Contact Request Dev Simulation] Recipient: ${recipientEmail}, From: ${name} (${email}), Msg: ${message}`);
+      // Diagnostic success fallback if RESEND_API_KEY is missing or email not configured
+      console.log(`[Contact Request Dev Simulation] Recipient: ${recipientEmail || 'none'}, From: ${name} (${email}), Msg: ${message}`);
       return res.status(200).json({ 
-        message: 'Message received! Configure RESEND_API_KEY on Vercel to receive emails.',
+        message: 'Message saved to your admin dashboard!',
         devLogged: true 
       });
     }

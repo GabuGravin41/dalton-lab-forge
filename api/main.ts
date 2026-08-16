@@ -13,6 +13,7 @@ import chatHandler from './_chat.js';
 import adminContentHandler from './_admin/content.js';
 import adminMeHandler from './_admin/me.js';
 import adminUploadHandler from './_admin/upload.js';
+import adminLeadsHandler from './_admin/leads.js';
 import adminLoginHandler from './_admin/auth/login.js';
 import adminCallbackHandler from './_admin/auth/callback.js';
 import adminLogoutHandler from './_admin/auth/logout.js';
@@ -104,6 +105,8 @@ export default async function handler(req: any, res: any) {
         return await adminMeHandler(req, res);
       case '/api/admin/upload':
         return await adminUploadHandler(req, res);
+      case '/api/admin/leads':
+        return await adminLeadsHandler(req, res);
       case '/api/admin/auth/login':
         return await adminLoginHandler(req, res);
       case '/api/admin/auth/callback':

@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Send, Mic, MicOff, Volume2, VolumeX, Bot, User, X, MessageCircle, Sparkles, CheckCircle2 } from "lucide-react";
 
@@ -15,6 +16,115 @@ interface Message {
   sender: 'user' | 'bot';
   timestamp: Date;
 }
+
+const RecruiterForm = ({ onSubmitSuccess }: { onSubmitSuccess: (msg: string) => void }) => {
+  const { profile } = usePortfolio();
+  const [name, setName] = useState("");
+  const [company, setCompany] = useState("");
+  const [email, setEmail] = useState("");
+  const [message, setMessage] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!name || !email || !message) {
+      toast.error("Please fill in all required fields.");
+      return;
+    }
+    setSubmitting(true);
+    try {
+      const portfolioOwner = window.location.pathname.startsWith('/u/')
+        ? window.location.pathname.replace('/u/', '').split('/')[0]
+        : 'dalton';
+      
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          username: portfolioOwner,
+          name,
+          email,
+          message: company ? `[Inquiry from ${company}] ${message}` : message
+        })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Submission failed");
+      
+      setSubmitted(true);
+      onSubmitSuccess(`Inquiry submitted successfully! I've forwarded your details to ${profile.name || "the builder"} as a priority lead.`);
+    } catch (err: any) {
+      toast.error(err.message || "Failed to submit lead");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  if (submitted) {
+    return (
+      <div className="p-3 bg-green-500/10 border border-green-500/20 text-green-500 rounded-xl text-xs flex flex-col items-center gap-1 text-center font-medium">
+        <span>✓ Submission Received!</span>
+        <span>Saved to dashboard.</span>
+      </div>
+    );
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="p-3 bg-card border border-border/80 rounded-xl space-y-2 text-left shadow-sm">
+      <div className="text-[10px] font-bold text-muted-foreground uppercase flex items-center gap-1">
+        <Sparkles className="w-3 h-3 text-primary animate-pulse" />
+        Priority Recruiter Lead Form
+      </div>
+      <div className="space-y-1">
+        <label className="text-[9px] uppercase tracking-wider text-muted-foreground font-semibold">Your Name *</label>
+        <Input 
+          required 
+          value={name} 
+          onChange={(e) => setName(e.target.value)} 
+          placeholder="e.g. Jane Doe" 
+          className="h-7 text-xs bg-background/50 border-border/50 focus-visible:ring-primary" 
+        />
+      </div>
+      <div className="space-y-1">
+        <label className="text-[9px] uppercase tracking-wider text-muted-foreground font-semibold">Company Name</label>
+        <Input 
+          value={company} 
+          onChange={(e) => setCompany(e.target.value)} 
+          placeholder="e.g. OpenAI" 
+          className="h-7 text-xs bg-background/50 border-border/50 focus-visible:ring-primary" 
+        />
+      </div>
+      <div className="space-y-1">
+        <label className="text-[9px] uppercase tracking-wider text-muted-foreground font-semibold">Email Address *</label>
+        <Input 
+          required 
+          type="email" 
+          value={email} 
+          onChange={(e) => setEmail(e.target.value)} 
+          placeholder="e.g. jane@company.com" 
+          className="h-7 text-xs bg-background/50 border-border/50 focus-visible:ring-primary" 
+        />
+      </div>
+      <div className="space-y-1">
+        <label className="text-[9px] uppercase tracking-wider text-muted-foreground font-semibold">Inquiry Details *</label>
+        <Textarea 
+          required 
+          value={message} 
+          onChange={(e) => setMessage(e.target.value)} 
+          placeholder="Role details, schedule links, or feedback..." 
+          className="min-h-[50px] text-xs bg-background/50 border-border/50 focus-visible:ring-primary" 
+        />
+      </div>
+      <Button 
+        type="submit" 
+        disabled={submitting} 
+        className="w-full h-8 text-xs bg-gradient-primary hover:opacity-95 text-white font-bold"
+      >
+        {submitting ? "Submitting..." : "Submit Inquiry"}
+      </Button>
+    </form>
+  );
+};
 
 const FloatingChatbot = () => {
   const { isEditMode, profile, projects, papers, updateProfile, updateProjects, updatePapers } = usePortfolio();
@@ -77,6 +187,12 @@ ${JSON.stringify(papers, null, 2)}
 2. Be honest and accurate. If the answer to a question cannot be inferred from the provided data, politely state that you don't have that information but invite them to reach out directly at: ${profile.socials?.email || ""}
 3. Keep responses concise and readable (typically 2-4 sentences or bullet points) suitable for a small chat widget.
 4. Highlight their expertise, pointing to specific projects or papers from the data where relevant.
+
+--- RECRUITER SCREENING & INQUIRY BOOKING ---
+If the visitor expresses interest in hiring, scheduling an interview, booking a meeting, leaving contact info, or emailing ${profile.name || "the builder"}:
+- Act as a screening representative.
+- Politely invite them to submit their details through the priority inquiry form loaded below.
+- You MUST append the exact tag [LEAD_CAPTURE_FORM] at the very end of your response text.
 `;
 
   const handleSendMessage = async () => {
@@ -389,18 +505,39 @@ Assistant response:
                         </div>
                       )}
                       
-                      <div
-                        className={`max-w-[80%] px-2.5 py-1.5 md:px-3 md:py-2 rounded-2xl ${
-                          message.sender === 'user'
-                            ? 'bg-gradient-primary text-white shadow-sm'
-                            : 'bg-muted border border-border/50 text-foreground'
-                        }`}
-                      >
-                        <p className="text-xs md:text-sm leading-relaxed whitespace-pre-wrap">{message.text}</p>
-                        <span className="text-[10px] md:text-xs opacity-70 mt-0.5 md:mt-1 block">
-                          {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                        </span>
-                      </div>
+                      {(() => {
+                        const isForm = message.text.includes("[LEAD_CAPTURE_FORM]");
+                        const cleanText = message.text.replace("[LEAD_CAPTURE_FORM]", "").trim();
+                        return (
+                          <div
+                            className={`max-w-[80%] px-2.5 py-1.5 md:px-3 md:py-2 rounded-2xl ${
+                              message.sender === 'user'
+                                ? 'bg-gradient-primary text-white shadow-sm'
+                                : 'bg-muted border border-border/50 text-foreground'
+                            }`}
+                          >
+                            <p className="text-xs md:text-sm leading-relaxed whitespace-pre-wrap">{cleanText}</p>
+                            
+                            {isForm && (
+                              <div className="mt-3">
+                                <RecruiterForm onSubmitSuccess={(confirmMsg) => {
+                                  const botResponse: Message = {
+                                    id: Date.now().toString(),
+                                    text: confirmMsg,
+                                    sender: 'bot',
+                                    timestamp: new Date()
+                                  };
+                                  setMessages(prev => [...prev, botResponse]);
+                                }} />
+                              </div>
+                            )}
+
+                            <span className="text-[10px] md:text-xs opacity-70 mt-0.5 md:mt-1 block">
+                              {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            </span>
+                          </div>
+                        );
+                      })()}
                       
                       {message.sender === 'user' && (
                         <div className="w-5 h-5 md:w-6 md:h-6 rounded-full bg-gradient-accent flex items-center justify-center flex-shrink-0">
