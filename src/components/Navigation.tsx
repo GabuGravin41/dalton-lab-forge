@@ -3,11 +3,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, Sparkles, FileText, Settings, Palette, LayoutGrid, Copy, Users, Globe, User } from "lucide-react";
+import { Menu, X, Sparkles, FileText, Settings, Palette, LayoutGrid, Copy, Users, Globe, User, Download } from "lucide-react";
 import { useTheme } from "next-themes";
 import { usePortfolio } from "@/context/PortfolioContext";
-import {
-  Dialog,
+import { toast } from "sonner";
+import {  Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
@@ -305,6 +305,49 @@ const SettingsButton = ({
               </div>
             </>
           )}
+
+          {/* Static Site Export section */}
+          <div className="space-y-3 border-t border-border/50 pt-5">
+            <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
+              <Download className="w-3.5 h-3.5 text-primary" />
+              Export Portfolio
+            </h4>
+            <p className="text-[10px] text-muted-foreground leading-normal">
+              Download your entire portfolio as a standalone React/Vite project. This bundles all active themes, terminal command structures, and layouts with your custom data.
+            </p>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={async () => {
+                try {
+                  toast.loading("Packaging portfolio Vite project...");
+                  const portfolioOwner = window.location.pathname.startsWith('/u/')
+                    ? window.location.pathname.replace('/u/', '').split('/')[0]
+                    : 'dalton';
+                  
+                  const response = await fetch(`/api/export?username=${portfolioOwner}`);
+                  if (!response.ok) throw new Error("Failed to package ZIP archive");
+                  
+                  const blob = await response.blob();
+                  const url = window.URL.createObjectURL(blob);
+                  const a = document.createElement("a");
+                  a.href = url;
+                  a.download = `portfolio-${portfolioOwner}.zip`;
+                  document.body.appendChild(a);
+                  a.click();
+                  window.URL.revokeObjectURL(url);
+                  toast.dismiss();
+                  toast.success("Vite project ZIP downloaded successfully!");
+                } catch (err: any) {
+                  toast.dismiss();
+                  toast.error(err.message || "Failed to export ZIP");
+                }
+              }}
+              className="w-full text-xs font-semibold h-9 border-primary/30 hover:border-primary text-primary hover:bg-primary/5 flex items-center justify-center gap-2"
+            >
+              <Download className="w-4 h-4" /> Download Standalone Vite Project (.zip)
+            </Button>
+          </div>
         </div>
       </DialogContent>
     </Dialog>
