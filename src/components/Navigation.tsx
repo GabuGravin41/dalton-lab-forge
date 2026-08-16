@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, Sparkles, FileText, Settings, Palette, LayoutGrid, Copy, Users, Globe, User, Download } from "lucide-react";
+import { Menu, X, Sparkles, FileText, Settings, Palette, LayoutGrid, Copy, Users, Globe, User, Download, ArrowUp, ArrowDown, Eye, EyeOff } from "lucide-react";
 import { useTheme } from "next-themes";
 import { usePortfolio } from "@/context/PortfolioContext";
 import { toast } from "sonner";
@@ -131,6 +131,88 @@ const SettingsButton = ({
               ))}
             </div>
           </div>
+
+          {/* Section Selector & Reordering (Standard Layout only) */}
+          {activeLayout === "standard" && (
+            <div className="space-y-3 border-t border-border/50 pt-5">
+              <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
+                <LayoutGrid className="w-3.5 h-3.5 text-primary" />
+                Homepage Sections & Order
+              </h4>
+              <p className="text-[10px] text-muted-foreground leading-normal">
+                Toggle visibility and rearrange the sections on your homepage. Edits apply in real-time.
+              </p>
+              <div className="space-y-2">
+                {(() => {
+                  const defaultSections = [
+                    { id: "hero", name: "Hero / Introduction", visible: true },
+                    { id: "about", name: "About Me", visible: true },
+                    { id: "projects", name: "Featured Projects", visible: true },
+                    { id: "research", name: "Research Publications", visible: !profile?.hideResearch },
+                    { id: "contact", name: "Contact Inquiry Form", visible: true }
+                  ];
+                  
+                  const sectionsList = [...(profile?.sections || defaultSections)];
+
+                  const handleToggleVisibility = (idx: number) => {
+                    sectionsList[idx] = { ...sectionsList[idx], visible: !sectionsList[idx].visible };
+                    updateProfile("sections", sectionsList);
+                  };
+
+                  const handleMoveSection = (idx: number, direction: "up" | "down") => {
+                    const targetIdx = direction === "up" ? idx - 1 : idx + 1;
+                    if (targetIdx < 0 || targetIdx >= sectionsList.length) return;
+                    
+                    // Swap items
+                    const temp = sectionsList[idx];
+                    sectionsList[idx] = sectionsList[targetIdx];
+                    sectionsList[targetIdx] = temp;
+                    
+                    updateProfile("sections", sectionsList);
+                  };
+
+                  return sectionsList.map((sec, idx) => (
+                    <div 
+                      key={sec.id} 
+                      className="flex items-center justify-between p-2 rounded-lg bg-card/40 border border-border/50 text-xs shadow-sm hover:bg-card/60 transition-colors"
+                    >
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => handleToggleVisibility(idx)}
+                          className={`p-1.5 rounded-md hover:bg-muted transition-colors ${sec.visible ? 'text-primary' : 'text-muted-foreground opacity-50'}`}
+                          title={sec.visible ? "Hide Section" : "Show Section"}
+                        >
+                          {sec.visible ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
+                        </button>
+                        <span className={sec.visible ? 'font-medium text-foreground' : 'text-muted-foreground line-through opacity-60'}>
+                          {sec.name}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <button
+                          type="button"
+                          disabled={idx === 0}
+                          onClick={() => handleMoveSection(idx, "up")}
+                          className="p-1 rounded hover:bg-muted text-muted-foreground hover:text-foreground disabled:opacity-30 disabled:pointer-events-none transition-colors"
+                        >
+                          <ArrowUp className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          type="button"
+                          disabled={idx === sectionsList.length - 1}
+                          onClick={() => handleMoveSection(idx, "down")}
+                          className="p-1 rounded hover:bg-muted text-muted-foreground hover:text-foreground disabled:opacity-30 disabled:pointer-events-none transition-colors"
+                        >
+                          <ArrowDown className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  ));
+                })()}
+              </div>
+            </div>
+          )}
 
           {/* Resume Focus selection */}
           <div className="space-y-3 border-t border-border/50 pt-5">

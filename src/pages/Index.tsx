@@ -169,16 +169,40 @@ const Index = () => {
       case "terminal":
         return <TerminalLayout />;
       case "standard":
-      default:
+      default: {
+        const defaultSections = [
+          { id: "hero", name: "Hero / Introduction", visible: true },
+          { id: "about", name: "About Me", visible: true },
+          { id: "projects", name: "Featured Projects", visible: true },
+          { id: "research", name: "Research Publications", visible: !profile?.hideResearch },
+          { id: "contact", name: "Contact Inquiry Form", visible: true }
+        ];
+        
+        const sectionsList = profile?.sections || defaultSections;
+
         return (
           <>
-            <Hero />
-            <About />
-            <Projects />
-            {!profile?.hideResearch && <Research />}
-            <Contact />
+            {sectionsList
+              .filter((sec: any) => sec.visible !== false)
+              .map((sec: any) => {
+                switch (sec.id) {
+                  case "hero":
+                    return <Hero key="hero" />;
+                  case "about":
+                    return <About key="about" />;
+                  case "projects":
+                    return <Projects key="projects" />;
+                  case "research":
+                    return <Research key="research" />;
+                  case "contact":
+                    return <Contact key="contact" />;
+                  default:
+                    return null;
+                }
+              })}
           </>
         );
+      }
     }
   };
 
